@@ -30,7 +30,6 @@ selected_lane = None
 enemies = []
 
 rand_numb_of_enemies = random.randint(1, 4)
-random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
 # creating enemy position matrix for coordinates and slot availability
 enemy_position_matrix = []
@@ -38,7 +37,7 @@ enemy_position_matrix = []
 for row in range(ROW_NUMBER):
     row_position = []
     for col in range(COL_NUMBER):
-        x_pos = int(round((WIDTH - MARGIN - (COL_WIDTH * col) - COL_WIDTH / 2), 0))
+        x_pos = int(round((WIDTH - MARGIN - ((COL_WIDTH - border_thickness) * col) - COL_WIDTH / 2), 0))
         y_pos = int(round((HEIGHT - MARGIN - (LANE_HEIGHT * (3 - row)) + LANE_HEIGHT / 2), 0))
         occupied = False
         position = (x_pos, y_pos, occupied)
@@ -76,27 +75,38 @@ def add_columns(number_of_cols):
 
 # enemies
 class Enemy:
-    def __init__(self, lane_pos, col_pos):
-        self.lane_pos = lane_pos
-        #self.col_pos = ((WIDTH - LANE_START_X - MARGIN) / COL_NUMBER + 4) * COL_NUMBER - col_pos
-        self.col_pos = col_pos
+    enemy_width = 50
+    enemy_height = 50
 
-    def draw(self, screen):
-        pygame.draw.rect(screen, random_color, (self.col_pos, self.lane_pos, 50, 50))
+    def __init__(self, lane_pos, col_pos, color):
+        self.lane_pos = lane_pos
+        self.col_pos = col_pos
+        self.color = color
+
+    def draw(self, canvas):
+        pygame.draw.rect(canvas, self.color, (self.col_pos, self.lane_pos, self.enemy_width, self.enemy_height))
 
 
 # generate enemies
+'''
 for _ in range(rand_numb_of_enemies):
-    random_col1 = random.randint(0, len(enemy_position_matrix) - 1)
-    random_col2 = random.randint(0, len(enemy_position_matrix[0]) - 1)
     random_row1 = random.randint(0, len(enemy_position_matrix) - 1)
-    random_row2 = random.randint(0, len(enemy_position_matrix[0]) - 1)
+    random_col1 = random.randint(0, len(enemy_position_matrix[0]) - 1)
+    random_row2 = random.randint(0, len(enemy_position_matrix) - 1)
+    random_col2 = random.randint(0, len(enemy_position_matrix[0]) - 1)
     print(random_col1)
     print(random_col2)
     print(random_row1)
     print(random_row2)
-    enemy = Enemy(enemy_position_matrix[random_col1][random_col2][0], enemy_position_matrix[random_row1][random_row2][1])
+    enemy = Enemy(enemy_position_matrix[random_row1][random_col1][1] - Enemy.enemy_width / 2, enemy_position_matrix[random_row2][random_col2][0] - Enemy.enemy_height / 2)
     enemies.append(enemy)
+'''
+'''for row in range(ROW_NUMBER):
+    for col in range(COL_NUMBER):
+        random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        enemy = Enemy(enemy_position_matrix[row][col][1] - Enemy.enemy_width / 2,
+                      enemy_position_matrix[row][col][0] - Enemy.enemy_height / 2, random_color)
+        enemies.append(enemy)'''
 
 while running:
     # poll for events
