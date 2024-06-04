@@ -36,14 +36,23 @@ random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0
 enemy_position_matrix = []
 
 for row in range(ROW_NUMBER):
+    row_position = []
     for col in range(COL_NUMBER):
-        x_pos = (WIDTH - MARGIN - (COL_WIDTH * col) - COL_WIDTH / 2)
-        y_pos = (HEIGHT - MARGIN - (LANE_HEIGHT * (3 - row)) + LANE_HEIGHT / 2)
+        x_pos = int(round((WIDTH - MARGIN - (COL_WIDTH * col) - COL_WIDTH / 2), 0))
+        y_pos = int(round((HEIGHT - MARGIN - (LANE_HEIGHT * (3 - row)) + LANE_HEIGHT / 2), 0))
         occupied = False
         position = (x_pos, y_pos, occupied)
-        enemy_position_matrix.append(position)
+        row_position.append(position)
+    enemy_position_matrix.append(row_position)
 
-print(enemy_position_matrix)
+print(enemy_position_matrix[0])
+print(enemy_position_matrix[0])
+
+print(enemy_position_matrix[0][0])
+print(enemy_position_matrix[0][1])
+
+print(enemy_position_matrix[0][0][0])
+print(enemy_position_matrix[0][1][0])
 
 # objects
 # lanes
@@ -69,15 +78,24 @@ def add_columns(number_of_cols):
 class Enemy:
     def __init__(self, lane_pos, col_pos):
         self.lane_pos = lane_pos
-        self.col_pos = ((WIDTH - LANE_START_X - MARGIN) / COL_NUMBER + 4) * COL_NUMBER - col_pos
+        #self.col_pos = ((WIDTH - LANE_START_X - MARGIN) / COL_NUMBER + 4) * COL_NUMBER - col_pos
+        self.col_pos = col_pos
 
-    def draw(self, canvas):
-        pygame.draw.rect(canvas, random_color, (self.col_pos, self.lane_pos, 50, 50))
+    def draw(self, screen):
+        pygame.draw.rect(screen, random_color, (self.col_pos, self.lane_pos, 50, 50))
 
 
 # generate enemies
 for _ in range(rand_numb_of_enemies):
-    enemy = Enemy(random.randint(1, 3), random.randint(1, 8))
+    random_col1 = random.randint(0, len(enemy_position_matrix) - 1)
+    random_col2 = random.randint(0, len(enemy_position_matrix[0]) - 1)
+    random_row1 = random.randint(0, len(enemy_position_matrix) - 1)
+    random_row2 = random.randint(0, len(enemy_position_matrix[0]) - 1)
+    print(random_col1)
+    print(random_col2)
+    print(random_row1)
+    print(random_row2)
+    enemy = Enemy(enemy_position_matrix[random_col1][random_col2][0], enemy_position_matrix[random_row1][random_row2][1])
     enemies.append(enemy)
 
 while running:
