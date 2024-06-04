@@ -12,6 +12,7 @@ LANE_START_Y = HEIGHT/6
 LANE_HEIGHT = HEIGHT/6
 COL_START = LANE_START_X
 COL_WIDTH = (WIDTH - LANE_START_X - MARGIN) / COL_NUMBER + 4
+CARD_COUNT = 3
 
 # pygame setup
 pygame.init()
@@ -28,8 +29,14 @@ border_thickness = 5
 # stores info on which lane is selected
 selected_lane = None
 enemies = []
-
+cards = []
+card_types = {
+    "damage1": 1,
+    "freeze2": 2,
+    "damage2": 2
+}
 rand_numb_of_enemies = random.randint(1, 4)
+font = pygame.font.SysFont(None, 32)
 
 # creating enemy position matrix for coordinates and slot availability
 enemy_position_matrix = []
@@ -40,18 +47,9 @@ for row in range(ROW_NUMBER):
         x_pos = int(round((WIDTH - MARGIN - ((COL_WIDTH - border_thickness) * col) - COL_WIDTH / 2), 0))
         y_pos = int(round((HEIGHT - MARGIN - (LANE_HEIGHT * (3 - row)) + LANE_HEIGHT / 2), 0))
         occupied = False
-        position = (x_pos, y_pos, occupied)
+        position = [x_pos, y_pos, occupied]
         row_position.append(position)
     enemy_position_matrix.append(row_position)
-
-print(enemy_position_matrix[0])
-print(enemy_position_matrix[0])
-
-print(enemy_position_matrix[0][0])
-print(enemy_position_matrix[0][1])
-
-print(enemy_position_matrix[0][0][0])
-print(enemy_position_matrix[0][1][0])
 
 # objects
 # lanes
@@ -74,6 +72,20 @@ def add_columns(number_of_cols):
 
 
 # enemies
+class Card:
+    card_width = 120
+    card_height = 250
+    click_color = "dark grey"
+
+    def __init__(self, x_cord, y_cord, color):
+        self.x_cord = x_cord + MARGIN
+        self.y_cord = HEIGHT - self.card_height - MARGIN
+        self.color = color
+
+    def draw(self, canvas):
+        pygame.draw.rect(canvas, self.color, (self.x_cord, self.y_cord, self.card_width, self.card_height))
+
+
 class Enemy:
     enemy_width = 50
     enemy_height = 50
@@ -86,27 +98,49 @@ class Enemy:
     def draw(self, canvas):
         pygame.draw.rect(canvas, self.color, (self.col_pos, self.lane_pos, self.enemy_width, self.enemy_height))
 
-
 # generate enemies
-'''
+
+
 for _ in range(rand_numb_of_enemies):
+    '''
     random_row1 = random.randint(0, len(enemy_position_matrix) - 1)
     random_col1 = random.randint(0, len(enemy_position_matrix[0]) - 1)
     random_row2 = random.randint(0, len(enemy_position_matrix) - 1)
     random_col2 = random.randint(0, len(enemy_position_matrix[0]) - 1)
-    print(random_col1)
-    print(random_col2)
-    print(random_row1)
-    print(random_row2)
-    enemy = Enemy(enemy_position_matrix[random_row1][random_col1][1] - Enemy.enemy_width / 2, enemy_position_matrix[random_row2][random_col2][0] - Enemy.enemy_height / 2)
+    random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+    
+    enemy = Enemy(enemy_position_matrix[random_row1][random_col1][1] - Enemy.enemy_width / 2, 
+                            enemy_position_matrix[random_row2][random_col2][0] - Enemy.enemy_height / 2, random_color)
     enemies.append(enemy)
+    '''
+    random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+    random_row = random.randint(0, len(enemy_position_matrix) - 1)
+
+    for index, col in enumerate(enemy_position_matrix[random_row]):
+        if not col[2]:
+            enemy = Enemy(enemy_position_matrix[random_row][index][1] - Enemy.enemy_width / 2,
+                          enemy_position_matrix[random_row][index][0] - Enemy.enemy_height / 2, random_color)
+            enemies.append(enemy)
+            enemy_position_matrix[random_row][index][2] = True
+            break
+
 '''
-'''for row in range(ROW_NUMBER):
+# this code draws all enemies in all possible positions   
+for row in range(ROW_NUMBER):
     for col in range(COL_NUMBER):
         random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         enemy = Enemy(enemy_position_matrix[row][col][1] - Enemy.enemy_width / 2,
                       enemy_position_matrix[row][col][0] - Enemy.enemy_height / 2, random_color)
-        enemies.append(enemy)'''
+        enemies.append(enemy)
+'''
+
+# generating game cards
+for count in range(CARD_COUNT):
+    random_card = random.randint(0, len(card_types) - 1)
+    temp_card = Card(150 * count + 1, -600, "gray")
+    cards.append(temp_card)
+print(cards)
+print(enemies)
 
 while running:
     # poll for events
@@ -143,6 +177,10 @@ while running:
     # drawing enemies
     for enemy in enemies:
         enemy.draw(screen)
+
+    # drawing cards
+    for card in cards:
+        card.draw(screen)
 
     # rendering game here
 
