@@ -163,6 +163,14 @@ while running:
             for lane in lanes:
                 if lane.collidepoint(mouse_pos):
                     selected_lane = lanes.index(lane)
+                    print(selected_lane)
+
+                    # kill enemy when lane is selected
+                    enemy_to_kill_position = enemy_finder(lanes.index(lane))
+                    for enemy in enemies:
+                        if enemy.position == enemy_to_kill_position:
+                            enemy.health -= 1
+
                     # exits loop if condition is met
                     break
 
@@ -180,6 +188,9 @@ while running:
             pygame.draw.rect(screen, selected_lane_color, lane, border_thickness)
         else:
             pygame.draw.rect(screen, "black", lane, border_thickness)
+
+    # updates enemy list
+    enemies = [enemy for enemy in enemies if enemy.health > 0]
 
     # drawing enemies
     for enemy in enemies:
