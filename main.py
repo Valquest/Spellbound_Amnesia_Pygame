@@ -45,16 +45,8 @@ def main():
             row_position.append(position)
         enemy_position_matrix.append(row_position)
 
-    # objects
     # lanes
-    lanes = [
-        pygame.Rect(constants.LANE_START_X, constants.LANE_START_Y * 3 - constants.MARGIN, constants.WINDOW_WIDTH -
-                    constants.LANE_START_X - constants.MARGIN, constants.LANE_HEIGHT),
-        pygame.Rect(constants.LANE_START_X, constants.LANE_START_Y * 4 - constants.MARGIN, constants.WINDOW_WIDTH -
-                    constants.LANE_START_X - constants.MARGIN, constants.LANE_HEIGHT),
-        pygame.Rect(constants.LANE_START_X, constants.LANE_START_Y * 5 - constants.MARGIN, constants.WINDOW_WIDTH -
-                    constants.LANE_START_X - constants.MARGIN, constants.LANE_HEIGHT)
-    ]
+    lanes = util_funct.add_lanes(constants.ROW_NUMBER)
 
     # def turn_calculation(card1, lane1, card2, lane2, card3, lane3):
 
