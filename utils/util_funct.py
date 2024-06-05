@@ -13,17 +13,8 @@ def add_columns(number_of_cols):
 
 
 def add_lanes(number_of_lanes):
-    '''lanes = [
-        pygame.Rect(constants.LANE_START_X, constants.LANE_START_Y * 3 - constants.MARGIN, constants.WINDOW_WIDTH -
-                    constants.LANE_START_X - constants.MARGIN, constants.LANE_HEIGHT),
-        pygame.Rect(constants.LANE_START_X, constants.LANE_START_Y * 4 - constants.MARGIN, constants.WINDOW_WIDTH -
-                    constants.LANE_START_X - constants.MARGIN, constants.LANE_HEIGHT),
-        pygame.Rect(constants.LANE_START_X, constants.LANE_START_Y * 5 - constants.MARGIN, constants.WINDOW_WIDTH -
-                    constants.LANE_START_X - constants.MARGIN, constants.LANE_HEIGHT)]
-                    '''
     lanes = []
     for lane_num in range(number_of_lanes):
-        print(f"number of lanes: {number_of_lanes}")
         lane = pygame.Rect(constants.LANE_START_X, constants.LANE_START_Y * (3 + lane_num) - constants.MARGIN,
                            constants.WINDOW_WIDTH - constants.LANE_START_X - constants.MARGIN, constants.LANE_HEIGHT)
         lanes.append(lane)

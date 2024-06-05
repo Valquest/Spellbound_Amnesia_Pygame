@@ -5,6 +5,7 @@ from utils import classes
 from variables import constants
 from core import core_funct
 from utils import util_funct
+from data import entities
 
 
 def main():
@@ -17,17 +18,12 @@ def main():
     pygame.display.set_caption('Spellbound Amnesia')
 
     # variables
-
     selected_lane_color = (255, 0, 0)
     border_thickness = 5
     selected_lane = None
     enemies = []
     cards = []
-    card_types = {
-        "damage1": 1,
-        "freeze2": 2,
-        "damage2": 2
-    }
+
     rand_numb_of_enemies = random.randint(4, 8)
 
     # creating enemy position matrix for coordinates and slot availability
@@ -45,7 +41,7 @@ def main():
             row_position.append(position)
         enemy_position_matrix.append(row_position)
 
-    # lanes
+    # create lanes
     lanes = util_funct.add_lanes(constants.ROW_NUMBER)
 
     # def turn_calculation(card1, lane1, card2, lane2, card3, lane3):
@@ -77,9 +73,9 @@ def main():
 
     # generating game cards
     for count in range(constants.CARD_COUNT):
-        random_card_type = random.choice(list(card_types.keys()))
+        random_card_type = random.choice(list(entities.card_types.keys()))
         temp_card = classes.Card(150 * count + 1, 0, "gray")
-        temp_card.type = card_types[random_card_type]
+        temp_card.type = entities.card_types[random_card_type]
         cards.append(temp_card)
 
     while running:
