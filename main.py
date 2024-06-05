@@ -22,12 +22,11 @@ def main():
     selected_lane = None
     enemies = []
     cards = []
-
     rand_numb_of_enemies = random.randint(4, 8)
 
-    # creating enemy position matrix for coordinates and slot availability
+    # creating enemy position matrix for coordinates and slot availability. This is used to determine what positions in
+    # the field are available and will be used for combat to determine what effects apply to what lanes
     enemy_position_matrix = []
-
     for row in range(constants.ROW_NUMBER):
         row_position = []
         for col in range(constants.COL_NUMBER):
@@ -69,6 +68,7 @@ def main():
                                       random_color)
                 enemy_position_matrix[random_row][index][2] = True
                 enemy.position = enemy_position_matrix[random_row][index]
+                enemy.health = random.randint(1, 3)
                 enemies.append(enemy)
                 break
 
