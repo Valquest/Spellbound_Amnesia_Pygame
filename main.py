@@ -36,7 +36,6 @@ card_types = {
     "damage2": 2
 }
 rand_numb_of_enemies = random.randint(4, 8)
-font = pygame.font.SysFont(None, 32)
 
 # creating enemy position matrix for coordinates and slot availability
 enemy_position_matrix = []
@@ -145,6 +144,8 @@ for count in range(CARD_COUNT):
     random_card = random.randint(0, len(card_types) - 1)
     temp_card = Card(150 * count + 1, 0, "gray")
     cards.append(temp_card)
+
+
 
 while running:
     # poll for events
