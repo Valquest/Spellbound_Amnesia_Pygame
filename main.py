@@ -35,7 +35,7 @@ card_types = {
     "freeze2": 2,
     "damage2": 2
 }
-rand_numb_of_enemies = random.randint(1, 4)
+rand_numb_of_enemies = random.randint(4, 8)
 font = pygame.font.SysFont(None, 32)
 
 # creating enemy position matrix for coordinates and slot availability
@@ -130,9 +130,6 @@ for _ in range(rand_numb_of_enemies):
             enemies.append(enemy)
             break
 
-for i, enemy in enumerate(enemies):
-    print(f"enemy {i} : {enemy.position}")
-
 # this code draws all enemies in all possible positions
 '''
 for row in range(ROW_NUMBER):
@@ -163,7 +160,6 @@ while running:
             for lane in lanes:
                 if lane.collidepoint(mouse_pos):
                     selected_lane = lanes.index(lane)
-                    print(selected_lane)
 
                     # kill enemy when lane is selected
                     enemy_to_kill_position = enemy_finder(lanes.index(lane))
@@ -189,8 +185,13 @@ while running:
         else:
             pygame.draw.rect(screen, "black", lane, border_thickness)
 
-    # updates enemy list
-    enemies = [enemy for enemy in enemies if enemy.health > 0]
+    # updates enemy list and matrix
+    for enemy in enemies[:]:
+        if enemy.health <= 0:
+            enemies.remove(enemy)
+            for index, position in enumerate(enemy_position_matrix[selected_lane]):
+                if enemy.position == position:
+                    enemy_position_matrix[selected_lane][index][2] = False
 
     # drawing enemies
     for enemy in enemies:
