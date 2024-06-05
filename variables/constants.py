@@ -1,5 +1,6 @@
 # constant variables
 
+BORDER_THICKNESS = 5
 COL_NUMBER = 8
 ROW_NUMBER = 3
 WINDOW_WIDTH = 1280

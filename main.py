@@ -19,7 +19,6 @@ def main():
 
     # variables
     selected_lane_color = (255, 0, 0)
-    border_thickness = 5
     selected_lane = None
     enemies = []
     cards = []
@@ -32,19 +31,31 @@ def main():
     for row in range(constants.ROW_NUMBER):
         row_position = []
         for col in range(constants.COL_NUMBER):
-            x_pos = int(round((constants.WINDOW_WIDTH - constants.MARGIN -
-                               ((constants.COL_WIDTH - border_thickness) * col) - constants.COL_WIDTH / 2), 0))
-            y_pos = int(round((constants.WINDOW_HEIGHT - constants.MARGIN - (constants.LANE_HEIGHT * (3 - row)) +
-                               constants.LANE_HEIGHT / 2), 0))
+            x_pos = int(round((constants.WINDOW_WIDTH -
+                               constants.MARGIN - ((constants.COL_WIDTH - constants.BORDER_THICKNESS) * col) -
+                               constants.COL_WIDTH / 2), 0))
+            y_pos = int(round((constants.WINDOW_HEIGHT -
+                               constants.MARGIN - (constants.LANE_HEIGHT * (3 - row))
+                               + constants.LANE_HEIGHT / 2), 0))
             occupied = False
             position = [x_pos, y_pos, occupied]
             row_position.append(position)
         enemy_position_matrix.append(row_position)
 
-    # create lanes
+    # create lanes/rows
     lanes = util_funct.add_lanes(constants.ROW_NUMBER)
 
+    # create spots/columns
+    spots = util_funct.add_columns(constants.COL_NUMBER)
+
     # def turn_calculation(card1, lane1, card2, lane2, card3, lane3):
+
+    # generating game cards
+    for count in range(constants.CARD_COUNT):
+        random_card_type = random.choice(list(entities.card_types.keys()))
+        temp_card = classes.Card(150 * count + 1, 0, "gray")
+        temp_card.type = entities.card_types[random_card_type]
+        cards.append(temp_card)
 
     # generate enemies
     for _ in range(rand_numb_of_enemies):
@@ -71,12 +82,7 @@ def main():
             enemies.append(enemy)
     '''
 
-    # generating game cards
-    for count in range(constants.CARD_COUNT):
-        random_card_type = random.choice(list(entities.card_types.keys()))
-        temp_card = classes.Card(150 * count + 1, 0, "gray")
-        temp_card.type = entities.card_types[random_card_type]
-        cards.append(temp_card)
+    # MAIN GAME LOOP
 
     while running:
         # poll for events
@@ -94,10 +100,7 @@ def main():
                         selected_lane = lanes.index(lane)
 
                         # kill enemy when lane is selected
-                        enemy_to_kill_position = core_funct.enemy_finder(lanes.index(lane), enemy_position_matrix)
-                        for enemy in enemies:
-                            if enemy.position == enemy_to_kill_position:
-                                enemy.health -= 1
+                        core_funct.kill_enemy(lanes, lane, enemy_position_matrix, enemies)
 
                         # exits loop if condition is met
                         break
@@ -105,17 +108,16 @@ def main():
         # fill the screen with a color to wipe away anything from last frame
         screen.fill((102, 140, 255))
 
-        # draw columns/spots
-        spots = util_funct.add_columns(constants.COL_NUMBER)
+        # drawing spots/columns
         for col in spots:
-            pygame.draw.rect(screen, "black", col, border_thickness)
+            pygame.draw.rect(screen, "black", col, constants.BORDER_THICKNESS)
 
-        # drawing lanes
+        # drawing lanes/rows
         for i, lane in enumerate(lanes):
             if i == selected_lane and selected_lane is not None:
-                pygame.draw.rect(screen, selected_lane_color, lane, border_thickness)
+                pygame.draw.rect(screen, selected_lane_color, lane, constants.BORDER_THICKNESS)
             else:
-                pygame.draw.rect(screen, "black", lane, border_thickness)
+                pygame.draw.rect(screen, "black", lane, constants.BORDER_THICKNESS)
 
         # updates enemy list and matrix
         for enemy in enemies[:]:
@@ -133,8 +135,7 @@ def main():
         for card in cards:
             card.draw(screen)
 
-        # rendering game here
-
+        # GAME RENDERING
         # flip() the display to put your work on screen
         pygame.display.flip()
         clock.tick(60)
