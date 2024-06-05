@@ -12,7 +12,7 @@ LANE_START_Y = HEIGHT/6
 LANE_HEIGHT = HEIGHT/6
 COL_START = LANE_START_X
 COL_WIDTH = (WIDTH - LANE_START_X - MARGIN) / COL_NUMBER + 4
-CARD_COUNT = 3
+CARD_COUNT = 5
 
 # pygame setup
 pygame.init()
@@ -71,6 +71,20 @@ def add_columns(number_of_cols):
     return cols
 
 
+def enemy_finder(lane):
+    last_position = None
+    print(lane)
+    for index in list(reversed(enemy_position_matrix[lane])):
+        if index[2]:
+            print(f"col {index} value: {index[2]}")
+            last_position = index
+            break
+    return last_position
+
+
+#def turn_calculation(card1, lane1, card2, lane2, card3, lane3):
+
+
 # enemies
 class Card:
     card_width = 120
@@ -79,7 +93,7 @@ class Card:
 
     def __init__(self, x_cord, y_cord, color):
         self.x_cord = x_cord + MARGIN
-        self.y_cord = HEIGHT - self.card_height - MARGIN
+        self.y_cord = MARGIN
         self.color = color
 
     def draw(self, canvas):
@@ -89,6 +103,8 @@ class Card:
 class Enemy:
     enemy_width = 50
     enemy_height = 50
+    position = []
+    health = 1
 
     def __init__(self, lane_pos, col_pos, color):
         self.lane_pos = lane_pos
@@ -98,21 +114,10 @@ class Enemy:
     def draw(self, canvas):
         pygame.draw.rect(canvas, self.color, (self.col_pos, self.lane_pos, self.enemy_width, self.enemy_height))
 
+
 # generate enemies
 
-
 for _ in range(rand_numb_of_enemies):
-    '''
-    random_row1 = random.randint(0, len(enemy_position_matrix) - 1)
-    random_col1 = random.randint(0, len(enemy_position_matrix[0]) - 1)
-    random_row2 = random.randint(0, len(enemy_position_matrix) - 1)
-    random_col2 = random.randint(0, len(enemy_position_matrix[0]) - 1)
-    random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-    
-    enemy = Enemy(enemy_position_matrix[random_row1][random_col1][1] - Enemy.enemy_width / 2, 
-                            enemy_position_matrix[random_row2][random_col2][0] - Enemy.enemy_height / 2, random_color)
-    enemies.append(enemy)
-    '''
     random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
     random_row = random.randint(0, len(enemy_position_matrix) - 1)
 
@@ -120,12 +125,16 @@ for _ in range(rand_numb_of_enemies):
         if not col[2]:
             enemy = Enemy(enemy_position_matrix[random_row][index][1] - Enemy.enemy_width / 2,
                           enemy_position_matrix[random_row][index][0] - Enemy.enemy_height / 2, random_color)
-            enemies.append(enemy)
             enemy_position_matrix[random_row][index][2] = True
+            enemy.position = enemy_position_matrix[random_row][index]
+            enemies.append(enemy)
             break
 
+for i, enemy in enumerate(enemies):
+    print(f"enemy {i} : {enemy.position}")
+
+# this code draws all enemies in all possible positions
 '''
-# this code draws all enemies in all possible positions   
 for row in range(ROW_NUMBER):
     for col in range(COL_NUMBER):
         random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
@@ -137,10 +146,8 @@ for row in range(ROW_NUMBER):
 # generating game cards
 for count in range(CARD_COUNT):
     random_card = random.randint(0, len(card_types) - 1)
-    temp_card = Card(150 * count + 1, -600, "gray")
+    temp_card = Card(150 * count + 1, 0, "gray")
     cards.append(temp_card)
-print(cards)
-print(enemies)
 
 while running:
     # poll for events
