@@ -65,7 +65,3 @@ class Card:
     def update_position(self, x, y):
         self.x_cord = x
         self.y_cord = y
-
-    def reset_possition(self):
-        self.x_cord = self.original_x
-        self.y_cord = self.original_y

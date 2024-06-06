@@ -8,10 +8,10 @@ def enemy_finder(lane_to_search, position_matrix):
     return last_position
 
 
-def damage_enemy(lanes, kill_in_lane, position_matrix, enemy_list, damage=1):
-    enemy_to_kill_position = enemy_finder(lanes.index(kill_in_lane), position_matrix)
+def damage_enemy(lanes, damage_in_lane, position_matrix, enemy_list, damage=1):
+    enemy_to_damage_position = enemy_finder(lanes.index(damage_in_lane), position_matrix)
     for enemy in enemy_list:
-        if enemy.position == enemy_to_kill_position:
+        if enemy.position == enemy_to_damage_position:
             enemy.health -= damage
 
 
@@ -26,3 +26,23 @@ def calculate_return_path(start_pos, end_pos, steps=20):
         y = (1 - t)**2 * start_pos[1] + 2 * (1 - t) * t * mid_y + t**2 * end_pos[1]
         path.append((x, y))
     return path
+
+
+def move_enemy(lane, direction, num_of_spots_moved, enemy_list, map_matrix):
+    if direction not in [-1, 1]:
+        raise ValueError("Direction must be either 1 or -1 for \"move_enemy\" function")
+
+    lane_matrix = map_matrix[lane]
+    num_positions = len(lane_matrix)
+
+    for enemy in enemy_list:
+        enemy_pos = enemy.position
+        current_index = next((i for i, pos in enumerate(lane_matrix) if pos[:2] == enemy_pos[:2]), None)
+
+        if current_index is not None:
+            new_index = current_index + direction * num_of_spots_moved
+            if 0 <= new_index < num_positions and not lane_matrix[new_index][2]:
+                # Update positions
+                lane_matrix[current_index][2] = False
+                lane_matrix[new_index][2] = True
+                enemy.position = lane_matrix[new_index][:2]

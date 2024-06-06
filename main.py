@@ -34,7 +34,7 @@ def main():
     card_offset_y = 0
     returning_card = None
     returning_path = []
-    animation_index = 0
+    card_animation_index = 0
 
     # creating enemy position matrix for coordinates and slot availability. This is used to determine what positions in
     # the field are available and will be used for combat to determine what effects apply to what lanes
@@ -147,6 +147,7 @@ def main():
                         if lane.collidepoint(pygame.mouse.get_pos()):
                             print(f"Card {cards.index(selected_card)} touched Lane {lanes.index(lane)}")
                             touched_lane = True
+                            card_select_lane_select.append((selected_card, lanes.index(lane)))
                             break
 
                     # Calculate returning path
@@ -154,7 +155,7 @@ def main():
                         (selected_card.x_cord, selected_card.y_cord),
                         (selected_card.original_x, selected_card.original_y))
                     returning_card = selected_card
-                    animation_index = 0
+                    card_animation_index = 0
                     selected_card = None
 
             elif event.type == pygame.MOUSEMOTION:
@@ -170,9 +171,15 @@ def main():
                     print(f"action: {current_action}")
                     current_action += 1
                     action_start_time = current_time
+                    for action in card_select_lane_select:
+                        lane = action[1]
+                        core_funct.move_enemy(lane, -1, 1, enemies, enemy_position_matrix)
             else:
                 turn_ended = False
                 current_action = 1
+                print(card_select_lane_select)
+                card_select_lane_select = []
+                print(card_select_lane_select)
 
 
         # fill the screen with a color to wipe away anything from last frame
@@ -210,10 +217,10 @@ def main():
             card.draw(screen)
 
         # card return to it's spot animation
-        if returning_card and animation_index < len(returning_path):
-            returning_card.update_position(*returning_path[animation_index])
-            animation_index += 1
-            if animation_index >= len(returning_path):
+        if returning_card and card_animation_index < len(returning_path):
+            returning_card.update_position(*returning_path[card_animation_index])
+            card_animation_index += 1
+            if card_animation_index >= len(returning_path):
                 returning_card = None
 
         # GAME RENDERING
