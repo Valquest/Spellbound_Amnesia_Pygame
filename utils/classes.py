@@ -47,6 +47,8 @@ class Card:
         self.x_cord = x_cord + constants.MARGIN
         self.y_cord = constants.MARGIN
         self.color = color
+        self.original_x = self.x_cord
+        self.original_y = self.y_cord
 
     def draw(self, canvas):
         pygame.draw.rect(canvas, self.color, (self.x_cord, self.y_cord, self.card_width, self.card_height))
@@ -59,3 +61,11 @@ class Card:
                                                                   self.card_height // 2))
 
         canvas.blit(text_surface_object, text_rect_position)
+
+    def update_position(self, x, y):
+        self.x_cord = x
+        self.y_cord = y
+
+    def reset_possition(self):
+        self.x_cord = self.original_x
+        self.y_cord = self.original_y

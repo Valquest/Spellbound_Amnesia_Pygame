@@ -21,14 +21,20 @@ def main():
     # variables
     selected_lane_color = (255, 0, 0)
     selected_lane = None
+    selected_card = None
     enemies = []
-    cards = []
     rand_numb_of_enemies = random.randint(4, 8)
     players_actions = [1, 1, 1]
     current_action = 1
     action_start_time = 0
     delay_between_actions = 1500
     delay_between_turns = 3000
+    card_select_lane_select = []
+    card_offset_x = 0
+    card_offset_y = 0
+    returning_card = None
+    returning_path = []
+    animation_index = 0
 
     # creating enemy position matrix for coordinates and slot availability. This is used to determine what positions in
     # the field are available and will be used for combat to determine what effects apply to what lanes
@@ -56,6 +62,7 @@ def main():
     # def turn_calculation(card1, lane1, card2, lane2, card3, lane3):
 
     # generating game cards
+    cards = []
     for count in range(constants.CARD_COUNT):
         random_card_type = random.choice(list(entities.card_types.keys()))
         temp_card = classes.Card(150 * count + 1, 0, "gray")
@@ -126,22 +133,46 @@ def main():
                     turn_ended = True
                     action_start_time = pygame.time.get_ticks()
 
+                for card in cards:
+                    if pygame.Rect(card.x_cord, card.y_cord, card.card_width, card.card_height).collidepoint(event.pos):
+                        selected_card = card
+                        card_offset_x = card.x_cord - event.pos[0]
+                        card_offset_y = card.y_cord - event.pos[1]
+                        break
+
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if selected_card:
+                    touched_lane = False
+                    for lane in lanes:
+                        if lane.collidepoint(pygame.mouse.get_pos()):
+                            print(f"Card {cards.index(selected_card)} touched Lane {lanes.index(lane)}")
+                            touched_lane = True
+                            break
+
+                    # Calculate returning path
+                    returning_path = core_funct.calculate_return_path(
+                        (selected_card.x_cord, selected_card.y_cord),
+                        (selected_card.original_x, selected_card.original_y))
+                    returning_card = selected_card
+                    animation_index = 0
+                    selected_card = None
+
+            elif event.type == pygame.MOUSEMOTION:
+                if selected_card:
+                    selected_card.update_position(event.pos[0] + card_offset_x, event.pos[1] + card_offset_y)
+
         current_time = pygame.time.get_ticks()
 
         # turn based action logic, every action takes 2 seconds to complete, 3 seconds delay between turns
         if turn_ended:
             if current_action <= len(players_actions):
                 if current_time - action_start_time > delay_between_actions:
-                    print(current_time)
-                    print(action_start_time)
-                    print(current_time - action_start_time)
-                    print(delay_between_actions)
                     print(f"action: {current_action}")
                     current_action += 1
                     action_start_time = current_time
             else:
                 turn_ended = False
-                current_action = 0
+                current_action = 1
 
 
         # fill the screen with a color to wipe away anything from last frame
@@ -177,6 +208,13 @@ def main():
         # drawing cards
         for card in cards:
             card.draw(screen)
+
+        # card return to it's spot animation
+        if returning_card and animation_index < len(returning_path):
+            returning_card.update_position(*returning_path[animation_index])
+            animation_index += 1
+            if animation_index >= len(returning_path):
+                returning_card = None
 
         # GAME RENDERING
         # flip() the display to put your work on screen
