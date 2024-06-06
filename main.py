@@ -12,6 +12,7 @@ def main():
 
     # pygame setup
     pygame.init()
+    pygame.font.init()
     screen = pygame.display.set_mode((constants.WINDOW_WIDTH, constants.WINDOW_HEIGHT))
     clock = pygame.time.Clock()
     running = True
@@ -23,6 +24,8 @@ def main():
     enemies = []
     cards = []
     rand_numb_of_enemies = random.randint(4, 8)
+    delay_between_actions = 2000
+    delay_between_turns = 3000
 
     # creating enemy position matrix for coordinates and slot availability. This is used to determine what positions in
     # the field are available and will be used for combat to determine what effects apply to what lanes
@@ -72,6 +75,17 @@ def main():
                 enemies.append(enemy)
                 break
 
+    # generate an end turn button and text
+    end_turn_btn = pygame.Rect((cards[0].card_width + constants.MARGIN) * constants.CARD_COUNT + 100, constants.MARGIN,
+                               200, 50)
+    turn_ended = False
+    end_btn_font = pygame.font.Font(None, 32)
+    render_btn_font = end_btn_font.render("Start Turn", True, (0, 0, 0))
+    end_turn_btn_position = render_btn_font.get_rect(center=((cards[0].card_width + constants.MARGIN) *
+                                                             constants.CARD_COUNT + 100 + 200 // 2, constants.MARGIN +
+                                                             50 // 2))
+
+
     # this code draws all enemies in all possible positions
     '''
     for row in range(constants.ROW_NUMBER):
@@ -105,8 +119,15 @@ def main():
                         # exits loop if condition is met
                         break
 
+                if end_turn_btn.collidepoint(mouse_pos):
+                    turn_ended = True
+
         # fill the screen with a color to wipe away anything from last frame
         screen.fill((102, 140, 255))
+
+        # draw "end turn" button
+        pygame.draw.rect(screen, "white", end_turn_btn)
+        screen.blit(render_btn_font, end_turn_btn_position)
 
         # drawing spots/columns
         for col in spots:
