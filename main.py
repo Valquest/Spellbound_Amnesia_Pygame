@@ -24,7 +24,10 @@ def main():
     enemies = []
     cards = []
     rand_numb_of_enemies = random.randint(4, 8)
-    delay_between_actions = 2000
+    players_actions = [1, 1, 1]
+    current_action = 1
+    action_start_time = 0
+    delay_between_actions = 1500
     delay_between_turns = 3000
 
     # creating enemy position matrix for coordinates and slot availability. This is used to determine what positions in
@@ -113,14 +116,33 @@ def main():
                     if lane.collidepoint(mouse_pos):
                         selected_lane = lanes.index(lane)
 
-                        # kill enemy when lane is selected
-                        core_funct.kill_enemy(lanes, lane, enemy_position_matrix, enemies)
+                        # damage enemy when lane is selected
+                        core_funct.damage_enemy(lanes, lane, enemy_position_matrix, enemies)
 
                         # exits loop if condition is met
                         break
 
                 if end_turn_btn.collidepoint(mouse_pos):
                     turn_ended = True
+                    action_start_time = pygame.time.get_ticks()
+
+        current_time = pygame.time.get_ticks()
+
+        # turn based action logic, every action takes 2 seconds to complete, 3 seconds delay between turns
+        if turn_ended:
+            if current_action <= len(players_actions):
+                if current_time - action_start_time > delay_between_actions:
+                    print(current_time)
+                    print(action_start_time)
+                    print(current_time - action_start_time)
+                    print(delay_between_actions)
+                    print(f"action: {current_action}")
+                    current_action += 1
+                    action_start_time = current_time
+            else:
+                turn_ended = False
+                current_action = 0
+
 
         # fill the screen with a color to wipe away anything from last frame
         screen.fill((102, 140, 255))

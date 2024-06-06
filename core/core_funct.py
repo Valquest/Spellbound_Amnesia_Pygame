@@ -10,7 +10,7 @@ def enemy_finder(lane_to_search, position_matrix):
             break
     return last_position
 
-def kill_enemy(lanes, kill_in_lane, position_matrix, enemy_list):
+def damage_enemy(lanes, kill_in_lane, position_matrix, enemy_list):
     enemy_to_kill_position = enemy_finder(lanes.index(kill_in_lane), position_matrix)
     for enemy in enemy_list:
         if enemy.position == enemy_to_kill_position:
