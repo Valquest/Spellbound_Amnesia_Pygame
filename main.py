@@ -56,20 +56,22 @@ def main():
 
     # generate enemies
     enemies = []
-    for _ in range(random.randint(4, 8)):
-        random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-        random_row = random.randint(0, len(enemy_position_matrix) - 1)
-
-        for index, col in enumerate(enemy_position_matrix[random_row]):
-            if not col[2]:
-                enemy = classes.Enemy(enemy_position_matrix[random_row][index][1],
-                                      enemy_position_matrix[random_row][index][0],
-                                      random_color)
-                enemy_position_matrix[random_row][index][2] = True
-                enemy.position = enemy_position_matrix[random_row][index]
-                enemy.health = random.randint(1, 3)
-                enemies.append(enemy)
-                break
+    number_of_enemies = random.randint(4, 8)
+    core_funct.generate_enemies(enemies, number_of_enemies, enemy_position_matrix)
+    # for _ in range(random.randint(4, 8)):
+    #     random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+    #     random_row = random.randint(0, len(enemy_position_matrix) - 1)
+    #
+    #     for index, col in enumerate(enemy_position_matrix[random_row]):
+    #         if not col[2]:
+    #             enemy = classes.Enemy(enemy_position_matrix[random_row][index][1],
+    #                                   enemy_position_matrix[random_row][index][0],
+    #                                   random_color)
+    #             enemy_position_matrix[random_row][index][2] = True
+    #             enemy.position = enemy_position_matrix[random_row][index]
+    #             enemy.health = random.randint(1, 3)
+    #             enemies.append(enemy)
+    #             break
 
     # generate an end turn button and text
     end_turn_btn = pygame.Rect((cards[0].card_width + constants.MARGIN) * constants.CARD_COUNT + 100, constants.MARGIN,
@@ -180,8 +182,6 @@ def main():
                     for action in card_select_lane_select:
                         lane = action[1]
                         enemies = core_funct.move_enemy(lane, 1, 1, enemies, enemy_position_matrix)
-
-
 
             else:
                 turn_ended = False

@@ -1,3 +1,5 @@
+import random
+from utils import classes
 
 def last_position_enemy_finder(lane_to_search, position_matrix):
     last_position = None
@@ -13,6 +15,23 @@ def damage_enemy(lane_index, position_matrix, enemy_list, damage=1):
     for enemy in enemy_list:
         if enemy.position == enemy_to_damage_position:
             enemy.health -= damage
+
+
+def generate_enemies(enemy_list, buffer_int, enemy_matrix):
+    for _ in range(buffer_int):
+        random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        random_row = random.randint(0, len(enemy_matrix) - 1)
+
+        for index, col in enumerate(enemy_matrix[random_row]):
+            if not col[2]:
+                enemy = classes.Enemy(enemy_matrix[random_row][index][1],
+                                      enemy_matrix[random_row][index][0],
+                                      random_color)
+                enemy_matrix[random_row][index][2] = True
+                enemy.position = enemy_matrix[random_row][index]
+                enemy.health = random.randint(1, 3)
+                enemy_list.append(enemy)
+                break
 
 
 def calculate_return_path(start_pos, end_pos, steps=20):
