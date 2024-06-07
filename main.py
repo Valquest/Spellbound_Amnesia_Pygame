@@ -173,13 +173,18 @@ def main():
                     action_start_time = current_time
                     for action in card_select_lane_select:
                         lane = action[1]
-                        core_funct.move_enemy(lane, -1, 1, enemies, enemy_position_matrix)
+                        print("before function")
+                        for enemy in enemies:
+                            print(enemy.position)
+                            print_flag = False
+                        enemies = core_funct.move_enemy(lane, 1, 1, enemies, enemy_position_matrix)
+                        print("after function")
+                        for enemy in enemies:
+                            print(enemy.position)
             else:
                 turn_ended = False
                 current_action = 1
-                print(card_select_lane_select)
                 card_select_lane_select = []
-                print(card_select_lane_select)
 
 
         # fill the screen with a color to wipe away anything from last frame

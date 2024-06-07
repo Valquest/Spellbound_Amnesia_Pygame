@@ -1,5 +1,5 @@
 
-def enemy_finder(lane_to_search, position_matrix):
+def last_position_enemy_finder(lane_to_search, position_matrix):
     last_position = None
     for lane_index in list(reversed(position_matrix[lane_to_search])):
         if lane_index[2]:
@@ -9,7 +9,7 @@ def enemy_finder(lane_to_search, position_matrix):
 
 
 def damage_enemy(lanes, damage_in_lane, position_matrix, enemy_list, damage=1):
-    enemy_to_damage_position = enemy_finder(lanes.index(damage_in_lane), position_matrix)
+    enemy_to_damage_position = last_position_enemy_finder(lanes.index(damage_in_lane), position_matrix)
     for enemy in enemy_list:
         if enemy.position == enemy_to_damage_position:
             enemy.health -= damage
@@ -28,21 +28,73 @@ def calculate_return_path(start_pos, end_pos, steps=20):
     return path
 
 
+# finds enemy position index inside a lane list based of an enemy instance of Enemy class
+def enemy_position_index_finder(enemy, lane_list):
+    enemy_pos = enemy.position
+    #print(f"Enemy position: {enemy_pos}")
+    #print(f"Lane list: {lane_list}")
+    current_index = None
+    for i, pos in enumerate(lane_list):
+        #print(f"Lane position being checked: {pos}, its index {i}")
+        if pos[:2] == enemy_pos[:2]:
+            #print(f"Matching positions {enemy_pos} and {pos}")
+            current_index = i
+            break
+
+    # current_index = next((i for i, pos in enumerate(lane_matrix) if pos[:2] == enemy_pos[:2]), None)
+
+    return current_index
+
+
+def enemy_list_sorter(enemy_list):
+    return sorted(enemy_list, key=lambda enemy: (enemy.position[1], enemy.position[0]))
+
+
 def move_enemy(lane, direction, num_of_spots_moved, enemy_list, map_matrix):
     if direction not in [-1, 1]:
         raise ValueError("Direction must be either 1 or -1 for \"move_enemy\" function")
+    else:
+        lane_list = map_matrix[lane]
+        num_positions = len(lane_list)
+        # sort enemy list
+        enemy_list = enemy_list_sorter(enemy_list)
+        # based on direction we set lane_list order, so we could move enemies only if they are not colliding with other
+        # enemies
+        if direction == 1:
+            lane_list = list(reversed(map_matrix[lane]))
+            # print(f"Lane list: {lane_list}")
+            # for enemy in enemy_list:
+                # print(f"Current enemy position: {enemy.position}")
+            #print(f"Reversed lane list: {reversed_lane_list}")
+            #print("forwards direction")
+        elif direction == -1:
+            lane_list = list(reversed(map_matrix[lane]))
 
-    lane_matrix = map_matrix[lane]
-    num_positions = len(lane_matrix)
+        # after lists are established we find position indexes for enemies, set new indexes and check if new indexes
+        # are valid
+        for enemy in enemy_list:
+            current_index = enemy_position_index_finder(enemy, lane_list)
+            #print("New enemy checks -----------------")
+            #print(f"Enemy position: {enemy.position}")
+            #print(f"Current index: {current_index}")
+            # print(f"Current enemy index: {current_index}")
+            if current_index is not None:
+                for moves in range(num_of_spots_moved, 0, -1):
+                    #print(f"move: {moves}")
+                    new_index = current_index - direction * moves
+                    # print(f"New index {new_index}")
+                    #print(f"Check 1 {0 <= new_index < num_positions}")
+                    #print(f"Check 2 {lane_list[new_index][2]}")
+                    #print(f"new index lane position list: {lane_list[new_index]}")
+                    # print(f"num_positions: {num_positions}")
+                    # print(f"lane_list: {lane_list}")
+                    # print(f"Lane list item i: {lane_list[new_index]}")
+                    if 0 <= new_index < num_positions and not lane_list[new_index][2]:
+                        # store move queue information in order to complete movements in the right order
+                        #print(f"Enemy position old: {enemy.position}")
+                        lane_list[current_index][2] = False
+                        lane_list[new_index][2] = True
+                        enemy.position = lane_list[new_index]
+                        #print(f"Enemy position new: {enemy.position}")
 
-    for enemy in enemy_list:
-        enemy_pos = enemy.position
-        current_index = next((i for i, pos in enumerate(lane_matrix) if pos[:2] == enemy_pos[:2]), None)
-
-        if current_index is not None:
-            new_index = current_index + direction * num_of_spots_moved
-            if 0 <= new_index < num_positions and not lane_matrix[new_index][2]:
-                # Update positions
-                lane_matrix[current_index][2] = False
-                lane_matrix[new_index][2] = True
-                enemy.position = lane_matrix[new_index][:2]
+    return enemy_list
