@@ -100,10 +100,11 @@ def main():
 
     # turn related variables
     total_actions = 3
+    total_steps = total_actions * 3
     current_action = 1
     action_start_time = 0
-    delay_between_actions = 1500
-    players_turn = True
+    delay_between_actions = 2000
+    turn_sequence = 1
 
     # card movement variables
     returning_card = None
@@ -169,28 +170,34 @@ def main():
 
         # turn based action logic, every action takes 2 seconds to complete, 3 seconds delay between turns
         if turn_ended:
-            if current_action <= total_actions:
+            if current_action <= total_steps * 3:  # total_steps for each of damage, move, spawn
                 if current_time - action_start_time > delay_between_actions:
+                    sequence_index = (current_action - 1) % 3  # Cycle through 0, 1, 2
 
-                    # damaging enemies
-                    action = card_select_lane_select[current_action - 1]
-                    current_card = action[0]
-                    current_lane = action[1]
-                    core_funct.damage_enemy(current_lane, enemy_position_matrix, enemies, current_card.damage)
+                    if sequence_index == 0:
+                        # damaging enemies
+                        if (current_action - 1) // 3 < len(card_select_lane_select):
+                            action = card_select_lane_select[(current_action - 1) // 3]
+                            current_card = action[0]
+                            current_lane = action[1]
+                            core_funct.damage_enemy(current_lane, enemy_position_matrix, enemies, current_card.damage)
 
-                    # create additional enemy
-                    core_funct.generate_enemies(enemies, 1, enemy_position_matrix)
+                    elif sequence_index == 1:
+                        # moving enemies
+                        for lane in range(3):
+                            enemies = core_funct.move_enemy(lane, 1, 1, enemies, enemy_position_matrix)
+
+                    elif sequence_index == 2:
+                        # creating additional enemies
+                        core_funct.generate_enemies(enemies, 1, enemy_position_matrix)
 
                     current_action += 1
                     action_start_time = current_time
-                    for action in card_select_lane_select:
-                        lane = action[1]
-                        enemies = core_funct.move_enemy(lane, 1, 1, enemies, enemy_position_matrix)
-
             else:
                 turn_ended = False
                 current_action = 1
                 card_select_lane_select = []
+                turn_sequence = 1  # Reset turn_sequence for the next turn
 
         # fill the screen with a color to wipe away anything from last frame
         screen.fill((102, 140, 255))
