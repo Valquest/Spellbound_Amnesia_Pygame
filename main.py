@@ -18,24 +18,6 @@ def main():
     running = True
     pygame.display.set_caption('Spellbound Amnesia')
 
-    # variables
-    selected_lane_color = (255, 0, 0)
-    selected_lane = None
-    selected_card = None
-    enemies = []
-    rand_numb_of_enemies = random.randint(4, 8)
-    players_actions = [1, 1, 1]
-    current_action = 1
-    action_start_time = 0
-    delay_between_actions = 1500
-    delay_between_turns = 3000
-    card_select_lane_select = []
-    card_offset_x = 0
-    card_offset_y = 0
-    returning_card = None
-    returning_path = []
-    card_animation_index = 0
-
     # creating enemy position matrix for coordinates and slot availability. This is used to determine what positions in
     # the field are available and will be used for combat to determine what effects apply to what lanes
     enemy_position_matrix = []
@@ -59,18 +41,22 @@ def main():
     # create spots/columns
     spots = util_funct.add_columns(constants.COL_NUMBER)
 
-    # def turn_calculation(card1, lane1, card2, lane2, card3, lane3):
-
     # generating game cards
     cards = []
     for count in range(constants.CARD_COUNT):
-        random_card_type = random.choice(list(entities.card_types.keys()))
+        random_item = random.choice(list(entities.card_types.items()))
+
         temp_card = classes.Card(150 * count + 1, 0, "gray")
-        temp_card.type = entities.card_types[random_card_type]
+
+        # take random card type and damage value from the card type dictionary
+        temp_card.type = random_item[0]
+        temp_card.damage = random_item[1]
+
         cards.append(temp_card)
 
     # generate enemies
-    for _ in range(rand_numb_of_enemies):
+    enemies = []
+    for _ in range(random.randint(4, 8)):
         random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         random_row = random.randint(0, len(enemy_position_matrix) - 1)
 
@@ -95,18 +81,33 @@ def main():
                                                              constants.CARD_COUNT + 100 + 200 // 2, constants.MARGIN +
                                                              50 // 2))
 
-
-    # this code draws all enemies in all possible positions
-    '''
-    for row in range(constants.ROW_NUMBER):
-        for col in range(constants.COL_NUMBER):
-            random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-            enemy = Enemy(enemy_position_matrix[row][col][1] - Enemy.enemy_width / 2,
-                          enemy_position_matrix[row][col][0] - Enemy.enemy_height / 2, random_color)
-            enemies.append(enemy)
-    '''
+    # this code draws all enemies in all possible positions to test if positioning is correct
+    # for row in range(constants.ROW_NUMBER):
+    #     for col in range(constants.COL_NUMBER):
+    #         random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+    #         enemy = Enemy(enemy_position_matrix[row][col][1] - Enemy.enemy_width / 2,
+    #                       enemy_position_matrix[row][col][0] - Enemy.enemy_height / 2, random_color)
+    #         enemies.append(enemy)
 
     # MAIN GAME LOOP
+
+    # game loop variables
+    selected_lane = None
+    selected_card = None
+    card_select_lane_select = []
+
+    # turn related variables
+    total_actions = 3
+    current_action = 1
+    action_start_time = 0
+    delay_between_actions = 1500
+
+    # card movement variables
+    returning_card = None
+    card_offset_x = 0
+    card_offset_y = 0
+    returning_path = []
+    card_animation_index = 0
 
     while running:
         # poll for events
@@ -117,18 +118,18 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # get mouse position
                 mouse_pos = pygame.mouse.get_pos()
-
-                # check if clicked inside any rectangle
+                """
+                # check if clicked inside any rectangle and damage enemies
                 for lane in lanes:
                     if lane.collidepoint(mouse_pos):
                         selected_lane = lanes.index(lane)
 
                         # damage enemy when lane is selected
-                        core_funct.damage_enemy(lanes, lane, enemy_position_matrix, enemies)
+                        #core_funct.damage_enemy(lanes.index(lane), enemy_position_matrix, enemies, 1)
 
                         # exits loop if condition is met
                         break
-
+                """
                 if end_turn_btn.collidepoint(mouse_pos):
                     turn_ended = True
                     action_start_time = pygame.time.get_ticks()
@@ -142,12 +143,11 @@ def main():
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 if selected_card:
-                    touched_lane = False
                     for lane in lanes:
                         if lane.collidepoint(pygame.mouse.get_pos()):
                             print(f"Card {cards.index(selected_card)} touched Lane {lanes.index(lane)}")
-                            touched_lane = True
                             card_select_lane_select.append((selected_card, lanes.index(lane)))
+                            selected_card.assigned_lane = lanes.index(lane)
                             break
 
                     # Calculate returning path
@@ -166,19 +166,27 @@ def main():
 
         # turn based action logic, every action takes 2 seconds to complete, 3 seconds delay between turns
         if turn_ended:
-            if current_action <= len(players_actions):
+            if current_action <= total_actions:
                 if current_time - action_start_time > delay_between_actions:
+
+                    # damaging enemies
+                    action = card_select_lane_select[current_action - 1]
+                    current_card = action[0]
+                    current_lane = action[1]
+                    core_funct.damage_enemy(current_lane, enemy_position_matrix, enemies, current_card.damage)
+
                     current_action += 1
                     action_start_time = current_time
                     for action in card_select_lane_select:
                         lane = action[1]
                         enemies = core_funct.move_enemy(lane, 1, 1, enemies, enemy_position_matrix)
 
+
+
             else:
                 turn_ended = False
                 current_action = 1
                 card_select_lane_select = []
-
 
         # fill the screen with a color to wipe away anything from last frame
         screen.fill((102, 140, 255))
@@ -194,7 +202,7 @@ def main():
         # drawing lanes/rows
         for i, lane in enumerate(lanes):
             if i == selected_lane and selected_lane is not None:
-                pygame.draw.rect(screen, selected_lane_color, lane, constants.BORDER_THICKNESS)
+                pygame.draw.rect(screen, "red", lane, constants.BORDER_THICKNESS)
             else:
                 pygame.draw.rect(screen, "black", lane, constants.BORDER_THICKNESS)
 
@@ -202,9 +210,10 @@ def main():
         for enemy in enemies[:]:
             if enemy.health <= 0:
                 enemies.remove(enemy)
-                for index, position in enumerate(enemy_position_matrix[selected_lane]):
-                    if enemy.position == position:
-                        enemy_position_matrix[selected_lane][index][2] = False
+                for lane_index, lane_positions in enumerate(enemy_position_matrix):
+                    for index, position in enumerate(lane_positions):
+                        if enemy.position == position:
+                            enemy_position_matrix[lane_index][index][2] = False
 
         # drawing enemies
         for enemy in enemies:

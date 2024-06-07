@@ -43,9 +43,12 @@ class Card:
     card_height = 250
     click_color = "dark grey"
     type = None
+    assigned_lane = None
+    damage = 0
 
     # create a font object
     card_type_font = pygame.font.Font(None, 36)
+    card_lane_match_font = pygame.font.Font(None, 26)
 
     def __init__(self, x_cord, y_cord, color):
         self.x_cord = x_cord + constants.MARGIN
@@ -53,18 +56,27 @@ class Card:
         self.color = color
         self.original_x = self.x_cord
         self.original_y = self.y_cord
+        # this variable is not used, might not need it in the future, function parameter needs to
+        # go, in that case
+        self.y_cord2 = y_cord
 
     def draw(self, canvas):
         pygame.draw.rect(canvas, self.color, (self.x_cord, self.y_cord, self.card_width, self.card_height))
 
         # create a font surface object by using font object and text we want to render
-        text_surface_object = self.card_type_font.render(str(self.type), False, (0, 0, 0))
-
+        type_text_surface = self.card_type_font.render(str(self.type), False, (0, 0, 0))
         # center text surface object rectangle in a center
-        text_rect_position = text_surface_object.get_rect(center=(self.x_cord + self.card_width // 2, self.y_cord +
-                                                                  self.card_height // 2))
+        type_text_rect_position = type_text_surface.get_rect(center=(self.x_cord + self.card_width // 2, self.y_cord +
+                                                                     self.card_height // 2))
+        canvas.blit(type_text_surface, type_text_rect_position)
 
-        canvas.blit(text_surface_object, text_rect_position)
+        if self.assigned_lane is not None:
+            # create a font surface for card lane selection
+            card_lane_text_surface = self.card_lane_match_font.render(f"Lane: {self.assigned_lane}", False, "black")
+            # position text surface object rectangle in a center
+            card_lane_rect_position = card_lane_text_surface.get_rect(center=(self.x_cord + self.card_width // 2,
+                                                                              self.y_cord + self.card_height // 2 + 50))
+            canvas.blit(card_lane_text_surface, card_lane_rect_position)
 
     def update_position(self, x, y):
         self.x_cord = x

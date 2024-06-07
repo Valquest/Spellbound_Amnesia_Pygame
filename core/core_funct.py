@@ -8,8 +8,8 @@ def last_position_enemy_finder(lane_to_search, position_matrix):
     return last_position
 
 
-def damage_enemy(lanes, damage_in_lane, position_matrix, enemy_list, damage=1):
-    enemy_to_damage_position = last_position_enemy_finder(lanes.index(damage_in_lane), position_matrix)
+def damage_enemy(lane_index, position_matrix, enemy_list, damage=1):
+    enemy_to_damage_position = last_position_enemy_finder(lane_index, position_matrix)
     for enemy in enemy_list:
         if enemy.position == enemy_to_damage_position:
             enemy.health -= damage
