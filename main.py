@@ -76,8 +76,8 @@ def main():
 
         for index, col in enumerate(enemy_position_matrix[random_row]):
             if not col[2]:
-                enemy = classes.Enemy(enemy_position_matrix[random_row][index][1] - classes.Enemy.enemy_width / 2,
-                                      enemy_position_matrix[random_row][index][0] - classes.Enemy.enemy_height / 2,
+                enemy = classes.Enemy(enemy_position_matrix[random_row][index][1],
+                                      enemy_position_matrix[random_row][index][0],
                                       random_color)
                 enemy_position_matrix[random_row][index][2] = True
                 enemy.position = enemy_position_matrix[random_row][index]
@@ -173,14 +173,8 @@ def main():
                     action_start_time = current_time
                     for action in card_select_lane_select:
                         lane = action[1]
-                        print("before function")
-                        for enemy in enemies:
-                            print(enemy.position)
-                            print_flag = False
                         enemies = core_funct.move_enemy(lane, 1, 1, enemies, enemy_position_matrix)
-                        print("after function")
-                        for enemy in enemies:
-                            print(enemy.position)
+
             else:
                 turn_ended = False
                 current_action = 1
