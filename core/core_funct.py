@@ -95,6 +95,7 @@ def move_enemy(lane, direction, num_of_spots_moved, enemy_list, map_matrix):
                         lane_list[current_index][2] = False
                         lane_list[new_index][2] = True
                         enemy.position = lane_list[new_index]
+                        enemy.update_position()
                         #print(f"Enemy position new: {enemy.position}")
 
     return enemy_list

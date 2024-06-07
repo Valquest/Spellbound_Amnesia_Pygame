@@ -16,8 +16,11 @@ class Enemy:
     enemy_health_font = pygame.font.Font(None, 36)
 
     def __init__(self, y_cord, x_cord, color):
-        self.y_cord = y_cord
+        # self.position = [x_cord, y_cord, True]
+        # self.x_cord = self.position[0]
+        # self.y_cord = self.position[1]
         self.x_cord = x_cord
+        self.y_cord = y_cord
         self.color = color
 
     def draw(self, canvas):
@@ -32,6 +35,10 @@ class Enemy:
 
         canvas.blit(text_surface_object, text_rect_position)
 
+    def update_position(self):
+        self.x_cord = self.position[0]  # Update x-cord from position[0]
+        self.y_cord = self.position[1]  # Update y-cord from position[1]
+        print("positions updated")
 
 # Card class
 class Card:
