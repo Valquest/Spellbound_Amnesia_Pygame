@@ -103,6 +103,7 @@ def main():
     current_action = 1
     action_start_time = 0
     delay_between_actions = 1500
+    players_turn = True
 
     # card movement variables
     returning_card = None
@@ -176,6 +177,9 @@ def main():
                     current_card = action[0]
                     current_lane = action[1]
                     core_funct.damage_enemy(current_lane, enemy_position_matrix, enemies, current_card.damage)
+
+                    # create additional enemy
+                    core_funct.generate_enemies(enemies, 1, enemy_position_matrix)
 
                     current_action += 1
                     action_start_time = current_time
