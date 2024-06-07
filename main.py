@@ -168,7 +168,6 @@ def main():
         if turn_ended:
             if current_action <= len(players_actions):
                 if current_time - action_start_time > delay_between_actions:
-                    print(f"action: {current_action}")
                     current_action += 1
                     action_start_time = current_time
                     for action in card_select_lane_select:

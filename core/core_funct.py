@@ -31,13 +31,9 @@ def calculate_return_path(start_pos, end_pos, steps=20):
 # finds enemy position index inside a lane list based of an enemy instance of Enemy class
 def enemy_position_index_finder(enemy, lane_list):
     enemy_pos = enemy.position
-    #print(f"Enemy position: {enemy_pos}")
-    #print(f"Lane list: {lane_list}")
     current_index = None
     for i, pos in enumerate(lane_list):
-        #print(f"Lane position being checked: {pos}, its index {i}")
         if pos[:2] == enemy_pos[:2]:
-            #print(f"Matching positions {enemy_pos} and {pos}")
             current_index = i
             break
 
@@ -62,11 +58,6 @@ def move_enemy(lane, direction, num_of_spots_moved, enemy_list, map_matrix):
         # enemies
         if direction == 1:
             lane_list = list(reversed(map_matrix[lane]))
-            # print(f"Lane list: {lane_list}")
-            # for enemy in enemy_list:
-                # print(f"Current enemy position: {enemy.position}")
-            #print(f"Reversed lane list: {reversed_lane_list}")
-            #print("forwards direction")
         elif direction == -1:
             lane_list = list(reversed(map_matrix[lane]))
 
@@ -74,28 +65,14 @@ def move_enemy(lane, direction, num_of_spots_moved, enemy_list, map_matrix):
         # are valid
         for enemy in enemy_list:
             current_index = enemy_position_index_finder(enemy, lane_list)
-            #print("New enemy checks -----------------")
-            #print(f"Enemy position: {enemy.position}")
-            #print(f"Current index: {current_index}")
-            # print(f"Current enemy index: {current_index}")
             if current_index is not None:
                 for moves in range(num_of_spots_moved, 0, -1):
-                    #print(f"move: {moves}")
                     new_index = current_index - direction * moves
-                    # print(f"New index {new_index}")
-                    #print(f"Check 1 {0 <= new_index < num_positions}")
-                    #print(f"Check 2 {lane_list[new_index][2]}")
-                    #print(f"new index lane position list: {lane_list[new_index]}")
-                    # print(f"num_positions: {num_positions}")
-                    # print(f"lane_list: {lane_list}")
-                    # print(f"Lane list item i: {lane_list[new_index]}")
                     if 0 <= new_index < num_positions and not lane_list[new_index][2]:
                         # store move queue information in order to complete movements in the right order
-                        #print(f"Enemy position old: {enemy.position}")
                         lane_list[current_index][2] = False
                         lane_list[new_index][2] = True
                         enemy.position = lane_list[new_index]
                         enemy.update_position()
-                        #print(f"Enemy position new: {enemy.position}")
 
     return enemy_list

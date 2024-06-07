@@ -1,5 +1,4 @@
 import pygame
-import random
 from variables import constants
 
 pygame.font.init()
