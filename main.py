@@ -103,7 +103,7 @@ def main():
     total_steps = total_actions * 3
     current_action = 1
     action_start_time = 0
-    delay_between_actions = 2000
+    delay_between_actions = 1500
     turn_sequence = 1
 
     # card movement variables
@@ -170,7 +170,7 @@ def main():
 
         # turn based action logic, every action takes 2 seconds to complete, 3 seconds delay between turns
         if turn_ended:
-            if current_action <= total_steps * 3:  # total_steps for each of damage, move, spawn
+            if current_action <= total_actions * 3:  # Ensure to perform all actions 3 times
                 if current_time - action_start_time > delay_between_actions:
                     sequence_index = (current_action - 1) % 3  # Cycle through 0, 1, 2
 
