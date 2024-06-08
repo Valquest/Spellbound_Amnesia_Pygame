@@ -96,15 +96,13 @@ def main():
     # game loop variables
     selected_lane = None
     selected_card = None
-    card_select_lane_select = []
+    move_selections = []
 
     # turn related variables
     total_actions = 3
-    total_steps = total_actions * 3
     current_action = 1
     action_start_time = 0
     delay_between_actions = 1500
-    turn_sequence = 1
 
     # card movement variables
     returning_card = None
@@ -149,9 +147,23 @@ def main():
                 if selected_card:
                     for lane in lanes:
                         if lane.collidepoint(pygame.mouse.get_pos()):
-                            print(f"Card {cards.index(selected_card)} touched Lane {lanes.index(lane)}")
-                            card_select_lane_select.append((selected_card, lanes.index(lane)))
-                            selected_card.assigned_lane = lanes.index(lane)
+                            lane_index = lanes.index(lane)
+                            move_index = -1
+                            print(f"Card {cards.index(selected_card)} touched Lane {lane_index}")
+                            for index, selection in enumerate(move_selections):
+                                if selection[0] == selected_card:
+                                    move_index = index
+                                    break
+
+                            if move_index != -1:
+                                move_selections[move_index][1] = lane_index
+                                move_index = -1
+                            elif len(move_selections) < 3:
+                                move_selections.append([selected_card, lane_index])
+                            else:
+                                move_selections.pop(0)
+                                move_selections.append([selected_card, lane_index])
+
                             break
 
                     # Calculate returning path
@@ -176,8 +188,8 @@ def main():
 
                     if sequence_index == 0:
                         # damaging enemies
-                        if (current_action - 1) // 3 < len(card_select_lane_select):
-                            action = card_select_lane_select[(current_action - 1) // 3]
+                        if (current_action - 1) // 3 < len(move_selections):
+                            action = move_selections[(current_action - 1) // 3]
                             current_card = action[0]
                             current_lane = action[1]
                             core_funct.damage_enemy(current_lane, enemy_position_matrix, enemies, current_card.damage)
@@ -196,8 +208,7 @@ def main():
             else:
                 turn_ended = False
                 current_action = 1
-                card_select_lane_select = []
-                turn_sequence = 1  # Reset turn_sequence for the next turn
+                move_selections = []
 
         # fill the screen with a color to wipe away anything from last frame
         screen.fill((102, 140, 255))
@@ -233,6 +244,10 @@ def main():
         # drawing cards
         for card in cards:
             card.draw(screen)
+
+        if len(move_selections) > 0:
+            for move in move_selections:
+                move[0].draw_lane_font(screen, move[1])
 
         # card return to it's spot animation
         if returning_card and card_animation_index < len(returning_path):

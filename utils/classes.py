@@ -43,7 +43,6 @@ class Card:
     card_height = 250
     click_color = "dark grey"
     type = None
-    assigned_lane = None
     damage = 0
 
     # create a font object
@@ -70,13 +69,13 @@ class Card:
                                                                      self.card_height // 2))
         canvas.blit(type_text_surface, type_text_rect_position)
 
-        if self.assigned_lane is not None:
-            # create a font surface for card lane selection
-            card_lane_text_surface = self.card_lane_match_font.render(f"Lane: {self.assigned_lane}", False, "black")
-            # position text surface object rectangle in a center
-            card_lane_rect_position = card_lane_text_surface.get_rect(center=(self.x_cord + self.card_width // 2,
-                                                                              self.y_cord + self.card_height // 2 + 50))
-            canvas.blit(card_lane_text_surface, card_lane_rect_position)
+    def draw_lane_font(self, canvas, assigned_lane):
+        # create a font surface for card lane selection
+        card_lane_text_surface = self.card_lane_match_font.render(f"Lane: {assigned_lane + 1}", False, "black")
+        # position text surface object rectangle in a center
+        card_lane_rect_position = card_lane_text_surface.get_rect(center=(self.x_cord + self.card_width // 2,
+                                                                          self.y_cord + self.card_height // 2 + 50))
+        canvas.blit(card_lane_text_surface, card_lane_rect_position)
 
     def update_position(self, x, y):
         self.x_cord = x
