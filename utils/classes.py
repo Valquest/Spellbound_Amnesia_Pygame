@@ -44,6 +44,7 @@ class Card:
     click_color = "dark grey"
     type = None
     damage = 0
+    position = []
 
     # create a font object
     card_type_font = pygame.font.Font(None, 36)

@@ -1,5 +1,8 @@
 import random
 from utils import classes
+from variables import constants
+from data import entities
+
 
 def last_position_enemy_finder(lane_to_search, position_matrix):
     last_position = None
@@ -95,3 +98,48 @@ def move_enemy(lane, direction, num_of_spots_moved, enemy_list, map_matrix):
                         enemy.update_position()
 
     return enemy_list
+
+
+# generating game cards
+def create_card_list():
+    game_cards = []
+    for count in range(constants.CARD_COUNT):
+        random_item = random.choice(list(entities.card_types.items()))
+
+        card = classes.Card(150 * count + 1, 0, "gray")
+
+        # take random card type and damage value from the card type dictionary
+        card.type = random_item[0]
+        card.damage = random_item[1]
+        card.position = [150 * count + 1 + constants.MARGIN, 0 + constants.MARGIN]
+
+        game_cards.append(card)
+    return game_cards
+
+
+def modify_card_list(card_list, cards_to_modify=None) -> (list, list):
+    """
+    Modifies a list of cards to get a random card type and a damage value associated to that card type.
+    :param card_list: - A list of Card class objects
+    :param cards_to_modify: - A list of index numbers targeting items that need to be modified in the card_list list. If
+    no value is provided, all cards will be updated
+    :return:
+    """
+    def modify(cards, to_modify):
+        for card_index in to_modify:
+            random_item = random.choice(list(entities.card_types.items()))
+            cards[card_index].type = random_item[0]
+            cards[card_index].damage = random_item[1]
+
+    if cards_to_modify is None:
+        cards_to_modify = [i-1 for i in range(constants.CARD_COUNT)]
+        modify(card_list, cards_to_modify)
+
+    elif cards_to_modify + 1 == constants.CARD_COUNT:
+        modify(card_list, [constants.CARD_COUNT])
+
+    else:
+        for index in cards_to_modify:
+            for i, card in enumerate(card_list[index:-1]):
+                card_list[i].position, card_list[i + 1].position = card_list[i + 1].position, card_list[i].position
+            modify(card_list, constants.CARD_COUNT)

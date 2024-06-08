@@ -42,17 +42,7 @@ def main():
     spots = util_funct.add_columns(constants.COL_NUMBER)
 
     # generating game cards
-    cards = []
-    for count in range(constants.CARD_COUNT):
-        random_item = random.choice(list(entities.card_types.items()))
-
-        temp_card = classes.Card(150 * count + 1, 0, "gray")
-
-        # take random card type and damage value from the card type dictionary
-        temp_card.type = random_item[0]
-        temp_card.damage = random_item[1]
-
-        cards.append(temp_card)
+    cards = core_funct.create_card_list()
 
     # generate enemies
     enemies = []
@@ -208,6 +198,10 @@ def main():
             else:
                 turn_ended = False
                 current_action = 1
+                cards_to_modify = []
+                for move in move_selections:
+                    cards_to_modify.append(cards.index(move[0]))
+                core_funct.modify_card_list(cards, cards_to_modify)
                 move_selections = []
 
                 # generate a list of new cards
