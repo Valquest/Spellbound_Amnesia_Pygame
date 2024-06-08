@@ -210,6 +210,19 @@ def main():
                 current_action = 1
                 move_selections = []
 
+                # generate a list of new cards
+                cards = []
+                for count in range(constants.CARD_COUNT):
+                    random_item = random.choice(list(entities.card_types.items()))
+
+                    temp_card = classes.Card(150 * count + 1, 0, "gray")
+
+                    # take random card type and damage value from the card type dictionary
+                    temp_card.type = random_item[0]
+                    temp_card.damage = random_item[1]
+
+                    cards.append(temp_card)
+
         # fill the screen with a color to wipe away anything from last frame
         screen.fill((102, 140, 255))
 
