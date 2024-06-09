@@ -68,6 +68,7 @@ def main():
     # generate a start turn button and text
     start_turn_btn = pygame.Rect((classes.Card.card_width + constants.MARGIN) * constants.CARD_COUNT + 100,
                                  constants.MARGIN, 200, 50)
+
     turn_ended = False
     end_btn_font = pygame.font.Font(None, 32)
     render_btn_font = end_btn_font.render("Start Turn", True, (0, 0, 0))
@@ -216,7 +217,7 @@ def main():
 
         # drawing amnesia meter
         for item in meter:
-            pygame.draw.rect(screen, "blue", item, constants.BORDER_THICKNESS)
+            item.draw(screen)
 
         # drawing spots/columns
         for col in spots:

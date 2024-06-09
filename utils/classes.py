@@ -81,3 +81,21 @@ class Card:
     def update_position(self, x, y):
         self.x_cord = x
         self.y_cord = y
+
+
+# amnesia meter class
+class Meter:
+    width = 20
+    height = 20
+
+    def __init__(self, x_pos, border=False):
+        from variables import variables
+        self.border = border
+        self.x_pos = x_pos
+        self.rect_obj = pygame.Rect(self.x_pos, variables.amnesia_bar_y, self.width, self.height)
+
+    def draw(self, screen):
+        if self.border:
+            pygame.draw.rect(screen, "blue", self.rect_obj, constants.BORDER_THICKNESS)
+        else:
+            pygame.draw.rect(screen, "blue", self.rect_obj)

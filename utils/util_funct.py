@@ -1,5 +1,6 @@
 import pygame
 from variables import constants, variables
+from utils import classes
 
 
 def add_columns(number_of_cols):
@@ -29,10 +30,18 @@ def add_amnesia_bar(number_of_amnesia_steps: int) -> list:
     :return: a list of rect objects
     """
     meter = []
-    for step in reversed(list(range(number_of_amnesia_steps))):
-        width = 20
-        height = 20
-        starting_x = variables.amnesia_bar_x + (2 * width) * (step - 1)
-        level = pygame.Rect(starting_x, variables.amnesia_bar_y, width, height)
-        meter.append(level)
+    for step in range(number_of_amnesia_steps):
+        starting_x = variables.amnesia_bar_x + (2 * classes.Meter.width) * step
+        meter_box = classes.Meter(starting_x, True)
+        meter.append(meter_box)
     return meter
+
+def update_amnesia_bar(meter_list: list):
+    """
+    Updates the infill of amnesia bar rect objects
+    :param meter_list:
+    :return:
+    """
+    #for i, meter in enumerate(meter_list):
+    #    if meter_list[len(meter_list) - 1].:
+
