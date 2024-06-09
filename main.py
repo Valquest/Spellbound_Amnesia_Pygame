@@ -2,10 +2,9 @@ import pygame
 import random
 # project files
 from utils import classes
-from variables import constants
+from variables import constants, variables
 from core import core_funct
 from utils import util_funct
-from data import entities
 
 
 def main():
@@ -25,15 +24,18 @@ def main():
         row_position = []
         for col in range(constants.COL_NUMBER):
             x_pos = int(round((constants.WINDOW_WIDTH -
-                               constants.MARGIN - ((constants.COL_WIDTH - constants.BORDER_THICKNESS) * col) -
-                               constants.COL_WIDTH / 2), 0))
+                               constants.MARGIN - ((variables.col_width - constants.BORDER_THICKNESS) * col) -
+                               variables.col_width / 2), 0))
             y_pos = int(round((constants.WINDOW_HEIGHT -
-                               constants.MARGIN - (constants.LANE_HEIGHT * (3 - row))
-                               + constants.LANE_HEIGHT / 2), 0))
+                               constants.MARGIN - (variables.lane_height * (3 - row))
+                               + variables.lane_height / 2), 0))
             occupied = False
             position = [x_pos, y_pos, occupied]
             row_position.append(position)
         enemy_position_matrix.append(row_position)
+
+    # create amnesia meter bar
+    meter = util_funct.add_amnesia_bar(constants.AMNESIA_BAR_COUNT)
 
     # create lanes/rows
     lanes = util_funct.add_lanes(constants.ROW_NUMBER)
@@ -63,15 +65,15 @@ def main():
     #             enemies.append(enemy)
     #             break
 
-    # generate an end turn button and text
-    end_turn_btn = pygame.Rect((cards[0].card_width + constants.MARGIN) * constants.CARD_COUNT + 100, constants.MARGIN,
-                               200, 50)
+    # generate a start turn button and text
+    start_turn_btn = pygame.Rect((classes.Card.card_width + constants.MARGIN) * constants.CARD_COUNT + 100,
+                                 constants.MARGIN, 200, 50)
     turn_ended = False
     end_btn_font = pygame.font.Font(None, 32)
     render_btn_font = end_btn_font.render("Start Turn", True, (0, 0, 0))
-    end_turn_btn_position = render_btn_font.get_rect(center=((cards[0].card_width + constants.MARGIN) *
-                                                             constants.CARD_COUNT + 100 + 200 // 2, constants.MARGIN +
-                                                             50 // 2))
+    start_turn_btn_position = render_btn_font.get_rect(center=((cards[0].card_width + constants.MARGIN) *
+                                                               constants.CARD_COUNT + 100 + 200 // 2,
+                                                               constants.MARGIN + 50 // 2))
 
     # this code draws all enemies in all possible positions to test if positioning is correct
     # for row in range(constants.ROW_NUMBER):
@@ -122,7 +124,7 @@ def main():
                         # exits loop if condition is met
                         break
                 """
-                if end_turn_btn.collidepoint(mouse_pos):
+                if start_turn_btn.collidepoint(mouse_pos):
                     turn_ended = True
                     action_start_time = pygame.time.get_ticks()
 
@@ -147,6 +149,7 @@ def main():
 
                             if move_index != -1:
                                 move_selections[move_index][1] = lane_index
+                                # noinspection PyUnusedLocal
                                 move_index = -1
                             elif len(move_selections) < 3:
                                 move_selections.append([selected_card, lane_index])
@@ -204,13 +207,16 @@ def main():
                 core_funct.modify_card_list(cards, cards_to_modify)
                 move_selections = []
 
-
         # fill the screen with a color to wipe away anything from last frame
         screen.fill((102, 140, 255))
 
         # draw "end turn" button
-        pygame.draw.rect(screen, "white", end_turn_btn)
-        screen.blit(render_btn_font, end_turn_btn_position)
+        pygame.draw.rect(screen, "white", start_turn_btn)
+        screen.blit(render_btn_font, start_turn_btn_position)
+
+        # drawing amnesia meter
+        for item in meter:
+            pygame.draw.rect(screen, "blue", item, constants.BORDER_THICKNESS)
 
         # drawing spots/columns
         for col in spots:

@@ -117,7 +117,7 @@ def create_card_list():
     return game_cards
 
 
-def modify_card_list(card_list, cards_to_modify=None) -> (list, list):
+def modify_card_list(card_list: list, cards_to_modify: list[int] = None):
     """
     Modifies a list of cards to get a random card type and a damage value associated to that card type.
     :param card_list: - A list of Card class objects
@@ -125,9 +125,8 @@ def modify_card_list(card_list, cards_to_modify=None) -> (list, list):
     no value is provided, all cards will be updated
     :return:
     """
-    def modify(cards, to_modify) -> (list, list):
+    def modify(cards: list, to_modify: list):
         for card_index in to_modify:
-            print(card_index)
             random_item = random.choice(list(entities.card_types.items()))
             cards[card_index].type = random_item[0]
             cards[card_index].damage = random_item[1]
@@ -137,8 +136,6 @@ def modify_card_list(card_list, cards_to_modify=None) -> (list, list):
         modify(card_list, cards_to_modify)
 
     elif len(cards_to_modify) == 1 and cards_to_modify[0] + 1 == constants.CARD_COUNT:
-        print(card_list)
-        print(cards_to_modify)
         modify(card_list, cards_to_modify)
 
     else:

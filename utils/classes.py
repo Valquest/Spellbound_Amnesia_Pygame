@@ -47,7 +47,7 @@ class Card:
     position = []
 
     # create a font object
-    card_type_font = pygame.font.Font(None, 36)
+    card_type_font = pygame.font.Font(None, 32)
     card_lane_match_font = pygame.font.Font(None, 26)
 
     def __init__(self, x_cord, y_cord, color):
