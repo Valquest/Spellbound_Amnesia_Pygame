@@ -1,4 +1,5 @@
 import pygame
+import random
 from variables import constants
 
 pygame.font.init()
@@ -10,19 +11,22 @@ class Position:
     height = constants.WINDOW_HEIGHT / 5 - constants.BORDER_THICKNESS
 
     def __init__(self, x, y, occupied=False):
-        self.rect = pygame.Rect(x, y, Position.width, Position.height)
+        self.x = x
+        self.y = y
         self.occupied = occupied
+        self.rect = pygame.Rect(x, y, Position.width, Position.height)
 
 
 class Lane:
-    start_x = constants.WINDOW_WIDTH / 10.75 * 4
+    start_x = constants.WINDOW_WIDTH - constants.MARGIN - Position.width
+    # start_x = constants.WINDOW_WIDTH / 10.75 * 4 This starts row reading left to right
     start_y = constants.WINDOW_HEIGHT / 5.1 * 2
 
     def __init__(self, lane_index):
         self.positions = []
         self.lane_index = lane_index
         for position_index in range(constants.POSITION_NUMBER):
-            x_pos = self.start_x + ((Position.width - constants.BORDER_THICKNESS) * position_index)
+            x_pos = self.start_x - ((Position.width - constants.BORDER_THICKNESS) * position_index + 1)
             y_pos = self.start_y + ((Position.height - constants.BORDER_THICKNESS) * self.lane_index)
             position = Position(x_pos, y_pos)
             self.positions.append(position)
@@ -72,6 +76,28 @@ class Enemy:
     def update_position(self):
         self.x_cord = self.position[0] - self.enemy_width / 2
         self.y_cord = self.position[1] - self.enemy_height / 2
+
+
+# hoard class generates enemy instances
+class Hoard:
+    def __init__(self, temp_var_num_of_enemies, battlefield):
+        self.enemy_count = temp_var_num_of_enemies
+        self.enemy_list = []
+        for _ in range(self.enemy_count):
+            # generate random light color for enemies
+            self.color = (random.randint(100, 255), random.randint(100, 255), random.randint(100, 255))
+            # randomise a row to generate enemy in
+            self.random_lane = random.randint(0, constants.LANE_NUMBER - 1)
+            lane = battlefield.lanes[self.random_lane]
+            for index, position in enumerate(lane.positions):
+                if not position.occupied:
+                    position = lane.positions[index]
+                    enemy = Enemy(position.x, position.y, self.color)
+                    position.occupied = True
+                    # enemy.position = enemy_matrix[random_row][index]
+                    enemy.health = random.randint(1, 3)
+                    self.enemy_list.append(enemy)
+                    break
 
 
 # Card class

@@ -1,5 +1,6 @@
 import pygame
 import random
+
 # project files
 from utils import classes
 from variables import constants
@@ -39,6 +40,10 @@ def main():
     # create battlefield with lanes and positions
     battlefield = classes.Battlefield(constants.LANE_NUMBER)
 
+    for i, lane in enumerate(battlefield.lanes):
+        for a, position in enumerate(lane.positions):
+            print(f"Lane {i}, position {a}, x: {position.x}, y: {position.y}")
+
     # create amnesia meter bar
     meters = util_funct.add_amnesia_bar(constants.AMNESIA_BAR_COUNT)
 
@@ -46,27 +51,12 @@ def main():
     cards = core_funct.create_card_list()
 
     # generate enemies
-    enemies = []
-    core_funct.generate_enemies(enemies, random.randint(4, 8), enemy_position_matrix)
+    enemies = classes.Hoard(random.randint(4, 8), battlefield).enemy_list
+    #core_funct.generate_enemies(enemies, random.randint(4, 8), enemy_position_matrix)
 
     # generate a start turn button and text
     start_turn_btn = classes.Button("Start turn", (classes.Card.card_width + constants.MARGIN) *
                                     constants.CARD_COUNT + 100, constants.MARGIN, 200, 50)
-    # start_turn_btn = pygame.Rect((classes.Card.card_width + constants.MARGIN) * constants.CARD_COUNT + 100,
-    #                              constants.MARGIN, 200, 50)
-    # end_btn_font = pygame.font.Font(None, 32)
-    # render_btn_font = end_btn_font.render("Start Turn", True, (0, 0, 0))
-    # start_turn_btn_position = render_btn_font.get_rect(center=((cards[0].card_width + constants.MARGIN) *
-    #                                                            constants.CARD_COUNT + 100 + 200 // 2,
-    #                                                            constants.MARGIN + 50 // 2))
-
-    # this code draws all enemies in all possible positions to test if positioning is correct
-    # for row in range(constants.ROW_NUMBER):
-    #     for col in range(constants.COL_NUMBER):
-    #         random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-    #         enemy = Enemy(enemy_position_matrix[row][col][1] - Enemy.enemy_width / 2,
-    #                       enemy_position_matrix[row][col][0] - Enemy.enemy_height / 2, random_color)
-    #         enemies.append(enemy)
 
     # MAIN GAME LOOP
 
