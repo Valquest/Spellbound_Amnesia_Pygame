@@ -45,6 +45,7 @@ class Card:
     type = None
     damage = 0
     position = []
+    enemy_to_damage = 0
 
     # create a font object
     card_type_font = pygame.font.Font(None, 32)

@@ -52,6 +52,3 @@ def increment_amnesia_bar(meter_list: list):
             if meter.border:
                 meter.border = False
                 break
-
-
-

@@ -186,7 +186,8 @@ def main():
                             action = move_selections[(current_action - 1) // 3]
                             current_card = action[0]
                             current_lane = action[1]
-                            core_funct.damage_enemy(current_lane, enemy_position_matrix, enemies, current_card.damage)
+                            core_funct.damage_enemy(current_lane, enemy_position_matrix, enemies, current_card.damage,
+                                                    current_card.enemy_to_damage)
                             util_funct.increment_amnesia_bar(meters)
 
                     elif sequence_index == 1:
