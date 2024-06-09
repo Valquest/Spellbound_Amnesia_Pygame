@@ -2,7 +2,7 @@ import pygame
 import random
 # project files
 from utils import classes
-from variables import constants, variables
+from variables import constants
 from core import core_funct
 from utils import util_funct
 
@@ -20,28 +20,31 @@ def main():
     # creating enemy position matrix for coordinates and slot availability. This is used to determine what positions in
     # the field are available and will be used for combat to determine what effects apply to what lanes
     enemy_position_matrix = []
-    for row in range(constants.ROW_NUMBER):
+    for row in range(constants.LANE_NUMBER):
         row_position = []
-        for col in range(constants.COL_NUMBER):
+        for col in range(constants.POSITION_NUMBER):
             x_pos = int(round((constants.WINDOW_WIDTH -
-                               constants.MARGIN - ((variables.col_width - constants.BORDER_THICKNESS) * col) -
-                               variables.col_width / 2), 0))
+                               constants.MARGIN - ((classes.Position.width - constants.BORDER_THICKNESS) * col) -
+                               classes.Position.width / 2), 0))
             y_pos = int(round((constants.WINDOW_HEIGHT -
-                               constants.MARGIN - (variables.lane_height * (3 - row))
-                               + variables.lane_height / 2), 0))
+                               constants.MARGIN - (classes.Position.height * (3 - row))
+                               + classes.Position.height / 2), 0))
             occupied = False
             position = [x_pos, y_pos, occupied]
             row_position.append(position)
         enemy_position_matrix.append(row_position)
 
+    # create battlefield with lanes and positions
+    battlefield = classes.Battlefield(constants.LANE_NUMBER)
+
     # create amnesia meter bar
     meters = util_funct.add_amnesia_bar(constants.AMNESIA_BAR_COUNT)
 
     # create lanes/rows
-    lanes = util_funct.add_lanes(constants.ROW_NUMBER)
+    #lanes = util_funct.add_lanes(constants.ROW_NUMBER)
 
     # create spots/columns
-    spots = util_funct.add_columns(constants.COL_NUMBER)
+    #spots = util_funct.add_columns(constants.COL_NUMBER)
 
     # generating game cards
     cards = core_funct.create_card_list()
@@ -138,9 +141,9 @@ def main():
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 if selected_card:
-                    for lane in lanes:
+                    for lane in battlefield.lanes:
                         if lane.collidepoint(pygame.mouse.get_pos()):
-                            lane_index = lanes.index(lane)
+                            lane_index = battlefield.lanes.index(lane)
                             move_index = -1
                             print(f"Card {cards.index(selected_card)} touched Lane {lane_index}")
                             for index, selection in enumerate(move_selections):
@@ -221,16 +224,19 @@ def main():
         for item in meters:
             item.draw(screen)
 
-        # drawing spots/columns
-        for col in spots:
-            pygame.draw.rect(screen, "black", col, constants.BORDER_THICKNESS)
+        # draw positions
+        battlefield.draw(screen)
 
-        # drawing lanes/rows
-        for i, lane in enumerate(lanes):
-            if i == selected_lane and selected_lane is not None:
-                pygame.draw.rect(screen, "red", lane, constants.BORDER_THICKNESS)
-            else:
-                pygame.draw.rect(screen, "black", lane, constants.BORDER_THICKNESS)
+        # # drawing spots/columns
+        # for col in spots:
+        #     pygame.draw.rect(screen, "black", col, constants.BORDER_THICKNESS)
+        #
+        # # drawing lanes/rows
+        # for i, lane in enumerate(lanes):
+        #     if i == selected_lane and selected_lane is not None:
+        #         pygame.draw.rect(screen, "red", lane, constants.BORDER_THICKNESS)
+        #     else:
+        #         pygame.draw.rect(screen, "black", lane, constants.BORDER_THICKNESS)
 
         # updates enemy list and matrix
         for enemy in enemies[:]:

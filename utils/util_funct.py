@@ -1,26 +1,25 @@
-import pygame
 from variables import constants, variables
 from utils import classes
 
 
-def add_columns(number_of_cols):
-    cols = []
-    for spot in range(number_of_cols):
-        column = pygame.Rect(constants.COL_START + ((variables.col_width - 5) * spot + 1), variables.lane_start_y * 3 -
-                             constants.MARGIN, variables.col_width, constants.WINDOW_HEIGHT - variables.lane_start_y *
-                             3)
-        cols.append(column)
-    return cols
+# def add_columns(number_of_cols):
+#     cols = []
+#     for spot in range(number_of_cols):
+#         column = pygame.Rect(constants.COL_START + ((variables.col_width - 5) * spot + 1), variables.lane_start_y * 3-
+#                              constants.MARGIN, variables.col_width, constants.WINDOW_HEIGHT - variables.lane_start_y *
+#                              3)
+#         cols.append(column)
+#     return cols
 
 
-def add_lanes(number_of_lanes):
-    lanes = []
-    for lane_num in range(number_of_lanes):
-        lane = pygame.Rect(variables.lane_start_x, variables.lane_start_y * (3 + lane_num) - constants.MARGIN,
-                           constants.WINDOW_WIDTH - variables.lane_start_x - constants.MARGIN, variables.lane_height)
-        lanes.append(lane)
-
-    return lanes
+# def add_lanes(number_of_lanes):
+#     lanes = []
+#     for lane_num in range(number_of_lanes):
+#         lane = pygame.Rect(variables.lane_start_x, variables.lane_start_y * (3 + lane_num) - constants.MARGIN,
+#                            constants.WINDOW_WIDTH - variables.lane_start_x - constants.MARGIN, variables.lane_height)
+#         lanes.append(lane)
+#
+#     return lanes
 
 
 def add_amnesia_bar(number_of_amnesia_steps: int) -> list:

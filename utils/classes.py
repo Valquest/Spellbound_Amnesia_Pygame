@@ -4,6 +4,43 @@ from variables import constants
 pygame.font.init()
 
 
+# Position class
+class Position:
+    width = constants.WINDOW_WIDTH / 12.5
+    height = constants.WINDOW_HEIGHT / 5 - constants.BORDER_THICKNESS
+
+    def __init__(self, x, y, occupied=False):
+        self.rect = pygame.Rect(x, y, Position.width, Position.height)
+        self.occupied = occupied
+
+
+class Lane:
+    start_x = constants.WINDOW_WIDTH / 10.75 * 4
+    start_y = constants.WINDOW_HEIGHT / 5.1 * 2
+
+    def __init__(self, lane_index):
+        self.positions = []
+        self.lane_index = lane_index
+        for position_index in range(constants.POSITION_NUMBER):
+            x_pos = self.start_x + ((Position.width - constants.BORDER_THICKNESS) * position_index)
+            y_pos = self.start_y + ((Position.height - constants.BORDER_THICKNESS) * self.lane_index)
+            position = Position(x_pos, y_pos)
+            self.positions.append(position)
+
+
+class Battlefield:
+    def __init__(self, lane_count):
+        self.lanes = []
+        for lane_index in range(lane_count):
+            lane = Lane(lane_index)
+            self.lanes.append(lane)
+
+    def draw(self, canvas):
+        for lane in self.lanes:
+            for position in lane.positions:
+                pygame.draw.rect(canvas, "black", position.rect, constants.BORDER_THICKNESS)
+
+
 # Enemy class
 class Enemy:
     enemy_width = 50
