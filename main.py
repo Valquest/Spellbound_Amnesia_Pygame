@@ -113,25 +113,10 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            # when mouse button is clicked, get mouse position
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # get mouse position
-                mouse_pos = pygame.mouse.get_pos()
-                """
-                # check if clicked inside any rectangle and damage enemies
-                for lane in lanes:
-                    if lane.collidepoint(mouse_pos):
-                        selected_lane = lanes.index(lane)
-
-                        # damage enemy when lane is selected
-                        #core_funct.damage_enemy(lanes.index(lane), enemy_position_matrix, enemies, 1)
-
-                        # exits loop if condition is met
-                        break
-                """
-                if start_turn_btn.collidepoint(mouse_pos):
-                    turn_ended = True
-                    action_start_time = pygame.time.get_ticks()
-
+                # for each card checks if mouse button is pushed down when hovering on a card. Selects that card and
+                # stores it to a variable
                 for card in cards:
                     if pygame.Rect(card.x_cord, card.y_cord, card.card_width, card.card_height).collidepoint(event.pos):
                         selected_card = card
@@ -140,28 +125,38 @@ def main():
                         break
 
             elif event.type == pygame.MOUSEBUTTONUP:
+                # get mouse position
+                mouse_pos = pygame.mouse.get_pos()
+                # if "start turn" button is collided with mouse position
+                if start_turn_btn.collidepoint(mouse_pos):
+                    # end the turn by changing flag and mark down game time during the click
+                    turn_ended = True
+                    action_start_time = pygame.time.get_ticks()
                 if selected_card:
                     for lane in battlefield.lanes:
-                        if lane.collidepoint(pygame.mouse.get_pos()):
-                            lane_index = battlefield.lanes.index(lane)
-                            move_index = -1
-                            print(f"Card {cards.index(selected_card)} touched Lane {lane_index}")
-                            for index, selection in enumerate(move_selections):
-                                if selection[0] == selected_card:
-                                    move_index = index
-                                    break
-
-                            if move_index != -1:
-                                move_selections[move_index][1] = lane_index
-                                # noinspection PyUnusedLocal
+                        lane_index = None
+                        for position in lane.positions:
+                            if position.rect.collidepoint(mouse_pos):
+                                lane_index = battlefield.lanes.index(lane)
+                                # sets variable move_index to -1 so that further conditions avoid iterating
+                                # move_selections if move_index is not set to value above -1
                                 move_index = -1
-                            elif len(move_selections) < 3:
-                                move_selections.append([selected_card, lane_index])
-                            else:
-                                move_selections.pop(0)
-                                move_selections.append([selected_card, lane_index])
-
-                            break
+                                print(f"Card {cards.index(selected_card)} touched Lane {lane_index}")
+                                # checks if cards that are being selected are not already in the list, if they are, lane
+                                # is rewritten on top of the same list item
+                                for index, selection in enumerate(move_selections):
+                                    if selection[0] == selected_card:
+                                        move_index = index
+                                        break
+                                if move_index != -1:
+                                    move_selections[move_index][1] = lane_index
+                                    move_index = -1
+                                elif len(move_selections) < 3:
+                                    move_selections.append([selected_card, lane_index])
+                                else:
+                                    move_selections.pop(0)
+                                    move_selections.append([selected_card, lane_index])
+                                break
 
                     # Calculate returning path
                     returning_path = core_funct.calculate_return_path(
