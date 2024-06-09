@@ -36,12 +36,22 @@ def add_amnesia_bar(number_of_amnesia_steps: int) -> list:
         meter.append(meter_box)
     return meter
 
-def update_amnesia_bar(meter_list: list):
+
+def increment_amnesia_bar(meter_list: list):
     """
     Updates the infill of amnesia bar rect objects
-    :param meter_list:
+    :param meter_list: A list of meter class objects
     :return:
     """
-    #for i, meter in enumerate(meter_list):
-    #    if meter_list[len(meter_list) - 1].:
+    final_meter = constants.AMNESIA_BAR_COUNT - 1
+    if not meter_list[final_meter].border:
+        for meter in meter_list:
+            meter.border = True
+    else:
+        for meter in meter_list:
+            if meter.border:
+                meter.border = False
+                break
+
+
 

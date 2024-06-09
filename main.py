@@ -35,7 +35,7 @@ def main():
         enemy_position_matrix.append(row_position)
 
     # create amnesia meter bar
-    meter = util_funct.add_amnesia_bar(constants.AMNESIA_BAR_COUNT)
+    meters = util_funct.add_amnesia_bar(constants.AMNESIA_BAR_COUNT)
 
     # create lanes/rows
     lanes = util_funct.add_lanes(constants.ROW_NUMBER)
@@ -95,7 +95,7 @@ def main():
     total_actions = 3
     current_action = 1
     action_start_time = 0
-    delay_between_actions = 100
+    delay_between_actions = 1000
 
     # card movement variables
     returning_card = None
@@ -187,6 +187,7 @@ def main():
                             current_card = action[0]
                             current_lane = action[1]
                             core_funct.damage_enemy(current_lane, enemy_position_matrix, enemies, current_card.damage)
+                            util_funct.increment_amnesia_bar(meters)
 
                     elif sequence_index == 1:
                         # moving enemies
@@ -216,7 +217,7 @@ def main():
         screen.blit(render_btn_font, start_turn_btn_position)
 
         # drawing amnesia meter
-        for item in meter:
+        for item in meters:
             item.draw(screen)
 
         # drawing spots/columns

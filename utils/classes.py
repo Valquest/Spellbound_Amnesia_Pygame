@@ -92,7 +92,8 @@ class Meter:
         from variables import variables
         self.border = border
         self.x_pos = x_pos
-        self.rect_obj = pygame.Rect(self.x_pos, variables.amnesia_bar_y, self.width, self.height)
+        self.y_pos = variables.amnesia_bar_y
+        self.rect_obj = pygame.Rect(self.x_pos, self.y_pos, self.width, self.height)
 
     def draw(self, screen):
         if self.border:
