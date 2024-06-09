@@ -138,3 +138,24 @@ class Meter:
             pygame.draw.rect(screen, "blue", self.rect_obj, constants.BORDER_THICKNESS)
         else:
             pygame.draw.rect(screen, "blue", self.rect_obj)
+
+
+# any button class
+class Button:
+    start_btn_font = pygame.font.Font(None, 32)
+
+    def __init__(self, button_name, x_pos, y_pos, width, height):
+        self.name = button_name
+        self.x = x_pos
+        self.y = y_pos
+        self.width = width
+        self.height = height
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.font_render = self.start_btn_font.render("Start Turn", True, (0, 0, 0))
+        self.btn_position = self.font_render.get_rect(center=((Card.card_width + constants.MARGIN) *
+                                                              constants.CARD_COUNT + 100 + 200 // 2,
+                                                              constants.MARGIN + 50 // 2))
+
+    # draw a button
+    def draw(self, canvas):
+        pygame.draw.rect(canvas, "white", self.rect)

@@ -121,11 +121,14 @@ def move_enemy(lane, direction, num_of_spots_moved, enemy_list, map_matrix):
 
 
 # generating game cards
-def create_card_list():
+def create_card_list() -> list:
+    """
+    Generates a list of Card class objects, each Card object has a rect object and few functions to manage these objects
+    :return: returns a list of Card class objects
+    """
     game_cards = []
     for count in range(constants.CARD_COUNT):
         random_item = random.choice(list(entities.card_types.items()))
-
         card = classes.Card(150 * count + 1, 0, "gray")
 
         # take random card type and damage value from the card type dictionary

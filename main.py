@@ -8,14 +8,16 @@ from utils import util_funct
 
 
 def main():
-
     # pygame setup
     pygame.init()
     pygame.font.init()
-    screen = pygame.display.set_mode((constants.WINDOW_WIDTH, constants.WINDOW_HEIGHT))
-    clock = pygame.time.Clock()
-    running = True
     pygame.display.set_caption('Spellbound Amnesia')
+
+    # generic game variables
+    running = True
+    screen = pygame.display.set_mode((constants.WINDOW_WIDTH, constants.WINDOW_HEIGHT))
+    turn_ended = False
+    clock = pygame.time.Clock()
 
     # creating enemy position matrix for coordinates and slot availability. This is used to determine what positions in
     # the field are available and will be used for combat to determine what effects apply to what lanes
@@ -40,44 +42,23 @@ def main():
     # create amnesia meter bar
     meters = util_funct.add_amnesia_bar(constants.AMNESIA_BAR_COUNT)
 
-    # create lanes/rows
-    #lanes = util_funct.add_lanes(constants.ROW_NUMBER)
-
-    # create spots/columns
-    #spots = util_funct.add_columns(constants.COL_NUMBER)
-
     # generating game cards
     cards = core_funct.create_card_list()
 
     # generate enemies
     enemies = []
-    number_of_enemies = random.randint(4, 8)
-    core_funct.generate_enemies(enemies, number_of_enemies, enemy_position_matrix)
-    # for _ in range(random.randint(4, 8)):
-    #     random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-    #     random_row = random.randint(0, len(enemy_position_matrix) - 1)
-    #
-    #     for index, col in enumerate(enemy_position_matrix[random_row]):
-    #         if not col[2]:
-    #             enemy = classes.Enemy(enemy_position_matrix[random_row][index][1],
-    #                                   enemy_position_matrix[random_row][index][0],
-    #                                   random_color)
-    #             enemy_position_matrix[random_row][index][2] = True
-    #             enemy.position = enemy_position_matrix[random_row][index]
-    #             enemy.health = random.randint(1, 3)
-    #             enemies.append(enemy)
-    #             break
+    core_funct.generate_enemies(enemies, random.randint(4, 8), enemy_position_matrix)
 
     # generate a start turn button and text
-    start_turn_btn = pygame.Rect((classes.Card.card_width + constants.MARGIN) * constants.CARD_COUNT + 100,
-                                 constants.MARGIN, 200, 50)
-
-    turn_ended = False
-    end_btn_font = pygame.font.Font(None, 32)
-    render_btn_font = end_btn_font.render("Start Turn", True, (0, 0, 0))
-    start_turn_btn_position = render_btn_font.get_rect(center=((cards[0].card_width + constants.MARGIN) *
-                                                               constants.CARD_COUNT + 100 + 200 // 2,
-                                                               constants.MARGIN + 50 // 2))
+    start_turn_btn = classes.Button("Start turn", (classes.Card.card_width + constants.MARGIN) *
+                                    constants.CARD_COUNT + 100, constants.MARGIN, 200, 50)
+    # start_turn_btn = pygame.Rect((classes.Card.card_width + constants.MARGIN) * constants.CARD_COUNT + 100,
+    #                              constants.MARGIN, 200, 50)
+    # end_btn_font = pygame.font.Font(None, 32)
+    # render_btn_font = end_btn_font.render("Start Turn", True, (0, 0, 0))
+    # start_turn_btn_position = render_btn_font.get_rect(center=((cards[0].card_width + constants.MARGIN) *
+    #                                                            constants.CARD_COUNT + 100 + 200 // 2,
+    #                                                            constants.MARGIN + 50 // 2))
 
     # this code draws all enemies in all possible positions to test if positioning is correct
     # for row in range(constants.ROW_NUMBER):
@@ -128,7 +109,7 @@ def main():
                 # get mouse position
                 mouse_pos = pygame.mouse.get_pos()
                 # if "start turn" button is collided with mouse position
-                if start_turn_btn.collidepoint(mouse_pos):
+                if start_turn_btn.rect.collidepoint(mouse_pos):
                     # end the turn by changing flag and mark down game time during the click
                     turn_ended = True
                     action_start_time = pygame.time.get_ticks()
@@ -211,9 +192,9 @@ def main():
         # fill the screen with a color to wipe away anything from last frame
         screen.fill((102, 140, 255))
 
-        # draw "end turn" button
-        pygame.draw.rect(screen, "white", start_turn_btn)
-        screen.blit(render_btn_font, start_turn_btn_position)
+        # draw start turn button with text
+        start_turn_btn.draw(screen)
+        screen.blit(start_turn_btn.font_render, start_turn_btn.btn_position)
 
         # drawing amnesia meter
         for item in meters:
