@@ -16,38 +16,27 @@ def enemy_position_finder(lane_to_search, position_matrix, enemy_to_look_for: in
     reversed_list = list(reversed(position_matrix[lane_to_search]))
     enemy_position_list = [index for index, position in enumerate(reversed_list) if position[2]]
     last_position = None
-    print(f"enemy_position_list: {enemy_position_list}")
-    print(f"enemy to look for: {enemy_to_look_for}")
     # checks if requested enemy is within the list or is not the first enemy in the list
     if 0 < enemy_to_look_for < len(reversed_list):
         if next_to:
             # checks if enemy, being looked, for has index that is 1 more than previous enemy (subsequent)
             if enemy_position_list[enemy_to_look_for] - 1 == enemy_position_list[enemy_to_look_for - 1]:
-                print(f"Executing 1")
                 last_position = enemy_position_list[enemy_to_look_for]
             else:
-                print(f"Executing 2")
                 last_position = None
         else:
-            print(f"Executing 3")
             last_position = enemy_position_list[enemy_to_look_for]
     else:
-        print(f"Executing 4")
         last_position = enemy_position_list[0]
-
-    print(f"finally returning: {last_position}")
 
     return reversed_list[last_position]
 
 
 def damage_enemy(lane_index, position_matrix, enemy_list, damage=1, enemy_to_damage: int = 0):
     enemy_to_damage_position = enemy_position_finder(lane_index, position_matrix, enemy_to_damage)
-    print(f"enemy_to_damage_position: {enemy_to_damage_position}")
     for enemy in enemy_list:
         print(enemy.position)
         if enemy.position == enemy_to_damage_position:
-            print("Damaging enemy")
-            print(damage)
             enemy.health -= damage
 
 
