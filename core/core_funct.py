@@ -125,21 +125,24 @@ def modify_card_list(card_list, cards_to_modify=None) -> (list, list):
     no value is provided, all cards will be updated
     :return:
     """
-    def modify(cards, to_modify):
+    def modify(cards, to_modify) -> (list, list):
         for card_index in to_modify:
+            print(card_index)
             random_item = random.choice(list(entities.card_types.items()))
             cards[card_index].type = random_item[0]
             cards[card_index].damage = random_item[1]
 
     if cards_to_modify is None:
-        cards_to_modify = [i-1 for i in range(constants.CARD_COUNT)]
+        cards_to_modify = [i - 1 for i in range(constants.CARD_COUNT)]
         modify(card_list, cards_to_modify)
 
-    elif cards_to_modify + 1 == constants.CARD_COUNT:
-        modify(card_list, [constants.CARD_COUNT])
+    elif len(cards_to_modify) == 1 and cards_to_modify[0] + 1 == constants.CARD_COUNT:
+        print(card_list)
+        print(cards_to_modify)
+        modify(card_list, cards_to_modify)
 
     else:
         for index in cards_to_modify:
-            for i, card in enumerate(card_list[index:-1]):
+            for i in range(index, len(card_list) - 1):
                 card_list[i].position, card_list[i + 1].position = card_list[i + 1].position, card_list[i].position
-            modify(card_list, constants.CARD_COUNT)
+            modify(card_list, [index])
