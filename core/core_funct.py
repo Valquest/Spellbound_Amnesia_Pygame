@@ -90,33 +90,29 @@ def enemy_list_sorter(enemy_list):
     return sorted(enemy_list, key=lambda enemy: (enemy.y_cord, enemy.x_cord))
 
 
-def move_enemy(lane, direction, num_of_spots_moved, enemy_list, battlefield):
+def move_enemy(lane, direction, num_of_spots_moved, battlefield) -> None:
     if direction not in [-1, 1]:
         raise ValueError("Direction must be either 1 or -1 for \"move_enemy\" function")
     else:
-        positions = battlefield[lane]
+        positions = battlefield.lanes[lane]
         num_positions = len(positions)
         # sort enemy list
-        enemy_list = enemy_list_sorter(enemy_list)
+        #           enemy_list = enemy_list_sorter(enemy_list)
         # based on direction we set lane_list order, so we could move enemies only if they are not colliding with other
         # enemies
         lane_list = list(reversed(positions))
 
         # after lists are established we find position indexes for enemies, set new indexes and check if new indexes
         # are valid
-        for enemy in enemy_list:
-            current_index = [index for index, enemy in positions if position.enemy = enemy]
-            if current_index is not None:
-                for moves in range(num_of_spots_moved, 0, -1):
-                    new_index = current_index - direction * moves
-                    if 0 <= new_index < num_positions and not lane_list[new_index][2]:
-                        # store move queue information in order to complete movements in the right order
-                        lane_list[current_index][2] = False
-                        lane_list[new_index][2] = True
-                        enemy.position = lane_list[new_index]
-                        enemy.update_position()
-
-    return enemy_list
+        for index, position in enumerate(positions):
+            for moves in range(num_of_spots_moved, 0, -1):
+                new_index = index - direction * moves
+                if 0 <= new_index < num_positions and not lane_list[new_index].occupied:
+                    # store move queue information in order to complete movements in the right order
+                    lane_list[index].occupied = False
+                    lane_list[new_index].enemy = lane_list[index].enemy
+                    lane_list[index].enemy = None
+                    lane_list[new_index].occupied = True
 
 
 # generating game cards
