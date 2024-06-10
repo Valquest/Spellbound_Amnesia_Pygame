@@ -94,7 +94,7 @@ def move_enemy(lane, direction, num_of_spots_moved, battlefield) -> None:
     if direction not in [-1, 1]:
         raise ValueError("Direction must be either 1 or -1 for \"move_enemy\" function")
     else:
-        positions = battlefield.lanes[lane]
+        positions = battlefield.lanes[lane].positions
         num_positions = len(positions)
         # sort enemy list
         #           enemy_list = enemy_list_sorter(enemy_list)
