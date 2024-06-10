@@ -20,6 +20,9 @@ def main():
     turn_ended = False
     clock = pygame.time.Clock()
 
+    # create battlefield with lanes and positions
+    battlefield = classes.Battlefield(constants.LANE_NUMBER)
+
     # creating enemy position matrix for coordinates and slot availability. This is used to determine what positions in
     # the field are available and will be used for combat to determine what effects apply to what lanes
     enemy_position_matrix = []
@@ -37,12 +40,7 @@ def main():
             row_position.append(position)
         enemy_position_matrix.append(row_position)
 
-    # create battlefield with lanes and positions
-    battlefield = classes.Battlefield(constants.LANE_NUMBER)
 
-    for i, lane in enumerate(battlefield.lanes):
-        for a, position in enumerate(lane.positions):
-            print(f"Lane {i}, position {a}, x: {position.x}, y: {position.y}")
 
     # create amnesia meter bar
     meters = util_funct.add_amnesia_bar(constants.AMNESIA_BAR_COUNT)
@@ -53,6 +51,10 @@ def main():
     # generate enemies
     enemies = classes.Hoard(random.randint(4, 8), battlefield).enemy_list
     #core_funct.generate_enemies(enemies, random.randint(4, 8), enemy_position_matrix)
+
+    for i, lane in enumerate(battlefield.lanes):
+        for a, position in enumerate(lane.positions):
+            print(f"Lane {i}, position {a}, x: {position.x}, y: {position.y}, enemy: {position.enemy}")
 
     # generate a start turn button and text
     start_turn_btn = classes.Button("Start turn", (classes.Card.card_width + constants.MARGIN) *
@@ -155,14 +157,16 @@ def main():
                             action = move_selections[(current_action - 1) // 3]
                             current_card = action[0]
                             current_lane = action[1]
-                            core_funct.damage_enemy(current_lane, enemy_position_matrix, enemies, current_card.damage,
+                            #core_funct.damage_enemy(current_lane, enemy_position_matrix, enemies, current_card.damage,
+                            #                        current_card.enemy_to_damage)
+                            core_funct.damage_enemy(current_lane, battlefield, enemies, current_card.damage,
                                                     current_card.enemy_to_damage)
                             util_funct.increment_amnesia_bar(meters)
 
                     elif sequence_index == 1:
                         # moving enemies
                         for lane in range(3):
-                            enemies = core_funct.move_enemy(lane, 1, 1, enemies, enemy_position_matrix)
+                            enemies = core_funct.move_enemy(lane, 1, 1, enemies, battlefield)
 
                     elif sequence_index == 2:
                         # creating additional enemies

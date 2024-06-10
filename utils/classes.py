@@ -9,6 +9,7 @@ pygame.font.init()
 class Position:
     width = constants.WINDOW_WIDTH / 12.5
     height = constants.WINDOW_HEIGHT / 5 - constants.BORDER_THICKNESS
+    enemy = None
 
     def __init__(self, x, y, occupied=False):
         self.x = x
@@ -93,6 +94,7 @@ class Hoard:
                 if not position.occupied:
                     position = lane.positions[index]
                     enemy = Enemy(position.x, position.y, self.color)
+                    position.enemy = enemy
                     position.occupied = True
                     # enemy.position = enemy_matrix[random_row][index]
                     enemy.health = random.randint(1, 3)

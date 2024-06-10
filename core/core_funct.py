@@ -4,17 +4,18 @@ from variables import constants
 from data import entities
 
 
-def enemy_position_finder(lane_to_search, position_matrix, enemy_to_look_for: int = 0, next_to: bool = False) -> list:
+def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 0, next_to: bool = False) -> list:
     """
     Functions locates requested enemy index position inside its lane
     :param lane_to_search: lane index number
-    :param position_matrix: a multi level list with all x, y and occupancy information for each lane/column
+    :param battlefield: a multi level class that stores lane and position class elements
     :param enemy_to_look_for: integer number of index for which enemy to find
     :param next_to: if looking for subsequent enemy, find only ones next to previous
     :return: returns a list with position information (x, y, bool)
     """
-    reversed_list = list(reversed(position_matrix[lane_to_search]))
-    enemy_position_list = [index for index, position in enumerate(reversed_list) if position[2]]
+    lanes = battlefield.lanes
+    reversed_list = list(reversed(lanes[lane_to_search].positions))
+    enemy_position_list = [index for index, position in enumerate(reversed_list) if position.occupied]
     last_position = None
     # checks if requested enemy is within the list or is not the first enemy in the list
     if 0 < enemy_to_look_for < len(reversed_list):
@@ -32,8 +33,8 @@ def enemy_position_finder(lane_to_search, position_matrix, enemy_to_look_for: in
     return reversed_list[last_position]
 
 
-def damage_enemy(lane_index, position_matrix, enemy_list, damage=1, enemy_to_damage: int = 0):
-    enemy_to_damage_position = enemy_position_finder(lane_index, position_matrix, enemy_to_damage)
+def damage_enemy(lane_index, battlefield, enemy_list, damage=1, enemy_to_damage: int = 0):
+    enemy_to_damage_position = enemy_position_finder(lane_index, battlefield, enemy_to_damage)
     for enemy in enemy_list:
         print(enemy.position)
         if enemy.position == enemy_to_damage_position:
@@ -71,42 +72,40 @@ def calculate_return_path(start_pos, end_pos, steps=20):
 
 
 # finds enemy position index inside a lane list based of an enemy instance of Enemy class
-def enemy_position_index_finder(enemy, lane_list):
-    enemy_pos = enemy.position
-    current_index = None
-    for i, pos in enumerate(lane_list):
-        if pos[:2] == enemy_pos[:2]:
-            current_index = i
-            break
-
-    # current_index = next((i for i, pos in enumerate(lane_matrix) if pos[:2] == enemy_pos[:2]), None)
-
-    return current_index
+# def enemy_position_index_finder(enemy, lane_list):
+#     enemy_pos = enemy.position
+#     current_index = None
+#     for i, pos in enumerate(lane_list):
+#         if pos[:2] == enemy_pos[:2]:
+#             current_index = i
+#             break
+#
+#     # current_index = next((i for i, pos in enumerate(lane_matrix) if pos[:2] == enemy_pos[:2]), None)
+#
+#     return current_index
 
 
 def enemy_list_sorter(enemy_list):
-    return sorted(enemy_list, key=lambda enemy: (enemy.position[1], enemy.position[0]))
+    # return a new list sorted in a priority order y and then x coordinates
+    return sorted(enemy_list, key=lambda enemy: (enemy.y_cord, enemy.x_cord))
 
 
-def move_enemy(lane, direction, num_of_spots_moved, enemy_list, map_matrix):
+def move_enemy(lane, direction, num_of_spots_moved, enemy_list, battlefield):
     if direction not in [-1, 1]:
         raise ValueError("Direction must be either 1 or -1 for \"move_enemy\" function")
     else:
-        lane_list = map_matrix[lane]
-        num_positions = len(lane_list)
+        positions = battlefield[lane]
+        num_positions = len(positions)
         # sort enemy list
         enemy_list = enemy_list_sorter(enemy_list)
         # based on direction we set lane_list order, so we could move enemies only if they are not colliding with other
         # enemies
-        if direction == 1:
-            lane_list = list(reversed(map_matrix[lane]))
-        elif direction == -1:
-            lane_list = list(reversed(map_matrix[lane]))
+        lane_list = list(reversed(positions))
 
         # after lists are established we find position indexes for enemies, set new indexes and check if new indexes
         # are valid
         for enemy in enemy_list:
-            current_index = enemy_position_index_finder(enemy, lane_list)
+            current_index = [index for index, enemy in positions if position.enemy = enemy]
             if current_index is not None:
                 for moves in range(num_of_spots_moved, 0, -1):
                     new_index = current_index - direction * moves
