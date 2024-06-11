@@ -50,7 +50,6 @@ class Battlefield:
 class Enemy:
     enemy_width = 50
     enemy_height = 50
-    position = []
     health = 1
 
     # create a font object
@@ -61,22 +60,22 @@ class Enemy:
         self.x_cord = x_cord - self.enemy_width / 2
         self.y_cord = y_cord - self.enemy_height / 2
         self.color = color
+        self.rect = pygame.Rect(self.x_cord, self.y_cord, self.enemy_width, self.enemy_height)
 
     def draw(self, canvas):
         pygame.draw.rect(canvas, self.color, (self.x_cord, self.y_cord, self.enemy_width, self.enemy_height))
 
         # create a font surface object by using font object and text we want to render
         text_surface_object = self.enemy_health_font.render(str(self.health), False, (0, 0, 0))
-
         # center text surface object rectangle in a center
         text_rect_position = text_surface_object.get_rect(center=(self.x_cord + self.enemy_width // 2, self.y_cord +
                                                                   self.enemy_height // 2))
-
         canvas.blit(text_surface_object, text_rect_position)
 
-    def update_position(self):
-        self.x_cord = self.position[0] - self.enemy_width / 2
-        self.y_cord = self.position[1] - self.enemy_height / 2
+    def update_position(self, x, y):
+        self.x_cord = x - self.enemy_width / 2
+        self.y_cord = y - self.enemy_height / 2
+        self.rect.topleft = (self.x_cord, self.y_cord)
 
 
 # hoard class generates enemy instances
@@ -96,8 +95,6 @@ class Hoard:
                     center_x, center_y = position.rect.center
                     enemy = Enemy(center_x, center_y, self.color)
                     position.enemy = enemy
-                    print(f"Creating enemy in lane {battlefield.lanes.index(battlefield.lanes[self.random_lane])}, "
-                          f"in position: {lane.positions.index(position)}")
                     position.occupied = True
                     # enemy.position = enemy_matrix[random_row][index]
                     enemy.health = random.randint(1, 3)

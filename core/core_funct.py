@@ -15,11 +15,7 @@ def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 
     """
     lanes = battlefield.lanes
     reversed_positions_list = list(reversed(lanes[lane_to_search].positions))
-    print(f"reversed_positions_list: {reversed_positions_list}")
-    for index, position in enumerate(reversed_positions_list):
-        print(f"position {index}, occupied: {position.occupied}")
     enemy_position_index_list = [index for index, position in enumerate(reversed_positions_list) if position.occupied]
-    print(f"enemy_position_index_list: {enemy_position_index_list}")
     last_position = None
     # checks if requested enemy is within the list or is not the first enemy in the list
     if 0 < enemy_to_look_for < len(reversed_positions_list):
@@ -39,28 +35,19 @@ def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 
 
 def damage_enemy(lane_index, battlefield, enemy_list, damage=1, enemy_to_damage: int = 0):
     enemy_to_damage_position = enemy_position_finder(lane_index, battlefield, enemy_to_damage)
-    print(f"This is enemy_to_damage_position: {enemy_to_damage_position}")
     for enemy in enemy_list:
-        print(f"printing enemy in final loop : {enemy}")
         if enemy == enemy_to_damage_position:
             enemy.health -= damage
+            if enemy.health <= 0:
+                # Remove references to the enemy in the battlefield
+                for lane in battlefield.lanes:
+                    for position in lane.positions:
+                        if enemy == position.enemy:
+                            position.enemy = None
 
-
-# def generate_enemies(enemy_list, buffer_int, enemy_matrix):
-#     for _ in range(buffer_int):
-#         random_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-#         random_row = random.randint(0, len(enemy_matrix) - 1)
-#
-#         for index, col in enumerate(enemy_matrix[random_row]):
-#             if not col[2]:
-#                 enemy = classes.Enemy(enemy_matrix[random_row][index][1],
-#                                       enemy_matrix[random_row][index][0],
-#                                       random_color)
-#                 enemy_matrix[random_row][index][2] = True
-#                 enemy.position = enemy_matrix[random_row][index]
-#                 enemy.health = random.randint(1, 3)
-#                 enemy_list.append(enemy)
-#                 break
+                # Remove the enemy from the enemy_list
+                enemy_list.remove(enemy)
+                break  # Exit the loop since the enemy is handled
 
 
 def calculate_return_path(start_pos, end_pos, steps=20):
@@ -76,46 +63,10 @@ def calculate_return_path(start_pos, end_pos, steps=20):
     return path
 
 
-# finds enemy position index inside a lane list based of an enemy instance of Enemy class
-# def enemy_position_index_finder(enemy, lane_list):
-#     enemy_pos = enemy.position
-#     current_index = None
-#     for i, pos in enumerate(lane_list):
-#         if pos[:2] == enemy_pos[:2]:
-#             current_index = i
-#             break
-#
-#     # current_index = next((i for i, pos in enumerate(lane_matrix) if pos[:2] == enemy_pos[:2]), None)
-#
-#     return current_index
-
-
 def enemy_list_sorter(enemy_list):
     # return a new list sorted in a priority order y and then x coordinates
     return sorted(enemy_list, key=lambda enemy: (enemy.y_cord, enemy.x_cord))
 
-
-# def move_enemy(lane, direction, num_of_spots_moved, battlefield) -> None:
-#     if direction not in [-1, 1]:
-#         raise ValueError("Direction must be either 1 or -1 for \"move_enemy\" function")
-#     else:
-#         positions = battlefield.lanes[lane].positions
-#         num_positions = len(positions)
-#
-#         # Find position indexes for enemies, set new indexes, and check if new indexes are valid
-#         for index in range(num_positions):
-#             position = positions[index]
-#             if position.occupied:
-#                 new_index = index + direction * num_of_spots_moved
-#                 if 0 <= new_index < num_positions and not positions[new_index].occupied:
-#                     # Move enemy to the new position
-#                     positions[new_index].enemy = position.enemy
-#                     positions[new_index].occupied = True
-#
-#                     # Clear the old position
-#                     position.enemy = None
-#                     position.occupied = False
-#                     break
 
 def move_enemy(lane, direction, num_of_spots_moved, battlefield) -> None:
     if direction not in [-1, 1]:
@@ -139,6 +90,8 @@ def move_enemy(lane, direction, num_of_spots_moved, battlefield) -> None:
         if new_positions[index] is not None:
             positions[index].enemy = new_positions[index]
             positions[index].occupied = True
+            # Update enemy position coordinates
+            positions[index].enemy.update_position(positions[index].rect.centerx, positions[index].rect.centery)
         else:
             positions[index].enemy = None
             positions[index].occupied = False

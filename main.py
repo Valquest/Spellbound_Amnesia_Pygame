@@ -23,25 +23,6 @@ def main():
     # create battlefield with lanes and positions
     battlefield = classes.Battlefield(constants.LANE_NUMBER)
 
-    # creating enemy position matrix for coordinates and slot availability. This is used to determine what positions in
-    # the field are available and will be used for combat to determine what effects apply to what lanes
-    enemy_position_matrix = []
-    for row in range(constants.LANE_NUMBER):
-        row_position = []
-        for col in range(constants.POSITION_NUMBER):
-            x_pos = int(round((constants.WINDOW_WIDTH -
-                               constants.MARGIN - ((classes.Position.width - constants.BORDER_THICKNESS) * col) -
-                               classes.Position.width / 2), 0))
-            y_pos = int(round((constants.WINDOW_HEIGHT -
-                               constants.MARGIN - (classes.Position.height * (3 - row))
-                               + classes.Position.height / 2), 0))
-            occupied = False
-            position = [x_pos, y_pos, occupied]
-            row_position.append(position)
-        enemy_position_matrix.append(row_position)
-
-
-
     # create amnesia meter bar
     meters = util_funct.add_amnesia_bar(constants.AMNESIA_BAR_COUNT)
 
@@ -50,11 +31,6 @@ def main():
 
     # generate enemies
     enemies = classes.Hoard(random.randint(4, 8), battlefield).enemy_list
-    # print(f"This is initial enemy list: {enemies}")
-    # for lindex, lane in enumerate(battlefield.lanes):
-    #     for pindex, position in enumerate(lane.positions):
-    #         print(f"Lane {lindex}, position {pindex} occupancy is: {position.occupied}")
-    #core_funct.generate_enemies(enemies, random.randint(4, 8), enemy_position_matrix)
 
     # generate a start turn button and text
     start_turn_btn = classes.Button("Start turn", (classes.Card.card_width + constants.MARGIN) *
@@ -157,8 +133,6 @@ def main():
                             action = move_selections[(current_action - 1) // 3]
                             current_card = action[0]
                             current_lane = action[1]
-                            #core_funct.damage_enemy(current_lane, enemy_position_matrix, enemies, current_card.damage,
-                            #                        current_card.enemy_to_damage)
                             core_funct.damage_enemy(current_lane, battlefield, enemies, current_card.damage,
                                                     current_card.enemy_to_damage)
                             util_funct.increment_amnesia_bar(meters)
@@ -166,9 +140,6 @@ def main():
                     elif sequence_index == 1:
                         # moving enemies
                         for lane in range(3):
-                            for lindex, lane2 in enumerate(battlefield.lanes):
-                                for pindex, position in enumerate(lane2.positions):
-                                    print(f"Pre-Move_enemy. Lane {lindex}, position {pindex} occupancy is: {position.occupied}")
                             core_funct.move_enemy(lane, 1, 1, battlefield)
 
                     elif sequence_index == 2:
@@ -176,7 +147,6 @@ def main():
                         new_enemies = classes.Hoard(1, battlefield).enemy_list
                         for enemy in new_enemies:
                             enemies.append(enemy)
-                        #core_funct.generate_enemies(enemies, 1, enemy_position_matrix)
 
                     current_action += 1
                     action_start_time = current_time
@@ -202,26 +172,6 @@ def main():
 
         # draw positions
         battlefield.draw(screen)
-
-        # # drawing spots/columns
-        # for col in spots:
-        #     pygame.draw.rect(screen, "black", col, constants.BORDER_THICKNESS)
-        #
-        # # drawing lanes/rows
-        # for i, lane in enumerate(lanes):
-        #     if i == selected_lane and selected_lane is not None:
-        #         pygame.draw.rect(screen, "red", lane, constants.BORDER_THICKNESS)
-        #     else:
-        #         pygame.draw.rect(screen, "black", lane, constants.BORDER_THICKNESS)
-
-        # updates enemy list and matrix
-        for enemy in enemies[:]:
-            if enemy.health <= 0:
-                enemies.remove(enemy)
-                for lane_index, lane_positions in enumerate(enemy_position_matrix):
-                    for index, position in enumerate(lane_positions):
-                        if enemy.position == position:
-                            enemy_position_matrix[lane_index][index][2] = False
 
         # drawing enemies
         for enemy in enemies:
