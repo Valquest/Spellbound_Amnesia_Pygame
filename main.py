@@ -23,10 +23,6 @@ def main():
     # create battlefield with lanes and positions
     battlefield = classes.Battlefield(constants.LANE_NUMBER)
 
-    print(f"Printed this 1 {battlefield.lanes}")
-    print(f"Printed this 2 {battlefield.lanes[0]}")
-    print(f"Printed this 3 {battlefield.lanes[0].positions}")
-
     # creating enemy position matrix for coordinates and slot availability. This is used to determine what positions in
     # the field are available and will be used for combat to determine what effects apply to what lanes
     enemy_position_matrix = []
@@ -54,11 +50,11 @@ def main():
 
     # generate enemies
     enemies = classes.Hoard(random.randint(4, 8), battlefield).enemy_list
+    # print(f"This is initial enemy list: {enemies}")
+    # for lindex, lane in enumerate(battlefield.lanes):
+    #     for pindex, position in enumerate(lane.positions):
+    #         print(f"Lane {lindex}, position {pindex} occupancy is: {position.occupied}")
     #core_funct.generate_enemies(enemies, random.randint(4, 8), enemy_position_matrix)
-
-    for i, lane in enumerate(battlefield.lanes):
-        for a, position in enumerate(lane.positions):
-            print(f"Lane {i}, position {a}, x: {position.x}, y: {position.y}, enemy: {position.enemy}")
 
     # generate a start turn button and text
     start_turn_btn = classes.Button("Start turn", (classes.Card.card_width + constants.MARGIN) *
@@ -170,6 +166,9 @@ def main():
                     elif sequence_index == 1:
                         # moving enemies
                         for lane in range(3):
+                            for lindex, lane2 in enumerate(battlefield.lanes):
+                                for pindex, position in enumerate(lane2.positions):
+                                    print(f"Pre-Move_enemy. Lane {lindex}, position {pindex} occupancy is: {position.occupied}")
                             core_funct.move_enemy(lane, 1, 1, battlefield)
 
                     elif sequence_index == 2:

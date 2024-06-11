@@ -4,40 +4,45 @@ from variables import constants
 from data import entities
 
 
-def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 0, next_to: bool = False) -> list:
+def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 0, next_to: bool = False) -> object:
     """
     Functions locates requested enemy index position inside its lane
     :param lane_to_search: lane index number
     :param battlefield: a multi level class that stores lane and position class elements
     :param enemy_to_look_for: integer number of index for which enemy to find
     :param next_to: if looking for subsequent enemy, find only ones next to previous
-    :return: returns a list with position information (x, y, bool)
+    :return: returns an Enemy class object
     """
     lanes = battlefield.lanes
-    reversed_list = list(reversed(lanes[lane_to_search].positions))
-    enemy_position_list = [index for index, position in enumerate(reversed_list) if position.occupied]
+    reversed_positions_list = list(reversed(lanes[lane_to_search].positions))
+    print(f"reversed_positions_list: {reversed_positions_list}")
+    for index, position in enumerate(reversed_positions_list):
+        print(f"position {index}, occupied: {position.occupied}")
+    enemy_position_index_list = [index for index, position in enumerate(reversed_positions_list) if position.occupied]
+    print(f"enemy_position_index_list: {enemy_position_index_list}")
     last_position = None
     # checks if requested enemy is within the list or is not the first enemy in the list
-    if 0 < enemy_to_look_for < len(reversed_list):
+    if 0 < enemy_to_look_for < len(reversed_positions_list):
         if next_to:
             # checks if enemy, being looked, for has index that is 1 more than previous enemy (subsequent)
-            if enemy_position_list[enemy_to_look_for] - 1 == enemy_position_list[enemy_to_look_for - 1]:
-                last_position = enemy_position_list[enemy_to_look_for]
+            if enemy_position_index_list[enemy_to_look_for] - 1 == enemy_position_index_list[enemy_to_look_for - 1]:
+                last_position = enemy_position_index_list[enemy_to_look_for]
             else:
                 last_position = None
         else:
-            last_position = enemy_position_list[enemy_to_look_for]
+            last_position = enemy_position_index_list[enemy_to_look_for]
     else:
-        last_position = enemy_position_list[0]
+        last_position = enemy_position_index_list[0]
 
-    return reversed_list[last_position]
+    return reversed_positions_list[last_position].enemy
 
 
 def damage_enemy(lane_index, battlefield, enemy_list, damage=1, enemy_to_damage: int = 0):
     enemy_to_damage_position = enemy_position_finder(lane_index, battlefield, enemy_to_damage)
+    print(f"This is enemy_to_damage_position: {enemy_to_damage_position}")
     for enemy in enemy_list:
-        print(enemy.position)
-        if enemy.position == enemy_to_damage_position:
+        print(f"printing enemy in final loop : {enemy}")
+        if enemy == enemy_to_damage_position:
             enemy.health -= damage
 
 
@@ -90,29 +95,53 @@ def enemy_list_sorter(enemy_list):
     return sorted(enemy_list, key=lambda enemy: (enemy.y_cord, enemy.x_cord))
 
 
+# def move_enemy(lane, direction, num_of_spots_moved, battlefield) -> None:
+#     if direction not in [-1, 1]:
+#         raise ValueError("Direction must be either 1 or -1 for \"move_enemy\" function")
+#     else:
+#         positions = battlefield.lanes[lane].positions
+#         num_positions = len(positions)
+#
+#         # Find position indexes for enemies, set new indexes, and check if new indexes are valid
+#         for index in range(num_positions):
+#             position = positions[index]
+#             if position.occupied:
+#                 new_index = index + direction * num_of_spots_moved
+#                 if 0 <= new_index < num_positions and not positions[new_index].occupied:
+#                     # Move enemy to the new position
+#                     positions[new_index].enemy = position.enemy
+#                     positions[new_index].occupied = True
+#
+#                     # Clear the old position
+#                     position.enemy = None
+#                     position.occupied = False
+#                     break
+
 def move_enemy(lane, direction, num_of_spots_moved, battlefield) -> None:
     if direction not in [-1, 1]:
         raise ValueError("Direction must be either 1 or -1 for \"move_enemy\" function")
-    else:
-        positions = battlefield.lanes[lane].positions
-        num_positions = len(positions)
-        # sort enemy list
-        #           enemy_list = enemy_list_sorter(enemy_list)
-        # based on direction we set lane_list order, so we could move enemies only if they are not colliding with other
-        # enemies
-        lane_list = list(reversed(positions))
 
-        # after lists are established we find position indexes for enemies, set new indexes and check if new indexes
-        # are valid
-        for index, position in enumerate(positions):
-            for moves in range(num_of_spots_moved, 0, -1):
-                new_index = index - direction * moves
-                if 0 <= new_index < num_positions and not lane_list[new_index].occupied:
-                    # store move queue information in order to complete movements in the right order
-                    lane_list[index].occupied = False
-                    lane_list[new_index].enemy = lane_list[index].enemy
-                    lane_list[index].enemy = None
-                    lane_list[new_index].occupied = True
+    positions = battlefield.lanes[lane].positions
+    num_positions = len(positions)
+
+    # Create a list to store the new states of positions
+    new_positions = [None] * num_positions
+
+    # Calculate new positions for all enemies
+    for index, position in enumerate(positions):
+        if position.occupied:
+            new_index = index + direction * num_of_spots_moved
+            if 0 <= new_index < num_positions:
+                new_positions[new_index] = position.enemy
+
+    # Update the lane with new positions
+    for index in range(num_positions):
+        if new_positions[index] is not None:
+            positions[index].enemy = new_positions[index]
+            positions[index].occupied = True
+        else:
+            positions[index].enemy = None
+            positions[index].occupied = False
 
 
 # generating game cards

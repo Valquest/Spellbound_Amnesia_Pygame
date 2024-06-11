@@ -61,7 +61,6 @@ class Enemy:
         self.x_cord = x_cord - self.enemy_width / 2
         self.y_cord = y_cord - self.enemy_height / 2
         self.color = color
-        print(f"Enemy created at ({self.x_cord}, {self.y_cord}) with color {self.color}")
 
     def draw(self, canvas):
         pygame.draw.rect(canvas, self.color, (self.x_cord, self.y_cord, self.enemy_width, self.enemy_height))
@@ -97,12 +96,13 @@ class Hoard:
                     center_x, center_y = position.rect.center
                     enemy = Enemy(center_x, center_y, self.color)
                     position.enemy = enemy
+                    print(f"Creating enemy in lane {battlefield.lanes.index(battlefield.lanes[self.random_lane])}, "
+                          f"in position: {lane.positions.index(position)}")
                     position.occupied = True
                     # enemy.position = enemy_matrix[random_row][index]
                     enemy.health = random.randint(1, 3)
                     self.enemy_list.append(enemy)
                     break
-        print(f"{len(self.enemy_list)} enemies created.")
 
 
 # Card class
