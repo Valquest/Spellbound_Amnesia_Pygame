@@ -18,7 +18,7 @@ def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 
     enemy_position_index_list = [index for index, position in enumerate(reversed_positions_list) if position.occupied]
     last_position = None
     # checks if requested enemy is within the list or is not the first enemy in the list
-    if 0 < enemy_to_look_for < len(reversed_positions_list):
+    if 0 < enemy_to_look_for < len(reversed_positions_list) and len(enemy_position_index_list) > enemy_to_look_for:
         if next_to:
             # checks if enemy, being looked, for has index that is 1 more than previous enemy (subsequent)
             if enemy_position_index_list[enemy_to_look_for] - 1 == enemy_position_index_list[enemy_to_look_for - 1]:
