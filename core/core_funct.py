@@ -4,6 +4,27 @@ from variables import constants
 from data import entities
 
 
+def first_last_enemy_finder(battlefield, lane_to_search, first_or_last) -> int:
+    """
+    :param battlefield:
+    :param lane_to_search:
+    :param first_or_last: 0 - finds last enemy, 1 - finds first enemy
+    :return:
+    """
+    lane = battlefield.lanes[lane_to_search]
+    enemy_position = None
+    for index, position in enumerate(lane):
+        if first_or_last == 1:
+            if position.enemy:
+                enemy_position = index
+                break
+        elif first_or_last == -1:
+            if position.enemy:
+                enemy_position = index
+                break
+    return enemy_position
+
+
 def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 0, next_to: bool = False) -> object:
     """
     Functions locates requested enemy index position inside its lane

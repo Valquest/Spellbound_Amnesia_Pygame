@@ -52,6 +52,7 @@ class Enemy:
     enemy_width = 50
     enemy_height = 50
     health = 1
+    frozen = 0
 
     # create a font object
     enemy_health_font = pygame.font.Font(None, 36)
@@ -111,7 +112,6 @@ class Card:
     type = None
     position = []
     params = {}
-    frozen = 0
 
     # create a font object
     card_type_font = pygame.font.Font(None, 32)
@@ -150,20 +150,23 @@ class Card:
         self.x_cord = x
         self.y_cord = y
 
-    def cast_effect(self, battlefield=None, target_lane=None, target_enemy_index=None):
+    def cast_effect(self, battlefield=None, target_lane=None, enemy_list=None, target_enemy_index=None):
+        from core import core_funct
         effects = self.params["Card effects"]
         for effect, funct in effects.items():
             match effect:
                 case "damage_enemy":
-                    funct(battlefield, target_lane, target_enemy_index)
-                    # damage_enemy(lane_index, battlefield, enemy_list, damage=1, enemy_to_damage: int = 0)
+                    funct(target_lane, battlefield, target_enemy_index, enemy_list, self.params["Damage"])
                     break
                 case "move_enemy":
-                    funct(battlefield, target_lane, target_enemy_index)
+                    funct(target_lane, self.params["Move direction"], self.params["Move positions"], battlefield,
+                          [core_funct.first_last_enemy_finder(battlefield, target_lane, 1)])
                     break
                 case "freeze_enemy":
-                    funct(battlefield, target_lane, target_enemy_index)
+                    funct(target_lane, target_enemy_index, self.params["Turns frozen"], battlefield)
                     break
+
+
 
 
 # amnesia meter class

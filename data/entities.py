@@ -47,5 +47,16 @@ card_types2 = {
             "damage_enemy": spells.damage_enemy,
             "freeze_enemy": spells.freeze_enemy
         }
+    },
+    "Gust 1": {
+        "Damage": 1,
+        "Enemy to target": 0,
+        "Turns frozen": 2,
+        "Move direction": -1,
+        "Move positions": 1,
+        "Card effects": {
+            "damage_enemy": spells.damage_enemy,
+            "move_enemy": spells.damage_enemy
+        }
     }
 }

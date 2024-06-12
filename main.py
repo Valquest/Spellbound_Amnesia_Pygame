@@ -4,7 +4,7 @@ import random
 # project files
 from utils import classes
 from variables import constants
-from core import core_funct
+from core import core_funct, spells
 from utils import util_funct
 
 
@@ -133,14 +133,13 @@ def main():
                             action = move_selections[(current_action - 1) // 3]
                             current_card = action[0]
                             current_lane = action[1]
-                            core_funct.damage_enemy(current_lane, battlefield, enemies, current_card.damage,
-                                                    current_card.enemy_to_damage)
+                            current_card.cast_effect(battlefield, current_lane, enemies)
                             util_funct.increment_amnesia_bar(meters)
 
                     elif sequence_index == 1:
                         # moving enemies
                         for lane in range(3):
-                            core_funct.move_enemy(lane, 1, 1, battlefield)
+                            spells.move_enemy(lane, 1, 1, battlefield)
 
                     elif sequence_index == 2:
                         # creating additional enemies
