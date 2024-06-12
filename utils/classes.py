@@ -1,6 +1,7 @@
 import pygame
 import random
 from variables import constants
+from data import entities
 
 pygame.font.init()
 
@@ -122,6 +123,7 @@ class Card:
         self.color = color
         self.original_x = self.x_cord
         self.original_y = self.y_cord
+
         # this variable is not used, might not need it in the future, function parameter needs to
         # go, in that case
         self.y_cord2 = y_cord
@@ -148,6 +150,8 @@ class Card:
         self.x_cord = x
         self.y_cord = y
 
+    def cast_spell(self, battlefield=None, target=None):
+        for spell, funct in self.effects:
 
 # amnesia meter class
 class Meter:
