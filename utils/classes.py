@@ -109,9 +109,8 @@ class Card:
     card_height = 250
     click_color = "dark grey"
     type = None
-    damage = 0
     position = []
-    enemy_to_damage = 0
+    params = {}
 
     # create a font object
     card_type_font = pygame.font.Font(None, 32)
@@ -150,8 +149,20 @@ class Card:
         self.x_cord = x
         self.y_cord = y
 
-    def cast_spell(self, battlefield=None, target=None):
-        for spell, funct in self.effects:
+    def cast_effect(self, battlefield=None, target_lane=None, target_enemy_index=None):
+        effects = self.params["Card effects"]
+        for effect, funct in effects.items():
+            match effect:
+                case "damage_enemy":
+                    funct(battlefield, target_lane, target_enemy_index)
+                    break
+                case "move_enemy":
+                    funct(battlefield, target_lane, target_enemy_index)
+                    break
+                case "freeze_enemy":
+                    funct(battlefield, target_lane, target_enemy_index)
+                    break
+
 
 # amnesia meter class
 class Meter:

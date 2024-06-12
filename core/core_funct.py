@@ -105,14 +105,13 @@ def create_card_list() -> list:
     """
     game_cards = []
     for count in range(constants.CARD_COUNT):
-        random_item = random.choice(list(entities.card_types.items()))
+        random_item = random.choice(list(entities.card_types2.items()))
         card = classes.Card(150 * count + 1, 0, "gray")
 
         # take random card type and damage value from the card type dictionary
         card.type = random_item[0]
-        card.damage = random_item[1][0]
+        card.params = random_item[1]
         card.position = [150 * count + 1 + constants.MARGIN, 0 + constants.MARGIN]
-        card.enemy_to_damage = random_item[1][1]
 
         game_cards.append(card)
     return game_cards
