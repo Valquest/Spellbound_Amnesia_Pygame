@@ -111,6 +111,7 @@ class Card:
     type = None
     position = []
     params = {}
+    frozen = 0
 
     # create a font object
     card_type_font = pygame.font.Font(None, 32)
@@ -155,6 +156,7 @@ class Card:
             match effect:
                 case "damage_enemy":
                     funct(battlefield, target_lane, target_enemy_index)
+                    # damage_enemy(lane_index, battlefield, enemy_list, damage=1, enemy_to_damage: int = 0)
                     break
                 case "move_enemy":
                     funct(battlefield, target_lane, target_enemy_index)

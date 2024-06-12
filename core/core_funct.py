@@ -33,23 +33,6 @@ def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 
     return reversed_positions_list[last_position].enemy
 
 
-def damage_enemy(lane_index, battlefield, enemy_list, damage=1, enemy_to_damage: int = 0):
-    enemy_to_damage_position = enemy_position_finder(lane_index, battlefield, enemy_to_damage)
-    for enemy in enemy_list:
-        if enemy == enemy_to_damage_position:
-            enemy.health -= damage
-            if enemy.health <= 0:
-                # Remove references to the enemy in the battlefield
-                for lane in battlefield.lanes:
-                    for position in lane.positions:
-                        if enemy == position.enemy:
-                            position.enemy = None
-
-                # Remove the enemy from the enemy_list
-                enemy_list.remove(enemy)
-                break  # Exit the loop since the enemy is handled
-
-
 def calculate_return_path(start_pos, end_pos, steps=20):
     path = []
     for step in range(steps):
@@ -66,35 +49,6 @@ def calculate_return_path(start_pos, end_pos, steps=20):
 def enemy_list_sorter(enemy_list):
     # return a new list sorted in a priority order y and then x coordinates
     return sorted(enemy_list, key=lambda enemy: (enemy.y_cord, enemy.x_cord))
-
-
-def move_enemy(lane, direction, num_of_spots_moved, battlefield) -> None:
-    if direction not in [-1, 1]:
-        raise ValueError("Direction must be either 1 or -1 for \"move_enemy\" function")
-
-    positions = battlefield.lanes[lane].positions
-    num_positions = len(positions)
-
-    # Create a list to store the new states of positions
-    new_positions = [None] * num_positions
-
-    # Calculate new positions for all enemies
-    for index, position in enumerate(positions):
-        if position.occupied:
-            new_index = index + direction * num_of_spots_moved
-            if 0 <= new_index < num_positions:
-                new_positions[new_index] = position.enemy
-
-    # Update the lane with new positions
-    for index in range(num_positions):
-        if new_positions[index] is not None:
-            positions[index].enemy = new_positions[index]
-            positions[index].occupied = True
-            # Update enemy position coordinates
-            positions[index].enemy.update_position(positions[index].rect.centerx, positions[index].rect.centery)
-        else:
-            positions[index].enemy = None
-            positions[index].occupied = False
 
 
 # generating game cards
