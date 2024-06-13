@@ -22,6 +22,7 @@ def first_last_enemy_finder(battlefield, lane_to_search, first_or_last) -> int:
             if position.enemy:
                 enemy_position = index
                 break
+    print(f"first_last_enemy_finder output: {enemy_position}")
     return enemy_position
 
 

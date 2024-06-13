@@ -19,7 +19,7 @@ card_types2 = {
     "Freeze 1": {
         "Damage": 1,
         "Enemy to target": 1,
-        "Turns frozen": 2,
+        "Turns frozen": 1,
         "Card effects": {
             "damage_enemy": spells.damage_enemy,
             "freeze_enemy": spells.freeze_enemy

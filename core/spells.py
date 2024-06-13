@@ -5,6 +5,7 @@ def freeze_enemy(lane, target_enemy_index, turns_frozen, battlefield) -> None:
     lane = battlefield.lanes[lane]
     enemy = lane[target_enemy_index]
     enemy.frozen = turns_frozen
+    print(f"enemy {enemy}, frozen value: {enemy.frozen}")
 
 
 def move_enemy(lane, direction, num_of_spots_moved, battlefield, enemies_to_move=None) -> None:
@@ -19,14 +20,19 @@ def move_enemy(lane, direction, num_of_spots_moved, battlefield, enemies_to_move
 
     # Calculate new positions for specified enemies or all if not specified
     for index, position in enumerate(positions):
-        if position.occupied and position.enemy.frozen == 0:
-            if enemies_to_move is None or index in enemies_to_move:  # Check if index should be moved
+        if position.occupied and position.enemy is not None:
+            print(position.enemy.frozen)
+            # Check if the enemy is frozen
+            if position.enemy.frozen > 0:
+                position.enemy.frozen -= 1
+                new_positions[index] = position.enemy  # Assign enemy back to the same position
+                continue  # Skip to the next iteration, preventing any further logic from moving this enemy
+
+            # Move non-frozen enemies if no specific enemies are designated or index is in designated list
+            if position.enemy.frozen == 0 and (enemies_to_move is None or index in enemies_to_move):
                 new_index = index + direction * num_of_spots_moved
                 if 0 <= new_index < num_positions:
                     new_positions[new_index] = position.enemy
-        elif position.enemy.frozen > 0:
-            position.enemy.frozen -= 1
-            new_positions[index] = position.enemy
 
     # Update the lane with new positions
     for index in range(num_positions):

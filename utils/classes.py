@@ -52,7 +52,6 @@ class Enemy:
     enemy_width = 50
     enemy_height = 50
     health = 1
-    frozen = 0
 
     # create a font object
     enemy_health_font = pygame.font.Font(None, 36)
@@ -63,6 +62,8 @@ class Enemy:
         self.y_cord = y_cord - self.enemy_height / 2
         self.color = color
         self.rect = pygame.Rect(self.x_cord, self.y_cord, self.enemy_width, self.enemy_height)
+        # frozen status prevents from moving enemy
+        self.frozen = 0
 
     def draw(self, canvas):
         pygame.draw.rect(canvas, self.color, (self.x_cord, self.y_cord, self.enemy_width, self.enemy_height))
@@ -156,7 +157,7 @@ class Card:
         for effect, funct in effects.items():
             match effect:
                 case "damage_enemy":
-                    funct(target_lane, battlefield, target_enemy_index, enemy_list, self.params["Damage"])
+                    funct(target_lane, battlefield, enemy_list, self.params["Damage"], 0)
                     break
                 case "move_enemy":
                     funct(target_lane, self.params["Move direction"], self.params["Move positions"], battlefield,
