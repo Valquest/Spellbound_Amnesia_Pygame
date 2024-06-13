@@ -157,17 +157,22 @@ class Card:
         for effect, funct in effects.items():
             match effect:
                 case "damage_enemy":
+                    print("Doing damage_enemy")
+                    print(f"Selected: {effect}")
                     funct(target_lane, battlefield, enemy_list, self.params["Damage"], 0)
-                    break
                 case "move_enemy":
+                    print("Doing move_enemy")
+                    print(f"Selected: {effect}")
                     funct(target_lane, self.params["Move direction"], self.params["Move positions"], battlefield,
                           [core_funct.first_last_enemy_finder(battlefield, target_lane, 1)])
-                    break
                 case "freeze_enemy":
-                    funct(target_lane, target_enemy_index, self.params["Turns frozen"], battlefield)
-                    break
-
-
+                    print("Doing freeze_enemy")
+                    print(f"Selected: {effect}")
+                    print(f"Input parameters for freeze enemy funct: target_lane:{target_lane}, "
+                          f"first_enemy:{core_funct.first_last_enemy_finder(battlefield, target_lane, 1)}, "
+                          f"frozen for:{self.params["Turns frozen"]} turns, battlefield:{battlefield}")
+                    funct(target_lane, core_funct.first_last_enemy_finder(battlefield, target_lane, 1),
+                          self.params["Turns frozen"], battlefield)
 
 
 # amnesia meter class

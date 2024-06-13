@@ -13,7 +13,7 @@ def first_last_enemy_finder(battlefield, lane_to_search, first_or_last) -> int:
     """
     lane = battlefield.lanes[lane_to_search]
     enemy_position = None
-    for index, position in enumerate(lane):
+    for index, position in enumerate(lane.positions):
         if first_or_last == 1:
             if position.enemy:
                 enemy_position = index

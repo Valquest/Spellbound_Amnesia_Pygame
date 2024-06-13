@@ -55,8 +55,9 @@ card_types2 = {
         "Move direction": -1,
         "Move positions": 1,
         "Card effects": {
-            "damage_enemy": spells.damage_enemy,
-            "move_enemy": spells.damage_enemy
+            "move_enemy": spells.move_enemy,
+            "damage_enemy": spells.damage_enemy
+
         }
     }
 }
