@@ -133,6 +133,10 @@ def main():
                             action = move_selections[(current_action - 1) // 3]
                             current_card = action[0]
                             current_lane = action[1]
+                            for lane in battlefield.lanes:
+                                for position in lane.positions:
+                                    if position.enemy is not None:
+                                        print(f"each enemy info. lane/position: {lane}/{position}, enemy present?:{position.enemy}, enemy frozen?:{position.enemy.frozen}")
                             current_card.cast_effect(battlefield, current_lane, enemies)
                             util_funct.increment_amnesia_bar(meters)
 
