@@ -136,8 +136,14 @@ def main():
                             for lane in battlefield.lanes:
                                 for position in lane.positions:
                                     if position.enemy is not None:
-                                        print(f"each enemy info. lane/position: {lane}/{position}, enemy present?:{position.enemy}, enemy frozen?:{position.enemy.frozen}")
+                                        print(f"each enemy info before action. lane/position: {battlefield.lanes.index(lane)}/{lane.positions.index(position)}, enemy frozen?:{position.enemy.frozen}")
+                                print("End of lane")
                             current_card.cast_effect(battlefield, current_lane, enemies)
+                            for lane in battlefield.lanes:
+                                for position in lane.positions:
+                                    if position.enemy is not None:
+                                        print(f"each enemy info before action. lane/position: {battlefield.lanes.index(lane)}/{lane.positions.index(position)}, enemy frozen?:{position.enemy.frozen}")
+                                print("End of lane")
                             util_funct.increment_amnesia_bar(meters)
 
                     elif sequence_index == 1:

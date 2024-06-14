@@ -2,12 +2,17 @@ from core import core_funct
 
 
 def freeze_enemy(lane, target_enemy_index, turns_frozen, battlefield) -> None:
-    print(lane, target_enemy_index, turns_frozen, battlefield)
-    lane = battlefield.lanes[lane]
-    enemy = lane.positions[target_enemy_index]
-    enemy.frozen = turns_frozen
-    print(f"enemy {enemy}, frozen value: {enemy.frozen}")
-
+    positions = battlefield.lanes[lane].positions
+    print(f"target_enemy_index: {target_enemy_index}")
+    print(f"positions[target_enemy_index]: {positions[target_enemy_index]}")
+    """
+    print(f"Freezing enemy on position: {positions.index(positions[target_enemy_index])}")
+    if positions[target_enemy_index] is not None:
+        print(f"Position is not empty: {positions[target_enemy_index] is not None}")
+        enemy = positions[target_enemy_index]
+        print(f"Assigning {turns_frozen} turns of frozen effect to the enemy")
+        enemy.frozen = turns_frozen
+    """
 
 def move_enemy(lane, direction, num_of_spots_moved, battlefield, enemies_to_move=None) -> None:
     if direction not in [-1, 1]:
@@ -22,7 +27,6 @@ def move_enemy(lane, direction, num_of_spots_moved, battlefield, enemies_to_move
     for index, position in enumerate(positions):
         if position.occupied and position.enemy is not None:
             # Check if the enemy is frozen
-            print(f"enemy frozen value before moving it: {position.enemy.frozen}")
             if position.enemy.frozen > 0:
                 position.enemy.frozen -= 1
                 new_positions[index] = position.enemy  # Assign enemy back to the same position

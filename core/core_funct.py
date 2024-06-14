@@ -12,17 +12,15 @@ def first_last_enemy_finder(battlefield, lane_to_search, first_or_last) -> int:
     :return:
     """
     lane = battlefield.lanes[lane_to_search]
+    enemy_list = [position.enemy for position in lane.positions if position.enemy is not None]
     enemy_position = None
-    for index, position in enumerate(lane.positions):
+    for position in enemy_list:
         if first_or_last == 1:
-            if position.enemy:
-                enemy_position = index
-                break
+            enemy_position = list(reversed(enemy_list))[0]
+            break
         elif first_or_last == -1:
-            if position.enemy:
-                enemy_position = index
-                break
-    print(f"first_last_enemy_finder output: {enemy_position}")
+            enemy_position = enemy_list[0]
+            break
     return enemy_position
 
 
@@ -36,23 +34,31 @@ def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 
     :return: returns an Enemy class object
     """
     lanes = battlefield.lanes
-    reversed_positions_list = list(reversed(lanes[lane_to_search].positions))
+    lane = lanes[lane_to_search]
+    reversed_positions_list = list(reversed(lane.positions))
     enemy_position_index_list = [index for index, position in enumerate(reversed_positions_list) if position.occupied]
     last_position = None
     # checks if requested enemy is within the list or is not the first enemy in the list
-    if 0 < enemy_to_look_for < len(reversed_positions_list) and len(enemy_position_index_list) > enemy_to_look_for:
-        if next_to:
-            # checks if enemy, being looked, for has index that is 1 more than previous enemy (subsequent)
-            if enemy_position_index_list[enemy_to_look_for] - 1 == enemy_position_index_list[enemy_to_look_for - 1]:
-                last_position = enemy_position_index_list[enemy_to_look_for]
+    if enemy_position_index_list:  # Check if the list is not empty
+        if 0 < enemy_to_look_for < len(reversed_positions_list) and len(enemy_position_index_list) > enemy_to_look_for:
+            if next_to:
+                if enemy_position_index_list[enemy_to_look_for] - 1 == enemy_position_index_list[enemy_to_look_for - 1]:
+                    last_position = enemy_position_index_list[enemy_to_look_for]
+                else:
+                    last_position = None
             else:
-                last_position = None
+                last_position = enemy_position_index_list[enemy_to_look_for]
         else:
-            last_position = enemy_position_index_list[enemy_to_look_for]
+            last_position = enemy_position_index_list[0]
     else:
-        last_position = enemy_position_index_list[0]
+        # Handle the case where there are no occupied positions
+        print("No occupied positions found.")
+        return None  # Or handle it some other way that fits your game's logic
 
-    return reversed_positions_list[last_position].enemy
+    if last_position is not None:
+        return reversed_positions_list[last_position].enemy
+    else:
+        return None
 
 
 def calculate_return_path(start_pos, end_pos, steps=20):
