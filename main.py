@@ -30,7 +30,9 @@ def main():
     cards = core_funct.create_card_list()
 
     # generate enemies
-    enemies = classes.Hoard(random.randint(4, 8), battlefield).enemy_list
+    # Temporarily using line bellow to debug. Restore if no longer debugging... hoard = classes.Hoard(random.randint(4, 8), battlefield)
+    hoard = classes.Hoard(1, battlefield)
+    enemies = hoard.enemy_list
 
     # generate a start turn button and text
     start_turn_btn = classes.Button("Start turn", (classes.Card.card_width + constants.MARGIN) *
@@ -129,6 +131,10 @@ def main():
 
                     if sequence_index == 0:
                         # damaging enemies
+                        for index, position in enumerate(battlefield.lanes[0].positions):
+                            if position.enemy is not None:
+                                print(f"enemy index {index}")
+                                print(f"Frozen: {position.enemy.frozen}")
                         if (current_action - 1) // 3 < len(move_selections):
                             action = move_selections[(current_action - 1) // 3]
                             current_card = action[0]
@@ -143,9 +149,7 @@ def main():
 
                     elif sequence_index == 2:
                         # creating additional enemies
-                        new_enemies = classes.Hoard(1, battlefield).enemy_list
-                        for enemy in new_enemies:
-                            enemies.append(enemy)
+                        hoard.create_enemy(1)
 
                     current_action += 1
                     action_start_time = current_time

@@ -37,7 +37,7 @@ def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 
     lanes = battlefield.lanes
     lane = lanes[lane_to_search]
     reversed_positions_list = list(reversed(lane.positions))
-    enemy_position_index_list = [index for index, position in enumerate(reversed_positions_list) if position.occupied]
+    enemy_position_index_list = [index for index, position in enumerate(reversed_positions_list) if position.enemy]
     last_position = None
     # checks if requested enemy is within the list or is not the first enemy in the list
     if enemy_position_index_list:  # Check if the list is not empty
@@ -87,7 +87,8 @@ def create_card_list() -> list:
     """
     game_cards = []
     for count in range(constants.CARD_COUNT):
-        random_item = random.choice(list(entities.card_types2.items()))
+        # Temporarily using line bellow to debug. Restore if no longer debugging... random_item = random.choice(list(entities.card_types2.items()))
+        random_item = ("Freeze 1", entities.card_types2["Freeze 1"])
         card = classes.Card(150 * count + 1, 0, "gray")
 
         # take random card type and damage value from the card type dictionary

@@ -19,7 +19,7 @@ def move_enemy(lane, direction, num_of_spots_moved, battlefield, enemies_to_move
 
     # Calculate new positions for specified enemies or all if not specified
     for index, position in enumerate(positions):
-        if position.occupied and position.enemy is not None:
+        if position.enemy is not None:
             # Check if the enemy is frozen
             if position.enemy.frozen > 0:
                 position.enemy.frozen -= 1
@@ -36,12 +36,10 @@ def move_enemy(lane, direction, num_of_spots_moved, battlefield, enemies_to_move
     for index in range(num_positions):
         if new_positions[index] is not None:
             positions[index].enemy = new_positions[index]
-            positions[index].occupied = True
             # Update enemy position coordinates
             positions[index].enemy.update_position(positions[index].rect.centerx, positions[index].rect.centery)
         else:
             positions[index].enemy = None
-            positions[index].occupied = False
 
 
 def damage_enemy(lane_index, battlefield, enemy_list, damage=1, enemy_to_damage: int = 0):
