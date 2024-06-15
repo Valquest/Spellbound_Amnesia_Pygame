@@ -9,7 +9,7 @@ def first_last_enemy_finder(battlefield, lane_to_search, first_or_last) -> int:
     :param battlefield:
     :param lane_to_search:
     :param first_or_last: 0 - finds last enemy, 1 - finds first enemy
-    :return:
+    :return: an integer value of an enemy index
     """
     lane = battlefield.lanes[lane_to_search]
     enemy_list = [position.enemy for position in lane.positions if position.enemy is not None]

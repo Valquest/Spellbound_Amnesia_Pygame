@@ -86,8 +86,14 @@ def main():
                 if selected_card:
                     for lane in battlefield.lanes:
                         lane_index = None
+                        # check if there are any enemies on that lane, if no, prevent selection
+                        enemies_on_lane = []
                         for position in lane.positions:
-                            if position.rect.collidepoint(mouse_pos):
+                            if position.enemy:
+                                enemies_on_lane.append(position.enemy)
+                        # add card and lane to move selection list
+                        for position in lane.positions:
+                            if position.rect.collidepoint(mouse_pos) and not not enemies_on_lane:
                                 lane_index = battlefield.lanes.index(lane)
                                 # sets variable move_index to -1 so that further conditions avoid iterating
                                 # move_selections if move_index is not set to value above -1
