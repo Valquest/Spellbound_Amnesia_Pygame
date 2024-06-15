@@ -155,7 +155,14 @@ def main():
                         for lane in range(3):
                             # move enemies and check if move_enemy function simultaneously returns 1
                             if spells.move_enemy(lane, 1, 1, battlefield) == 1:
+                                # remove hp and remove enemy
                                 player_health.remove_hp()
+                                positions = battlefield.lanes[lane].positions
+                                for enemy in enemies:
+                                    if enemy == positions[len(positions) - 1].enemy:
+                                        enemies.remove(enemy)
+                                        break
+                                positions[len(positions) - 1].enemy = None
 
                     elif sequence_index == 2:
                         # creating additional enemies

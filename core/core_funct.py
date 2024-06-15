@@ -8,14 +8,14 @@ def first_last_enemy_finder(battlefield, lane_to_search, first_or_last) -> int o
     """
     :param battlefield:
     :param lane_to_search:
-    :param first_or_last: 0 - finds last enemy, 1 - finds first enemy
+    :param first_or_last: -1 - finds last enemy, 1 - finds first enemy
     :return: an integer value of an enemy index or None
     """
     lane = battlefield.lanes[lane_to_search]
     enemy_list = [position.enemy for position in lane.positions if position.enemy is not None]
     enemy_position = None
     target_enemy = None
-    if not not enemy_list:
+    if enemy_list:
         if first_or_last == 1:
             target_enemy = list(reversed(enemy_list))[0]
         elif first_or_last == -1:
@@ -88,7 +88,7 @@ def create_card_list() -> list:
     """
     game_cards = []
     for count in range(constants.CARD_COUNT):
-        random_item = random.choice(list(entities.card_types2.items()))
+        random_item = random.choice(list(entities.card_types.items()))
         card = classes.Card(150 * count + 1, 0, "gray")
 
         # take random card type and damage value from the card type dictionary
@@ -110,9 +110,10 @@ def modify_card_list(card_list: list, cards_to_modify: list[int] = None):
     """
     def modify(cards: list, to_modify: list):
         for card_index in to_modify:
+            # take random card type and parameter value from the card type dictionary
             random_item = random.choice(list(entities.card_types.items()))
             cards[card_index].type = random_item[0]
-            cards[card_index].damage = random_item[1][0]
+            cards[card_index].params = random_item[1]
 
     if cards_to_modify is None:
         cards_to_modify = [i - 1 for i in range(constants.CARD_COUNT)]

@@ -86,7 +86,25 @@ class Hoard:
         self.enemy_count = temp_var_num_of_enemies
         self.enemy_list = []
         self.battlefield = battlefield
-        self.create_enemy(self.enemy_count)
+        self.setup_enemies(self.enemy_count)
+
+    def setup_enemies(self, new_enemy_count):
+        for _ in range(new_enemy_count):
+            # generate random light color for enemies
+            color = (random.randint(100, 255), random.randint(100, 255), random.randint(100, 255))
+            # randomise a row to generate enemy in
+            random_lane = random.randint(0, constants.LANE_NUMBER - 1)
+            lane = self.battlefield.lanes[random_lane]
+
+            for index, position in enumerate(lane.positions):
+                if position.enemy is None:
+                    position = lane.positions[index]
+                    center_x, center_y = position.rect.center
+                    enemy = Enemy(center_x, center_y, color)
+                    position.enemy = enemy
+                    enemy.health = random.randint(1, 3)
+                    self.enemy_list.append(enemy)
+                    break
 
     def create_enemy(self, new_enemy_count):
         for _ in range(new_enemy_count):
@@ -162,7 +180,7 @@ class Card:
                     funct(target_lane, battlefield, enemy_list, self.params["Damage"], 0)
                 case "move_enemy":
                     funct(target_lane, self.params["Move direction"], self.params["Move positions"], battlefield,
-                          [core_funct.first_last_enemy_finder(battlefield, target_lane, 1)])
+                          core_funct.first_last_enemy_finder(battlefield, target_lane, 1))
                 case "freeze_enemy":
                     funct(target_lane, core_funct.first_last_enemy_finder(battlefield, target_lane, 1),
                           self.params["Turns frozen"], battlefield)
