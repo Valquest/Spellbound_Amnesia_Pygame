@@ -14,13 +14,14 @@ def first_last_enemy_finder(battlefield, lane_to_search, first_or_last) -> int:
     lane = battlefield.lanes[lane_to_search]
     enemy_list = [position.enemy for position in lane.positions if position.enemy is not None]
     enemy_position = None
-    for position in enemy_list:
-        if first_or_last == 1:
-            enemy_position = list(reversed(enemy_list))[0]
-            break
-        elif first_or_last == -1:
-            enemy_position = enemy_list[0]
-            break
+    target_enemy = None
+    if first_or_last == 1:
+        target_enemy = list(reversed(enemy_list))[0]
+    elif first_or_last == -1:
+        target_enemy = enemy_list[0]
+    for index, position in enumerate(lane.positions):
+        if position.enemy == target_enemy:
+            enemy_position = index
     return enemy_position
 
 
@@ -52,8 +53,7 @@ def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 
             last_position = enemy_position_index_list[0]
     else:
         # Handle the case where there are no occupied positions
-        print("No occupied positions found.")
-        return None  # Or handle it some other way that fits your game's logic
+        return None
 
     if last_position is not None:
         return reversed_positions_list[last_position].enemy

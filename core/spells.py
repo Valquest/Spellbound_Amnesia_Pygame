@@ -3,16 +3,10 @@ from core import core_funct
 
 def freeze_enemy(lane, target_enemy_index, turns_frozen, battlefield) -> None:
     positions = battlefield.lanes[lane].positions
-    print(f"target_enemy_index: {target_enemy_index}")
-    print(f"positions[target_enemy_index]: {positions[target_enemy_index]}")
-    """
-    print(f"Freezing enemy on position: {positions.index(positions[target_enemy_index])}")
     if positions[target_enemy_index] is not None:
-        print(f"Position is not empty: {positions[target_enemy_index] is not None}")
-        enemy = positions[target_enemy_index]
-        print(f"Assigning {turns_frozen} turns of frozen effect to the enemy")
+        enemy = positions[target_enemy_index].enemy
         enemy.frozen = turns_frozen
-    """
+
 
 def move_enemy(lane, direction, num_of_spots_moved, battlefield, enemies_to_move=None) -> None:
     if direction not in [-1, 1]:
