@@ -29,6 +29,10 @@ def main():
     # generating game cards
     cards = core_funct.create_card_list()
 
+    # generating player health crystals
+    player_health = classes.PlayerHealth
+    health_crystals = player_health.crystal_list
+
     # generate enemies
     # Temporarily using line bellow to debug. Restore if no longer debugging... hoard = classes.Hoard(random.randint(4, 8), battlefield)
     hoard = classes.Hoard(1, battlefield)
@@ -137,10 +141,6 @@ def main():
 
                     if sequence_index == 0:
                         # damaging enemies
-                        for index, position in enumerate(battlefield.lanes[0].positions):
-                            if position.enemy is not None:
-                                print(f"enemy index {index}")
-                                print(f"Frozen: {position.enemy.frozen}")
                         if (current_action - 1) // 3 < len(move_selections):
                             action = move_selections[(current_action - 1) // 3]
                             current_card = action[0]
@@ -150,8 +150,9 @@ def main():
 
                     elif sequence_index == 1:
                         # moving enemies
-                        for lane in range(3):
-                            spells.move_enemy(lane, 1, 1, battlefield)
+                        spells.move_enemy(0, 1, 1, battlefield)
+                        # for lane in range(3):
+                        #     spells.move_enemy(lane, 1, 1, battlefield)
 
                     elif sequence_index == 2:
                         # creating additional enemies

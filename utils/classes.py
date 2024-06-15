@@ -90,15 +90,15 @@ class Hoard:
 
     def create_enemy(self, new_enemy_count):
         for _ in range(new_enemy_count):
-            # Check if position 0 in lane 0 is occupied by an enemy
-            if self.battlefield.lanes[0].positions[0].enemy is not None:
-                return
-
             # generate random light color for enemies
             color = (random.randint(100, 255), random.randint(100, 255), random.randint(100, 255))
             # randomise a row to generate enemy in
             # Temporarily using line bellow to debug. Restore if no longer debugging... random_lane = random.randint(0, constants.LANE_NUMBER - 1)
             random_lane = 0
+            # Check if position 0 in lane 0 is occupied by an enemy
+            if self.battlefield.lanes[random_lane].positions[0].enemy is not None:
+                return
+
             lane = self.battlefield.lanes[random_lane]
             position = lane.positions[0]
             center_x, center_y = position.rect.center
@@ -208,3 +208,38 @@ class Button:
     # draw a button
     def draw(self, canvas):
         pygame.draw.rect(canvas, "white", self.rect)
+
+
+class HealthCrystal:
+    width = 10
+    height = 10
+    display = True
+
+    def __init__(self, x, y):
+        self.x_pos = x
+        self.y_pos = y
+        self.rect_obj = pygame.Rect(self.x_pos, self.y_pos, self.width, self.height)
+
+    def draw(self, canvas):
+        if self.display:
+            pygame.draw.rect(canvas, "blue", self.rect_obj)
+
+
+class PlayerHealth:
+    crystal_list = []
+    x_pos = 500
+    y_pos = 300
+
+    def __init__(self):
+        from variables import variables
+        for health in variables.player_health:
+            crystal = HealthCrystal(self.x_pos, self.y_pos)
+            self.crystal_list.append(crystal)
+            self.x_pos += 10
+
+    def remove_hp(self):
+        list(reversed(self.crystal_list))[0].display = False
+    def add_hp(self):
+        for crystal in list(reversed(self.crystal_list)):
+
+

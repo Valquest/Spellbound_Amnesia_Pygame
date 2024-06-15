@@ -4,24 +4,25 @@ from variables import constants
 from data import entities
 
 
-def first_last_enemy_finder(battlefield, lane_to_search, first_or_last) -> int:
+def first_last_enemy_finder(battlefield, lane_to_search, first_or_last) -> int or None:
     """
     :param battlefield:
     :param lane_to_search:
     :param first_or_last: 0 - finds last enemy, 1 - finds first enemy
-    :return: an integer value of an enemy index
+    :return: an integer value of an enemy index or None
     """
     lane = battlefield.lanes[lane_to_search]
     enemy_list = [position.enemy for position in lane.positions if position.enemy is not None]
     enemy_position = None
     target_enemy = None
-    if first_or_last == 1:
-        target_enemy = list(reversed(enemy_list))[0]
-    elif first_or_last == -1:
-        target_enemy = enemy_list[0]
-    for index, position in enumerate(lane.positions):
-        if position.enemy == target_enemy:
-            enemy_position = index
+    if not not enemy_list:
+        if first_or_last == 1:
+            target_enemy = list(reversed(enemy_list))[0]
+        elif first_or_last == -1:
+            target_enemy = enemy_list[0]
+        for index, position in enumerate(lane.positions):
+            if position.enemy == target_enemy:
+                enemy_position = index
     return enemy_position
 
 
