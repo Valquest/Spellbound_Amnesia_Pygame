@@ -88,8 +88,7 @@ def create_card_list() -> list:
     """
     game_cards = []
     for count in range(constants.CARD_COUNT):
-        # Temporarily using line bellow to debug. Restore if no longer debugging... random_item = random.choice(list(entities.card_types2.items()))
-        random_item = ("Freeze 1", entities.card_types2["Freeze 1"])
+        random_item = random.choice(list(entities.card_types2.items()))
         card = classes.Card(150 * count + 1, 0, "gray")
 
         # take random card type and damage value from the card type dictionary

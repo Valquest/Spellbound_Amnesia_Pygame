@@ -3,7 +3,7 @@ import random
 
 # project files
 from utils import classes
-from variables import constants
+from variables import constants, variables
 from core import core_funct, spells
 from utils import util_funct
 
@@ -30,12 +30,11 @@ def main():
     cards = core_funct.create_card_list()
 
     # generating player health crystals
-    player_health = classes.PlayerHealth
+    player_health = classes.PlayerHealth()
     health_crystals = player_health.crystal_list
 
     # generate enemies
-    # Temporarily using line bellow to debug. Restore if no longer debugging... hoard = classes.Hoard(random.randint(4, 8), battlefield)
-    hoard = classes.Hoard(1, battlefield)
+    hoard = classes.Hoard(random.randint(4, 8), battlefield)
     enemies = hoard.enemy_list
 
     # generate a start turn button and text
@@ -67,6 +66,9 @@ def main():
         # pygame.Quit event means the user clicked X to close your window
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                running = False
+            # when player health goes to 0 quit
+            if variables.player_health <= 0:
                 running = False
             # when mouse button is clicked, get mouse position
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -150,9 +152,10 @@ def main():
 
                     elif sequence_index == 1:
                         # moving enemies
-                        spells.move_enemy(0, 1, 1, battlefield)
-                        # for lane in range(3):
-                        #     spells.move_enemy(lane, 1, 1, battlefield)
+                        for lane in range(3):
+                            # move enemies and check if move_enemy function simultaneously returns 1
+                            if spells.move_enemy(lane, 1, 1, battlefield) == 1:
+                                player_health.remove_hp()
 
                     elif sequence_index == 2:
                         # creating additional enemies
@@ -175,6 +178,10 @@ def main():
         # draw start turn button with text
         start_turn_btn.draw(screen)
         screen.blit(start_turn_btn.font_render, start_turn_btn.btn_position)
+
+        # drawing health crystals
+        for crystal in health_crystals:
+            crystal.draw(screen)
 
         # drawing amnesia meter
         for item in meters:

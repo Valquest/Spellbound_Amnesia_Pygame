@@ -93,8 +93,7 @@ class Hoard:
             # generate random light color for enemies
             color = (random.randint(100, 255), random.randint(100, 255), random.randint(100, 255))
             # randomise a row to generate enemy in
-            # Temporarily using line bellow to debug. Restore if no longer debugging... random_lane = random.randint(0, constants.LANE_NUMBER - 1)
-            random_lane = 0
+            random_lane = random.randint(0, constants.LANE_NUMBER - 1)
             # Check if position 0 in lane 0 is occupied by an enemy
             if self.battlefield.lanes[random_lane].positions[0].enemy is not None:
                 return
@@ -104,8 +103,7 @@ class Hoard:
             center_x, center_y = position.rect.center
             enemy = Enemy(center_x, center_y, color)
             position.enemy = enemy
-            # Temporarily using line bellow to debug. Restore if no longer debugging... enemy.health = random.randint(1, 3)
-            enemy.health = 5
+            enemy.health = random.randint(1, 3)
             self.enemy_list.append(enemy)
 
 
@@ -226,20 +224,36 @@ class HealthCrystal:
 
 
 class PlayerHealth:
+    from variables import variables
     crystal_list = []
-    x_pos = 500
+    x_pos = 50
     y_pos = 300
 
     def __init__(self):
         from variables import variables
-        for health in variables.player_health:
+        for health in range(variables.player_health):
             crystal = HealthCrystal(self.x_pos, self.y_pos)
             self.crystal_list.append(crystal)
-            self.x_pos += 10
+            self.x_pos += 20
 
     def remove_hp(self):
-        list(reversed(self.crystal_list))[0].display = False
+        last_crystal_index = self.last_crystal_locator()
+        self.crystal_list[last_crystal_index].display = False
+        self.variables.player_health -= 1
+
     def add_hp(self):
-        for crystal in list(reversed(self.crystal_list)):
+        last_crystal_index = self.last_crystal_locator()
+        self.crystal_list[last_crystal_index].display = True
+        self.variables.player_health += 1
+
+    def last_crystal_locator(self) -> int:
+        for index, crystal in enumerate(self.crystal_list):
+            if index >= len(self.crystal_list) - 1 and crystal.display:
+                return len(self.crystal_list) - 1
+            elif not crystal.display:
+                return index - 1
+
+
+
 
 

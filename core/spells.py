@@ -9,7 +9,7 @@ def freeze_enemy(lane, target_enemy_index, turns_frozen, battlefield) -> None:
             enemy.frozen = turns_frozen
 
 
-def move_enemy(lane, direction, num_of_spots_moved, battlefield, enemies_to_move=None) -> None:
+def move_enemy(lane, direction, num_of_spots_moved, battlefield, enemies_to_move=None) -> None or int:
     if direction not in [-1, 1]:
         raise ValueError("Direction must be either 1 or -1 for \"move_enemy\" function")
     positions = battlefield.lanes[lane].positions
@@ -35,7 +35,8 @@ def move_enemy(lane, direction, num_of_spots_moved, battlefield, enemies_to_move
             elif positions[index].enemy.frozen > 0:
                 positions[index].enemy.frozen -= 1
         elif next_index >= position_count and positions[index].enemy.frozen == 0:
-            positions[index].enemy = None
+            # return 1 if enemy has moved past last position and player should lose health
+            return 1
 
 
 
