@@ -152,9 +152,9 @@ def main():
 
                     elif sequence_index == 1:
                         # moving enemies
-                        for lane in range(3):
+                        for lane in range(1):
                             # move enemies and check if move_enemy function simultaneously returns 1
-                            if spells.move_enemy(lane, 1, 1, battlefield, enemies) == 1:
+                            if spells.move_enemy(lane, 1, 1, battlefield, enemies):
                                 # remove hp and remove enemy
                                 player_health.remove_hp()
                                 positions = battlefield.lanes[lane].positions

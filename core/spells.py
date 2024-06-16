@@ -16,6 +16,7 @@ def move_enemy(lane, direction, num_of_spots_moved, battlefield, enemy_list, ene
     positions = battlefield.lanes[lane].positions
     position_count = len(positions)
     enemy_index_list = list(reversed([index for index, position in enumerate(positions) if position.enemy is not None]))
+    health_lost = False
 
     # if specific enemy has to be moved we set up a target enemy
     target_enemy = None
@@ -40,10 +41,23 @@ def move_enemy(lane, direction, num_of_spots_moved, battlefield, enemy_list, ene
 
     else:
         for index in enemy_index_list:
+            print(f"for enemy index {index}")
             next_index = index + num_of_spots_moved * direction
+            if next_index >= position_count and positions[index].enemy.frozen == 0:
+                # return 1 if enemy has moved past last position and player should lose health
+                for enemy in enemy_list:
+                    if enemy == positions[index].enemy:
+                        enemy_list.remove(enemy)
+                        break
+                positions[index].enemy = None
+                enemy_index_list = list(
+                    reversed([index for index, position in enumerate(positions) if position.enemy is not None]))
+                print(f"After removing first enemy: {enemy_index_list}")
+                health_lost = True
             # 2 following ifs check if future position is not occupied, not out of lane and enemy is not frozen
-            if 0 < next_index < position_count:
+            elif 0 < next_index < position_count:
                 print(f"Pre checking if enemy exists in next index {enemy_index_list}")
+                print({positions[next_index].enemy is None and positions[index].enemy.frozen == 0})
                 if positions[next_index].enemy is None and positions[index].enemy.frozen == 0:
                     positions[next_index].enemy = positions[index].enemy
                     positions[index].enemy = None
@@ -56,17 +70,7 @@ def move_enemy(lane, direction, num_of_spots_moved, battlefield, enemy_list, ene
                     print("-------")
                 elif positions[index].enemy.frozen > 0:
                     positions[index].enemy.frozen -= 1
-            elif next_index >= position_count and positions[index].enemy.frozen == 0:
-                # return 1 if enemy has moved past last position and player should lose health
-                for enemy in enemy_list:
-                    if enemy == positions[index].enemy:
-                        enemy_list.remove(enemy)
-                        break
-                positions[index].enemy = None
-                enemy_index_list = list(
-                    reversed([index for index, position in enumerate(positions) if position.enemy is not None]))
-                print(f"After removing first enemy: {enemy_index_list}")
-                return 1
+    return health_lost
 
 
 def damage_enemy(lane_index, battlefield, enemy_list, damage=1, enemy_to_damage: int = 0):
