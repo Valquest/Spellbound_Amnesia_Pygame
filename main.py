@@ -20,8 +20,11 @@ def main():
     turn_ended = False
     clock = pygame.time.Clock()
 
+    # create a game instance
+    game = classes.Game()
+
     # create battlefield with lanes and positions
-    battlefield = classes.Battlefield(constants.LANE_NUMBER)
+    battlefield = game.battlefield
 
     # create amnesia meter bar
     meters = util_funct.add_amnesia_bar(constants.AMNESIA_BAR_COUNT)
@@ -30,12 +33,12 @@ def main():
     cards = core_funct.create_card_list()
 
     # generating player health crystals
-    player_health = classes.PlayerHealth()
+    player_health = game.player_health
     health_crystals = player_health.crystal_list
 
     # generate enemies
-    hoard = classes.Hoard(random.randint(4, 8), battlefield)
-    enemies = hoard.enemy_list
+    # hoard = classes.Hoard(random.randint(4, 8), battlefield)
+    enemies = battlefield.hoard.enemy_list
 
     # generate a start turn button and text
     start_turn_btn = classes.Button("Start turn", (classes.Card.card_width + constants.MARGIN) *
@@ -152,17 +155,20 @@ def main():
 
                     elif sequence_index == 1:
                         # moving enemies
-                        for lane in range(1):
+                        for lane in range(3):
                             # move enemies and check if move_enemy function simultaneously returns 1
-                            if spells.move_enemy(lane, 1, 1, battlefield, enemies):
-                                # remove hp and remove enemy
-                                player_health.remove_hp()
-                                positions = battlefield.lanes[lane].positions
-                                positions[len(positions) - 1].enemy = None
+                            print(f"Lane enemy list {battlefield.lanes[lane].get_enemy_list()}")
+                            for enemy in battlefield.lanes[lane].enemy_indexes:
+                                if spells.move_enemy(lane, 1, 1, battlefield, enemies) == 1:
+                                    # move_enemy(enemy_index, lane, direction, num_of_spots_moved, battlefield, enemy_list)
+                                    # remove hp and remove enemy
+                                    player_health.remove_hp()
+                                    # positions = battlefield.lanes[lane].positions
+                                    # positions[len(positions) - 1].enemy = None
 
                     elif sequence_index == 2:
                         # creating additional enemies
-                        hoard.create_enemy(1)
+                        battlefield.hoard.create_enemy(1)
 
                     current_action += 1
                     action_start_time = current_time

@@ -32,6 +32,10 @@ class Lane:
             position = Position(x_pos, y_pos)
             self.positions.append(position)
 
+    def get_enemy_list(self) -> list:
+        enemy_indexes = [index for index, position in enumerate(self.positions) if position.enemy is not None]
+        return enemy_indexes
+
 
 class Battlefield:
     def __init__(self, lane_count):
@@ -39,6 +43,7 @@ class Battlefield:
         for lane_index in range(lane_count):
             lane = Lane(lane_index)
             self.lanes.append(lane)
+        self.hoard = Hoard(random.randint(4, 8), self.lanes)
 
     def draw(self, canvas):
         for lane in self.lanes:
@@ -82,10 +87,10 @@ class Enemy:
 
 # hoard class generates enemy instances
 class Hoard:
-    def __init__(self, temp_var_num_of_enemies, battlefield):
+    def __init__(self, temp_var_num_of_enemies, lanes):
         self.enemy_count = temp_var_num_of_enemies
         self.enemy_list = []
-        self.battlefield = battlefield
+        self.lanes = lanes
         self.setup_enemies(self.enemy_count)
 
     def setup_enemies(self, new_enemy_count):
@@ -94,7 +99,7 @@ class Hoard:
             color = (random.randint(100, 255), random.randint(100, 255), random.randint(100, 255))
             # randomise a row to generate enemy in
             random_lane = random.randint(0, constants.LANE_NUMBER - 1)
-            lane = self.battlefield.lanes[random_lane]
+            lane = self.lanes[random_lane]
 
             for index, position in enumerate(lane.positions):
                 if position.enemy is None:
@@ -113,10 +118,10 @@ class Hoard:
             # randomise a row to generate enemy in
             random_lane = random.randint(0, constants.LANE_NUMBER - 1)
             # Check if position 0 in lane 0 is occupied by an enemy
-            if self.battlefield.lanes[random_lane].positions[0].enemy is not None:
+            if self.lanes[random_lane].positions[0].enemy is not None:
                 return
 
-            lane = self.battlefield.lanes[random_lane]
+            lane = self.lanes[random_lane]
             position = lane.positions[0]
             center_x, center_y = position.rect.center
             enemy = Enemy(center_x, center_y, color)
@@ -272,6 +277,7 @@ class PlayerHealth:
                 return index - 1
 
 
-
-
-
+class Game:
+    def __init__(self):
+        self.battlefield = Battlefield(constants.LANE_NUMBER)
+        self.player_health = PlayerHealth()
