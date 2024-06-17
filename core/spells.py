@@ -54,11 +54,12 @@ def move_enemy(enemy_index, lane, direction, num_of_spots_moved, battlefield) ->
 
 
 def damage_enemy(lane_index, battlefield, damage=1, enemy_to_damage: int = 0):
-    enemy_to_damage_position = core_funct.enemy_position_finder(lane_index, battlefield, enemy_to_damage)
+    enemy_to_damage_index = core_funct.enemy_position_finder(lane_index, battlefield, enemy_to_damage)
     enemy_list = battlefield.hoard.enemy_list
+    positions = battlefield.lanes[lane_index].positions
     if enemy_list is not None:
         for enemy in enemy_list:
-            if enemy == enemy_to_damage_position:
+            if enemy == positions[enemy_to_damage_index].enemy:
                 enemy.health -= damage
                 if enemy.health <= 0:
                     # Remove references to the enemy in the battlefield
@@ -73,27 +74,17 @@ def damage_enemy(lane_index, battlefield, damage=1, enemy_to_damage: int = 0):
 
 
 def damage_adjacent(lane_index, battlefield, damage=1, target_enemy: int = 0):
-    enemy_to_damage_position = core_funct.first_last_enemy_finder(battlefield, lane_index, 1)
-    print(enemy_to_damage_position)
+    enemy_to_damage_position = core_funct.enemy_position_finder(lane_index, battlefield, target_enemy)
 
     lanes = battlefield.lanes
     num_of_lanes = len(lanes)
-    if lane_index - 1 < 0:
-        if lanes[lane_index + 1].positions[enemy_to_damage_position].enemy is not None:
-            # lanes[lane_index + 1].positions[enemy_to_damage_position].enemy.health -= damage
-            print(enemy_to_damage_position)
-            damage_enemy(lane_index + 1, battlefield, damage, enemy_to_damage_position)
-    elif lane_index + 1 >= num_of_lanes:
+    if enemy_to_damage_position is None:
+        return
+
+    if lane_index - 1 >= 0:
         if lanes[lane_index - 1].positions[enemy_to_damage_position].enemy is not None:
-            # lanes[lane_index - 1].positions[enemy_to_damage_position].enemy.health -= damage
-            print(enemy_to_damage_position)
             damage_enemy(lane_index - 1, battlefield, damage, enemy_to_damage_position)
-    else:
+
+    if lane_index + 1 < num_of_lanes:
         if lanes[lane_index + 1].positions[enemy_to_damage_position].enemy is not None:
-            # lanes[lane_index + 1].positions[enemy_to_damage_position].enemy.health -= damage
-            print(enemy_to_damage_position)
             damage_enemy(lane_index + 1, battlefield, damage, enemy_to_damage_position)
-        if lanes[lane_index - 1].positions[enemy_to_damage_position].enemy is not None:
-            # lanes[lane_index - 1].positions[enemy_to_damage_position].enemy.health -= damage
-            print(enemy_to_damage_position)
-            damage_enemy(lane_index - 1, battlefield, damage, enemy_to_damage_position)

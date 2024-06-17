@@ -26,14 +26,14 @@ def first_last_enemy_finder(battlefield, lane_to_search, first_or_last) -> int o
     return enemy_position
 
 
-def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 0, next_to: bool = False) -> object:
+def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 0, next_to: bool = False) -> int:
     """
     Functions locates requested enemy index position inside its lane
     :param lane_to_search: lane index number
     :param battlefield: a multi level class that stores lane and position class elements
     :param enemy_to_look_for: integer number of index for which enemy to find
     :param next_to: if looking for subsequent enemy, find only ones next to previous
-    :return: returns an Enemy class object
+    :return: returns the position index of the enemy
     """
     lanes = battlefield.lanes
     lane = lanes[lane_to_search]
@@ -56,10 +56,8 @@ def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 
         # Handle the case where there are no occupied positions
         return None
 
-    if last_position is not None:
-        return reversed_positions_list[last_position].enemy
-    else:
-        return None
+    return len(reversed_positions_list) - 1 - last_position if last_position is not None else None
+
 
 
 def calculate_return_path(start_pos, end_pos, steps=20):
