@@ -143,7 +143,9 @@ def main():
             if current_action <= total_actions * 3:  # Ensure to perform all actions 3 times
                 if current_time - action_start_time > delay_between_actions:
                     sequence_index = (current_action - 1) % 3  # Cycle through 0, 1, 2
-
+                    # if player health reaches 0, exit this loop, so that the game could end
+                    if variables.player_health <= 0:
+                        return
                     if sequence_index == 0:
                         # damaging enemies
                         if (current_action - 1) // 3 < len(move_selections):
@@ -155,12 +157,12 @@ def main():
 
                     elif sequence_index == 1:
                         # moving enemies
-                        for lane in range(3):
+                        for lane_index in range(3):
                             # move enemies and check if move_enemy function simultaneously returns 1
-                            print(f"Lane enemy list {battlefield.lanes[lane].get_enemy_list()}")
-                            for enemy in battlefield.lanes[lane].enemy_indexes:
-                                if spells.move_enemy(lane, 1, 1, battlefield, enemies) == 1:
-                                    # move_enemy(enemy_index, lane, direction, num_of_spots_moved, battlefield, enemy_list)
+                            lane = battlefield.lanes[lane_index]
+                            print(f"Lane enemy list {lane.get_enemy_list()}")
+                            for enemy_index in lane.get_enemy_list():
+                                if spells.move_enemy(enemy_index, lane_index, 1, 1, battlefield, enemies) == 1:
                                     # remove hp and remove enemy
                                     player_health.remove_hp()
                                     # positions = battlefield.lanes[lane].positions
