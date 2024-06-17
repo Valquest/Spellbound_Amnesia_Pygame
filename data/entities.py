@@ -60,5 +60,23 @@ card_types = {
             "damage_adjacent": spells.damage_adjacent,
             "damage_enemy": spells.damage_enemy
         }
+    },
+    "Spark 1": {
+        "Damage": 1,
+        "Enemy to target": 0,
+        "Chain length": 3,
+        "Card effects": {
+            "chain_damage": spells.chain_damage,
+            "damage_enemy": spells.damage_enemy
+        }
+    },
+    "Thunderbolt 2": {
+        "Damage": 2,
+        "Enemy to target": 0,
+        "Chain length": 1,
+        "Card effects": {
+            "chain_damage": spells.chain_damage,
+            "damage_enemy": spells.damage_enemy
+        }
     }
 }

@@ -89,3 +89,25 @@ def damage_adjacent(lane_index, battlefield, damage=1, target_enemy: int = 0):
         adjacent_enemy_position = enemy_to_damage_position
         if lanes[lane_index + 1].positions[enemy_to_damage_position].enemy is not None:
             damage_enemy(lane_index + 1, battlefield, damage, enemy_to_damage_position)
+
+
+def chain_damage(lane_index, battlefield, chain_length, damage=1, target_enemy: int = 0):
+    enemy_to_damage_position = core_funct.first_last_enemy_finder(battlefield, lane_index, 1)
+    positions = battlefield.lanes[lane_index].positions
+    if enemy_to_damage_position is None:
+        return
+    while enemy_to_damage_position - chain_length < 0:
+        chain_length -= 1
+
+    chaining = True
+    damage_index = 1
+    while chaining:
+        if positions[enemy_to_damage_position - damage_index].enemy is not None and chain_length > 0:
+            damage_enemy(lane_index, battlefield, damage, enemy_to_damage_position - damage_index)
+            damage_index += 1
+            chain_length -= 1
+        else:
+            chaining = False
+
+
+

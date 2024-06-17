@@ -1,7 +1,6 @@
 import pygame
 import random
 from variables import constants
-from data import entities
 
 pygame.font.init()
 
@@ -192,7 +191,8 @@ class Card:
                           self.params["Turns frozen"], battlefield)
                 case "damage_adjacent":
                     funct(target_lane, battlefield)
-                # def damage_adjacent(lane_index, battlefield, damage=1, target_enemy: int = 0):
+                case "chain_damage":
+                    funct(target_lane, battlefield, self.params["Chain length"], self.params["Damage"])
 
 
 # amnesia meter class
