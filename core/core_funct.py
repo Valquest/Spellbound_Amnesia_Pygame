@@ -59,7 +59,6 @@ def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 
     return len(reversed_positions_list) - 1 - last_position if last_position is not None else None
 
 
-
 def calculate_return_path(start_pos, end_pos, steps=20):
     path = []
     for step in range(steps):

@@ -89,5 +89,3 @@ def damage_adjacent(lane_index, battlefield, damage=1, target_enemy: int = 0):
         adjacent_enemy_position = enemy_to_damage_position
         if lanes[lane_index + 1].positions[enemy_to_damage_position].enemy is not None:
             damage_enemy(lane_index + 1, battlefield, damage, enemy_to_damage_position)
-
-
