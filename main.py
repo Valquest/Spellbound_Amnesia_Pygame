@@ -158,15 +158,20 @@ def main():
                     elif sequence_index == 1:
                         # moving enemies
                         for lane_index in range(3):
-                            # move enemies and check if move_enemy function simultaneously returns 1
                             lane = battlefield.lanes[lane_index]
-                            print(f"Lane enemy list {lane.get_enemy_list()}")
-                            for enemy_index in lane.get_enemy_list():
-                                if spells.move_enemy(enemy_index, lane_index, 1, 1, battlefield, enemies) == 1:
-                                    # remove hp and remove enemy
+                            enemies_to_move = sorted(lane.get_enemy_list(), reverse=True)
+
+                            for enemy_index in enemies_to_move:
+                                initial_position = battlefield.lanes[lane_index].positions[enemy_index]
+                                final_position_index = enemy_index + 1
+                                final_position = battlefield.lanes[lane_index].positions[
+                                    final_position_index] if final_position_index < len(
+                                    battlefield.lanes[lane_index].positions) else None
+
+                                spells.move_enemy(enemy_index, lane_index, 1, 1, battlefield)
+
+                                if final_position is None:
                                     player_health.remove_hp()
-                                    # positions = battlefield.lanes[lane].positions
-                                    # positions[len(positions) - 1].enemy = None
 
                     elif sequence_index == 2:
                         # creating additional enemies
