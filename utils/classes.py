@@ -182,7 +182,7 @@ class Card:
         for effect, funct in effects.items():
             match effect:
                 case "damage_enemy":
-                    funct(target_lane, battlefield, enemy_list, self.params["Damage"], 0)
+                    funct(target_lane, battlefield, self.params["Damage"], 0)
                 case "move_enemy":
                     first_enemy = core_funct.first_last_enemy_finder(battlefield, target_lane, 1)
                     funct(first_enemy, target_lane, self.params["Move direction"],
@@ -190,6 +190,9 @@ class Card:
                 case "freeze_enemy":
                     funct(target_lane, core_funct.first_last_enemy_finder(battlefield, target_lane, 1),
                           self.params["Turns frozen"], battlefield)
+                case "damage_adjacent":
+                    funct(target_lane, battlefield)
+                # def damage_adjacent(lane_index, battlefield, damage=1, target_enemy: int = 0):
 
 
 # amnesia meter class

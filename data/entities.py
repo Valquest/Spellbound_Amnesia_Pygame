@@ -52,5 +52,13 @@ card_types = {
             "damage_enemy": spells.damage_enemy
 
         }
+    },
+    "Splash 3": {
+        "Damage": 3,
+        "Enemy to target": 0,
+        "Card effects": {
+            "damage_adjacent": spells.damage_adjacent,
+            "damage_enemy": spells.damage_enemy
+        }
     }
 }
