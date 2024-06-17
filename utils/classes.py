@@ -182,7 +182,7 @@ class Card:
         for effect, funct in effects.items():
             match effect:
                 case "damage_enemy":
-                    funct(target_lane, battlefield, self.params["Damage"], 0)
+                    funct(target_lane, battlefield, self.params["Damage"])
                 case "move_enemy":
                     first_enemy = core_funct.first_last_enemy_finder(battlefield, target_lane, 1)
                     funct(first_enemy, target_lane, self.params["Move direction"],

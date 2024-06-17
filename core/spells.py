@@ -53,8 +53,11 @@ def move_enemy(enemy_index, lane, direction, num_of_spots_moved, battlefield) ->
         )
 
 
-def damage_enemy(lane_index, battlefield, damage=1, enemy_to_damage: int = 0):
-    enemy_to_damage_index = core_funct.enemy_position_finder(lane_index, battlefield, enemy_to_damage)
+def damage_enemy(lane_index, battlefield, damage=1, enemy_to_damage=None):
+    if enemy_to_damage is None:
+        enemy_to_damage_index = core_funct.first_last_enemy_finder(battlefield, lane_index, 1)
+    else:
+        enemy_to_damage_index = enemy_to_damage
     enemy_list = battlefield.hoard.enemy_list
     positions = battlefield.lanes[lane_index].positions
     if enemy_list is not None:
@@ -74,17 +77,17 @@ def damage_enemy(lane_index, battlefield, damage=1, enemy_to_damage: int = 0):
 
 
 def damage_adjacent(lane_index, battlefield, damage=1, target_enemy: int = 0):
-    enemy_to_damage_position = core_funct.enemy_position_finder(lane_index, battlefield, target_enemy)
-
-    lanes = battlefield.lanes
-    num_of_lanes = len(lanes)
+    enemy_to_damage_position = core_funct.first_last_enemy_finder(battlefield, lane_index, 1)
     if enemy_to_damage_position is None:
         return
-
+    lanes = battlefield.lanes
+    num_of_lanes = len(lanes)
     if lane_index - 1 >= 0:
         if lanes[lane_index - 1].positions[enemy_to_damage_position].enemy is not None:
             damage_enemy(lane_index - 1, battlefield, damage, enemy_to_damage_position)
-
     if lane_index + 1 < num_of_lanes:
+        adjacent_enemy_position = enemy_to_damage_position
         if lanes[lane_index + 1].positions[enemy_to_damage_position].enemy is not None:
             damage_enemy(lane_index + 1, battlefield, damage, enemy_to_damage_position)
+
+
