@@ -29,14 +29,13 @@ def move_enemy(enemy_index, lane, direction, num_of_spots_moved, battlefield) ->
 
     # Calculate the next position
     next_position = enemy_index + num_of_spots_moved * direction
-    enemy_list = battlefield.hoard.enemy_list
 
     # Check if the enemy moves out of bounds
     if next_position >= position_count:
         # Remove the enemy from the battlefield and enemy_list
-        for i, e in enumerate(enemy_list):
+        for i, e in enumerate(battlefield.lanes[lane].enemy_list):
             if e == enemy:
-                del enemy_list[i]
+                del battlefield.lanes[lane].enemy_list[i]
                 break
         positions[enemy_index].enemy = None
         return

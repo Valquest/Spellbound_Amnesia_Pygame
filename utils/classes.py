@@ -184,8 +184,9 @@ class Card:
                 case "damage_enemy":
                     funct(target_lane, battlefield, enemy_list, self.params["Damage"], 0)
                 case "move_enemy":
-                    funct(target_lane, self.params["Move direction"], self.params["Move positions"], battlefield,
-                          core_funct.first_last_enemy_finder(battlefield, target_lane, 1))
+                    first_enemy = core_funct.first_last_enemy_finder(battlefield, target_lane, 1)
+                    funct(first_enemy, target_lane, self.params["Move direction"],
+                          self.params["Move positions"], battlefield)
                 case "freeze_enemy":
                     funct(target_lane, core_funct.first_last_enemy_finder(battlefield, target_lane, 1),
                           self.params["Turns frozen"], battlefield)

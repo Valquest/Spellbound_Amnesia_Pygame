@@ -156,21 +156,19 @@ def main():
                             util_funct.increment_amnesia_bar(meters)
 
                     elif sequence_index == 1:
-                        # moving enemies
+                        # Moving enemies
                         for lane_index in range(3):
                             lane = battlefield.lanes[lane_index]
                             enemies_to_move = sorted(lane.get_enemy_list(), reverse=True)
-
                             for enemy_index in enemies_to_move:
-                                initial_position = battlefield.lanes[lane_index].positions[enemy_index]
+                                positions = battlefield.lanes[lane_index].positions
+                                if positions[enemy_index].enemy.frozen > 0:
+                                    continue  # Skip frozen enemies
                                 final_position_index = enemy_index + 1
-                                final_position = battlefield.lanes[lane_index].positions[
-                                    final_position_index] if final_position_index < len(
-                                    battlefield.lanes[lane_index].positions) else None
-
+                                final_position = positions[final_position_index] if final_position_index < len(
+                                    positions) else None
                                 spells.move_enemy(enemy_index, lane_index, 1, 1, battlefield)
-
-                                if final_position is None:
+                                if final_position is None and positions[enemy_index].enemy is None:
                                     player_health.remove_hp()
 
                     elif sequence_index == 2:
