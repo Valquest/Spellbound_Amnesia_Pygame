@@ -281,7 +281,7 @@ class PlayerHealth:
                 return index - 1
 
 
-class Game:
+class Elements:
     def __init__(self):
         self.battlefield = Battlefield(constants.LANE_NUMBER)
         self.player_health = PlayerHealth()

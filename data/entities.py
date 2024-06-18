@@ -1,4 +1,4 @@
-from core import core_funct, spells
+from core import spells
 
 card_types = {
     "Damage 1": {

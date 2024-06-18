@@ -108,6 +108,3 @@ def chain_damage(lane_index, battlefield, chain_length, damage=1, target_enemy: 
             chain_length -= 1
         else:
             chaining = False
-
-
-

@@ -19,11 +19,8 @@ def main():
     turn_ended = False
     clock = pygame.time.Clock()
 
-    # create a game instance
-    game = classes.Game()
-
     # create battlefield with lanes and positions
-    battlefield = game.battlefield
+    battlefield = classes.Battlefield(constants.LANE_NUMBER)
 
     # create amnesia meter bar
     meters = util_funct.add_amnesia_bar(constants.AMNESIA_BAR_COUNT)
@@ -32,7 +29,7 @@ def main():
     cards = core_funct.create_card_list()
 
     # generating player health crystals
-    player_health = game.player_health
+    player_health = classes.PlayerHealth()
     health_crystals = player_health.crystal_list
 
     # generate enemies
