@@ -28,11 +28,18 @@ class Game:
 
                 # when mouse button is clicked, get mouse position
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    # selects a rectangle that is associated with a card class instance
                     card_selection()
 
                 elif event.type == pygame.MOUSEBUTTONUP:
                     card_on_lane_selection()
 
+                elif event.type == pygame.MOUSEMOTION:
+                    update_card_position()
+
+                current_time = pygame.time.get_ticks()
+
+                battle_actions()
 
 
             # GAME RENDERING
@@ -53,69 +60,6 @@ class Battle:
 
 
     def run(self):
-
-
-                # Calculate returning path
-                returning_path = core_funct.calculate_return_path(
-                    (selected_card.x_cord, selected_card.y_cord),
-                    (selected_card.original_x, selected_card.original_y))
-                returning_card = selected_card
-                card_animation_index = 0
-                selected_card = None
-
-        elif event.type == pygame.MOUSEMOTION:
-            if selected_card:
-                selected_card.update_position(event.pos[0] + card_offset_x, event.pos[1] + card_offset_y)
-
-    current_time = pygame.time.get_ticks()
-
-    # turn based action logic, every action takes 2 seconds to complete, 3 seconds delay between turns
-    if turn_ended:
-        if current_action <= total_actions * 3:  # Ensure to perform all actions 3 times
-            if current_time - action_start_time > delay_between_actions:
-                sequence_index = (current_action - 1) % 3  # Cycle through 0, 1, 2
-                # if player health reaches 0, exit this loop, so that the game could end
-                if variables.player_health <= 0:
-                    return
-                if sequence_index == 0:
-                    # damaging enemies
-                    if (current_action - 1) // 3 < len(move_selections):
-                        action = move_selections[(current_action - 1) // 3]
-                        current_card = action[0]
-                        current_lane = action[1]
-                        current_card.cast_effect(battlefield, current_lane, enemies)
-                        util_funct.increment_amnesia_bar(meters)
-
-                elif sequence_index == 1:
-                    # Moving enemies
-                    for lane_index in range(3):
-                        lane = battlefield.lanes[lane_index]
-                        enemies_to_move = sorted(lane.get_enemy_list(), reverse=True)
-                        for enemy_index in enemies_to_move:
-                            positions = battlefield.lanes[lane_index].positions
-                            if positions[enemy_index].enemy.frozen > 0:
-                                continue  # Skip frozen enemies
-                            final_position_index = enemy_index + 1
-                            final_position = positions[final_position_index] if final_position_index < len(
-                                positions) else None
-                            spells.move_enemy(enemy_index, lane_index, 1, 1, battlefield)
-                            if final_position is None and positions[enemy_index].enemy is None:
-                                player_health.remove_hp()
-
-                elif sequence_index == 2:
-                    # creating additional enemies
-                    battlefield.hoard.create_enemy(1)
-
-                current_action += 1
-                action_start_time = current_time
-        else:
-            turn_ended = False
-            current_action = 1
-            cards_to_modify = []
-            for move in move_selections:
-                cards_to_modify.append(cards.index(move[0]))
-            core_funct.modify_card_list(cards, cards_to_modify)
-            move_selections = []
 
         draw()
 
@@ -169,6 +113,67 @@ class Battle:
                             move_selections.pop(0)
                             move_selections.append([selected_card, lane_index])
                         break
+
+            # Calculate returning path
+            returning_path = core_funct.calculate_return_path(
+                (selected_card.x_cord, selected_card.y_cord),
+                (selected_card.original_x, selected_card.original_y))
+            returning_card = selected_card
+            card_animation_index = 0
+            selected_card = None
+
+    def update_card_position(self):
+        if selected_card:
+            selected_card.update_position(event.pos[0] + card_offset_x, event.pos[1] + card_offset_y)
+
+    def battle_actions(self):
+        # turn based action logic, every action takes 2 seconds to complete, 3 seconds delay between turns
+        if turn_ended:
+            if current_action <= total_actions * 3:  # Ensure to perform all actions 3 times
+                if current_time - action_start_time > delay_between_actions:
+                    sequence_index = (current_action - 1) % 3  # Cycle through 0, 1, 2
+                    # if player health reaches 0, exit this loop, so that the game could end
+                    if variables.player_health <= 0:
+                        return
+                    if sequence_index == 0:
+                        # damaging enemies
+                        if (current_action - 1) // 3 < len(move_selections):
+                            action = move_selections[(current_action - 1) // 3]
+                            current_card = action[0]
+                            current_lane = action[1]
+                            current_card.cast_effect(battlefield, current_lane, enemies)
+                            util_funct.increment_amnesia_bar(meters)
+
+                    elif sequence_index == 1:
+                        # Moving enemies
+                        for lane_index in range(3):
+                            lane = battlefield.lanes[lane_index]
+                            enemies_to_move = sorted(lane.get_enemy_list(), reverse=True)
+                            for enemy_index in enemies_to_move:
+                                positions = battlefield.lanes[lane_index].positions
+                                if positions[enemy_index].enemy.frozen > 0:
+                                    continue  # Skip frozen enemies
+                                final_position_index = enemy_index + 1
+                                final_position = positions[final_position_index] if final_position_index < len(
+                                    positions) else None
+                                spells.move_enemy(enemy_index, lane_index, 1, 1, battlefield)
+                                if final_position is None and positions[enemy_index].enemy is None:
+                                    player_health.remove_hp()
+
+                    elif sequence_index == 2:
+                        # creating additional enemies
+                        battlefield.hoard.create_enemy(1)
+
+                    current_action += 1
+                    action_start_time = current_time
+            else:
+                turn_ended = False
+                current_action = 1
+                cards_to_modify = []
+                for move in move_selections:
+                    cards_to_modify.append(cards.index(move[0]))
+                core_funct.modify_card_list(cards, cards_to_modify)
+                move_selections = []
 
     def draw():
         # fill the screen with a color to wipe away anything from last frame
