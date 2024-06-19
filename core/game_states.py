@@ -25,7 +25,7 @@ class Game:
         while self.running:
             self.event_handler()
             self.update()
-            # self.render()
+            self.render()
             pygame.display.flip()
             self.clock.tick(60)
         pygame.quit()
@@ -49,7 +49,8 @@ class Game:
 
     def render(self):
         self.screen.fill((102, 140, 255))
-        self.battle.draw()
+        if self.current_state == "Battlefield":
+            self.battle.draw()
 
     def get_state(self):
         return self.current_state
@@ -104,10 +105,13 @@ class Battle:
         elif variables.player_health <= 0:
             self.game_instance.running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            print("Mouse Down Event")
             self.card_selection(event)
         elif event.type == pygame.MOUSEBUTTONUP:
+            print("Mouse Up Event")
             self.card_on_lane_selection()
         elif event.type == pygame.MOUSEMOTION:
+            print("Mouse Motion Event")
             self.update_card_position(event)
 
     def card_selection(self, event):
@@ -218,15 +222,13 @@ class Battle:
                         self.battlefield.hoard.create_enemy(1)
 
                     self.current_action += 1
-                    action_start_time = current_time
+                    self.action_start_time = current_time
             else:
-                turn_ended = False
-                current_action = 1
-                cards_to_modify = []
-                for move in self.move_selections:
-                    cards_to_modify.append(self.cards.index(move[0]))
+                self.turn_ended = False
+                self.current_action = 1
+                cards_to_modify = [self.cards.index(move[0]) for move in self.move_selections]
                 core_funct.modify_card_list(self.cards, cards_to_modify)
-                move_selections = []
+                self.move_selections = []
 
     def draw(self):
 
