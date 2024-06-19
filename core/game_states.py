@@ -13,41 +13,43 @@ class Game:
         self.running = True
         self.screen = pygame.display.set_mode((constants.WINDOW_WIDTH, constants.WINDOW_HEIGHT))
         self.current_state = "Main menu"
+        self.battle = Battle(None)
+        self.main_menu = MainMenu()
 
     def run(self):
         while self.running:
-            # poll for events
-            # pygame.Quit event means the user clicked X to close your window
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-
-                # when player health goes to 0 quit
-                if variables.player_health <= 0:
-                    running = False
-
-                # when mouse button is clicked, get mouse position
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    # selects a rectangle that is associated with a card class instance
-                    card_selection()
-
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    card_on_lane_selection()
-
-                elif event.type == pygame.MOUSEMOTION:
-                    update_card_position()
-
-                current_time = pygame.time.get_ticks()
-
-                battle_actions()
-
-
-            # GAME RENDERING
-            # flip() the display to put your work on screen
-            pygame.display.flip()
-            clock.tick(60)
+            self.event_handler()
+            self.update()
+            self.render()
+            self.clock.tick(60)
 
         pygame.quit()
+
+    def event_handler(self):
+        # poll for events
+        # pygame.Quit event means the user clicked X to close your window
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+
+
+
+
+    def update(self):
+        match self.current_state:
+            case "Main menu":
+                self.home_screen.run()
+            case "Battlefield":
+                self.battle.run()
+            case _:
+                pass
+
+    def render(self):
+        # GAME RENDERING
+        # fill the screen with a color to wipe away anything from last frame
+        self.screen.fill((102, 140, 255))
+        # flip() the display to put your work on screen
+        pygame.display.flip()
 
     def get_state(self):
         return self.current_state
@@ -56,12 +58,29 @@ class Game:
         self.current_state = state
 
 class Battle:
-    def __init__():
-
+    def __init__(self, event):
 
     def run(self):
+        # when player health goes to 0 quit
+        if variables.player_health <= 0:
+            self.running = False
 
-        draw()
+        # when mouse button is clicked, get mouse position
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # selects a rectangle that is associated with a card class instance
+            self.card_selection()
+
+        elif event.type == pygame.MOUSEBUTTONUP:
+            self.card_on_lane_selection()
+
+        elif event.type == pygame.MOUSEMOTION:
+            self.update_card_position()
+
+        current_time = pygame.time.get_ticks()
+        self.battle_actions()
+
+        # setup new frame
+        self.draw()
 
     def card_selection(self):
         # for each card checks if mouse button is pushed down when hovering on a card. Selects that card and
@@ -176,8 +195,6 @@ class Battle:
                 move_selections = []
 
     def draw():
-        # fill the screen with a color to wipe away anything from last frame
-        screen.fill((102, 140, 255))
 
         # draw start turn button with text
         start_turn_btn.draw(screen)
@@ -213,7 +230,7 @@ class Battle:
             if card_animation_index >= len(returning_path):
                 returning_card = None
 
-class Home:
+class Base:
     def __init__():
 
 
