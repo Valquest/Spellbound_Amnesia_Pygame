@@ -27,7 +27,7 @@ class Game:
             self.update()
             self.render()
             pygame.display.flip()
-            self.clock.tick(60)
+            self.clock.tick(10)
         pygame.quit()
 
     def event_handler(self):
@@ -100,6 +100,7 @@ class Battle:
         self.battle_actions()
 
     def handle_event(self, event):
+        print(f"Handling event: {event}")
         if event.type == pygame.QUIT:
             self.running = False
         elif variables.player_health <= 0:
@@ -115,25 +116,33 @@ class Battle:
             self.update_card_position(event)
 
     def card_selection(self, event):
+        print("Checking for card selection...")
         # for each card checks if mouse button is pushed down when hovering on a card. Selects that card and
         # stores it to a variable
         for card in self.cards:
+            card_rect = pygame.Rect(card.x_cord, card.y_cord, card.card_width, card.card_height)
+            print(f"Card rect: {card_rect}, Mouse pos: {event.pos}")  # Added for debugging
+            print(f"Checking card at position: {card.x_cord}, {card.y_cord}")
             if pygame.Rect(card.x_cord, card.y_cord, card.card_width, card.card_height).collidepoint(
                     event.pos):
                 selected_card = card
                 card_offset_x = card.x_cord - event.pos[0]
                 card_offset_y = card.y_cord - event.pos[1]
+                print(f"Card selected: {self.selected_card}")
                 break
 
     def card_on_lane_selection(self):
         from core import core_funct
         # get mouse position
         mouse_pos = pygame.mouse.get_pos()
+        print(f"Mouse position on release: {mouse_pos}")
         # if "start turn" button is collided with mouse position
         if self.start_turn_btn.rect.collidepoint(mouse_pos):
             # end the turn by changing flag and mark down game time during the click
             self.turn_ended = True
             self.action_start_time = pygame.time.get_ticks()
+            print("Start Turn Button Clicked")
+
         if self.selected_card:
             for lane in self.battlefield.lanes:
                 lane_index = None
@@ -164,6 +173,7 @@ class Battle:
                         else:
                             self.move_selections.pop(0)
                             self.move_selections.append([self.selected_card, lane_index])
+                        print(f"Card {self.selected_card} moved to lane {lane_index}")
                         break
 
             # Calculate returning path
@@ -173,10 +183,13 @@ class Battle:
             returning_card = self.selected_card
             card_animation_index = 0
             self.selected_card = None
+            print("Card released and path calculated")
 
     def update_card_position(self, event):
         if self.selected_card:
+            print(f"Updating position for card: {self.selected_card}")  # Added for debugging
             self.selected_card.update_position(event.pos[0] + self.card_offset_x, event.pos[1] + self.card_offset_y)
+            print(f"Card position updated to: {self.selected_card.x_cord}, {self.selected_card.y_cord}")
 
     def battle_actions(self):
         from utils import util_funct
