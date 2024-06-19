@@ -13,8 +13,8 @@ class Game:
         self.running = True
         self.screen = pygame.display.set_mode((constants.WINDOW_WIDTH, constants.WINDOW_HEIGHT))
         self.current_state = "Main menu"
-        self.battle = Battle(None)
-        self.main_menu = MainMenu()
+        self.battle = Battle(self)
+        self.main_menu = MainMenu(self)
 
     def run(self):
         while self.running:
@@ -22,7 +22,6 @@ class Game:
             self.update()
             self.render()
             self.clock.tick(60)
-
         pygame.quit()
 
     def event_handler(self):
@@ -31,8 +30,6 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-
-
 
 
     def update(self):
@@ -58,23 +55,25 @@ class Game:
         self.current_state = state
 
 class Battle:
-    def __init__(self, event):
+    def __init__(self, game_instance):
+        self.game_instance = game_instance
 
-    def run(self):
+    def event_handler(self):
         # when player health goes to 0 quit
         if variables.player_health <= 0:
-            self.running = False
+            self.game_instance.running = False
 
-        # when mouse button is clicked, get mouse position
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            # selects a rectangle that is associated with a card class instance
-            self.card_selection()
+        for event in pygame.event.get():
+            # when mouse button is clicked, get mouse position
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # selects a rectangle that is associated with a card class instance
+                self.card_selection()
 
-        elif event.type == pygame.MOUSEBUTTONUP:
-            self.card_on_lane_selection()
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.card_on_lane_selection()
 
-        elif event.type == pygame.MOUSEMOTION:
-            self.update_card_position()
+            elif event.type == pygame.MOUSEMOTION:
+                self.update_card_position()
 
         current_time = pygame.time.get_ticks()
         self.battle_actions()
