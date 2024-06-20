@@ -81,57 +81,57 @@ def main():
     #                     card_offset_y = card.y_cord - event.pos[1]
     #                     break
     #
-    #         elif event.type == pygame.MOUSEBUTTONUP:
-    #             # get mouse position
-    #             mouse_pos = pygame.mouse.get_pos()
-    #             # if "start turn" button is collided with mouse position
-    #             if start_turn_btn.rect.collidepoint(mouse_pos):
-    #                 # end the turn by changing flag and mark down game time during the click
-    #                 turn_ended = True
-    #                 action_start_time = pygame.time.get_ticks()
-    #             if selected_card:
-    #                 for lane in battlefield.lanes:
-    #                     lane_index = None
-    #                     # check if there are any enemies on that lane, if no, prevent selection
-    #                     enemies_on_lane = []
-    #                     for position in lane.positions:
-    #                         if position.enemy:
-    #                             enemies_on_lane.append(position.enemy)
-    #                     # add card and lane to move selection list
-    #                     for position in lane.positions:
-    #                         if position.rect.collidepoint(mouse_pos) and not not enemies_on_lane:
-    #                             lane_index = battlefield.lanes.index(lane)
-    #                             # sets variable move_index to -1 so that further conditions avoid iterating
-    #                             # move_selections if move_index is not set to value above -1
-    #                             move_index = -1
-    #                             print(f"Card {cards.index(selected_card)} touched Lane {lane_index}")
-    #                             # checks if cards that are being selected are not already in the list, if they are, lane
-    #                             # is rewritten on top of the same list item
-    #                             for index, selection in enumerate(move_selections):
-    #                                 if selection[0] == selected_card:
-    #                                     move_index = index
-    #                                     break
-    #                             if move_index != -1:
-    #                                 move_selections[move_index][1] = lane_index
-    #                                 move_index = -1
-    #                             elif len(move_selections) < 3:
-    #                                 move_selections.append([selected_card, lane_index])
-    #                             else:
-    #                                 move_selections.pop(0)
-    #                                 move_selections.append([selected_card, lane_index])
-    #                             break
-    #
-    #                 # Calculate returning path
-    #                 returning_path = core_funct.calculate_return_path(
-    #                     (selected_card.x_cord, selected_card.y_cord),
-    #                     (selected_card.original_x, selected_card.original_y))
-    #                 returning_card = selected_card
-    #                 card_animation_index = 0
-    #                 selected_card = None
-    #
-    #         elif event.type == pygame.MOUSEMOTION:
-    #             if selected_card:
-    #                 selected_card.update_position(event.pos[0] + card_offset_x, event.pos[1] + card_offset_y)
+            # elif event.type == pygame.MOUSEBUTTONUP:
+            #     # get mouse position
+            #     mouse_pos = pygame.mouse.get_pos()
+            #     # if "start turn" button is collided with mouse position
+            #     if start_turn_btn.rect.collidepoint(mouse_pos):
+            #         # end the turn by changing flag and mark down game time during the click
+            #         turn_ended = True
+            #         action_start_time = pygame.time.get_ticks()
+            #     if selected_card:
+            #         for lane in battlefield.lanes:
+            #             lane_index = None
+            #             # check if there are any enemies on that lane, if no, prevent selection
+            #             enemies_on_lane = []
+            #             for position in lane.positions:
+            #                 if position.enemy:
+            #                     enemies_on_lane.append(position.enemy)
+            #             # add card and lane to move selection list
+            #             for position in lane.positions:
+            #                 if position.rect.collidepoint(mouse_pos) and not not enemies_on_lane:
+            #                     lane_index = battlefield.lanes.index(lane)
+            #                     # sets variable move_index to -1 so that further conditions avoid iterating
+            #                     # move_selections if move_index is not set to value above -1
+            #                     move_index = -1
+            #                     print(f"Card {cards.index(selected_card)} touched Lane {lane_index}")
+            #                     # checks if cards that are being selected are not already in the list, if they are, lane
+            #                     # is rewritten on top of the same list item
+            #                     for index, selection in enumerate(move_selections):
+            #                         if selection[0] == selected_card:
+            #                             move_index = index
+            #                             break
+            #                     if move_index != -1:
+            #                         move_selections[move_index][1] = lane_index
+            #                         move_index = -1
+            #                     elif len(move_selections) < 3:
+            #                         move_selections.append([selected_card, lane_index])
+            #                     else:
+            #                         move_selections.pop(0)
+            #                         move_selections.append([selected_card, lane_index])
+            #                     break
+            #
+            #         # Calculate returning path
+            #         returning_path = core_funct.calculate_return_path(
+            #             (selected_card.x_cord, selected_card.y_cord),
+            #             (selected_card.original_x, selected_card.original_y))
+            #         returning_card = selected_card
+            #         card_animation_index = 0
+            #         selected_card = None
+            #
+            # elif event.type == pygame.MOUSEMOTION:
+            #     if selected_card:
+            #         selected_card.update_position(event.pos[0] + card_offset_x, event.pos[1] + card_offset_y)
     #
     #     current_time = pygame.time.get_ticks()
     #
