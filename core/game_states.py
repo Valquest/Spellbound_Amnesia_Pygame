@@ -16,11 +16,12 @@ class Game:
 
         # main game variables
         self.screen = pygame.display.set_mode((constants.WINDOW_WIDTH, constants.WINDOW_HEIGHT))
-        self.current_state = "Battlefield"
+        self.current_state = "HomeBase"
 
         # core class instances created
         self.battle = Battle(self, self.screen)
         self.main_menu = MainMenu()
+        self.home_base = HomeBase(self, self.screen)
 
     def run(self):
         while self.running:
@@ -36,20 +37,31 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            self.battle.handle_event(event)
+            match self.current_state:
+                case "Battlefield":
+                    self.battle.handle_event(event)
+                case "HomeBase":
+                    self.home_base.handle_event(event)
+                case _:
+                    pass
 
     def update(self):
-        if self.current_state == "Battlefield":
-            self.battle.run()
-        # match self.current_state:
-        #     case "Battlefield":
-        #         self.battle.run()
-        #     case _:
-        #         pass
+        match self.current_state:
+            case "Battlefield":
+                self.battle.run()
+            case "HomeBase":
+                self.home_base.run()
+            case _:
+                pass
 
     def render(self):
-        if self.current_state == "Battlefield":
-            self.battle.draw()
+        match self.current_state:
+            case "Battlefield":
+                self.battle.draw()
+            case "HomeBase":
+                self.home_base.draw()
+            case _:
+                pass
 
     def get_state(self):
         return self.current_state
@@ -124,7 +136,7 @@ class Battle:
                     sequence_index = (self.current_action - 1) % 3  # Cycle through 0, 1, 2
                     # if player health reaches 0, exit this loop, so that the game could end
                     if variables.player_health <= 0:
-                        return
+                        self.game_instance.current_state = "HomeBase"
                     if sequence_index == 0:
                         # damaging enemies
                         if (self.current_action - 1) // 3 < len(self.move_selections):
@@ -169,7 +181,7 @@ class Battle:
             self.turn_ended = True
             self.action_start_time = pygame.time.get_ticks()
 
-        if self.start_turn_btn.colided(pygame.mouse.get_pos()):
+        if self.home_button.colided(pygame.mouse.get_pos()):
             self.game_instance.current_state = "HomeBase"
 
     def card_on_lane_selection(self):
@@ -283,6 +295,7 @@ class Battle:
             self.card_selection(event)
         elif event.type == pygame.MOUSEBUTTONUP:
             self.card_on_lane_selection()
+            self.button_clicks()
         elif event.type == pygame.MOUSEMOTION:
             self.update_card_position(event)
 
@@ -292,13 +305,39 @@ class Battle:
 
 
 class HomeBase:
-    def __init__(self):
-        self.me = None
 
+    def __init__(self, game_instance, screen):
+        # import modules
+        from utils import util_classes
 
-class InGameMenu:
-    def __init__(self):
-        self.me = None
+        # CORE VARIABLES
+        # game variables
+        self.game_instance = game_instance
+        self.screen = screen
+
+        # button variables
+        self.to_battle_btn = util_classes.Button(
+            "To Battle!", 25, 75, 150, 50, 32)
+
+    def run(self):
+        x = 0
+
+    def draw_buttons(self):
+        # draw home button
+        self.to_battle_btn.draw(self.screen)
+        self.screen.blit(self.to_battle_btn.font_render, self.to_battle_btn.btn_position)
+
+    def button_clicks(self):
+        if self.to_battle_btn.colided(pygame.mouse.get_pos()):
+            self.game_instance.current_state = "Battlefield"
+
+    def draw(self):
+        self.screen.fill((45, 166, 59))
+        self.draw_buttons()
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONUP:
+            self.button_clicks()
 
 
 class MainMenu:
