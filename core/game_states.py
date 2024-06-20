@@ -36,8 +36,7 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            else:
-                self.battle.handle_event(event)
+            self.battle.handle_event(event)
 
     def update(self):
         if self.current_state == "Battlefield":
@@ -64,17 +63,15 @@ class Battle:
 
         # local imports
         from core import core_funct
-        from utils import classes, util_funct
+        from utils import util_funct, util_classes
+        from core import battle_classes
 
-        # core classes initiated
-        self.battlefield = classes.Battlefield(constants.LANE_NUMBER)
+        # core class instances initiated
+        self.battlefield = battle_classes.Battlefield(constants.LANE_NUMBER)
         self.cards = core_funct.create_card_list()
         self.meters = util_funct.add_amnesia_bar(constants.AMNESIA_BAR_COUNT)
-        self.start_turn_btn = classes.Button("Start turn", (classes.Card.card_width + constants.MARGIN) *
-                                             constants.CARD_COUNT + 100, constants.MARGIN, 200, 50)
 
         # CORE VARIABLES
-
         # action variables
         self.action_start_time = 0
         self.current_action = 1
@@ -82,6 +79,14 @@ class Battle:
         self.move_selections = []
         self.total_actions = 3
         self.turn_ended = False
+
+        # button variables
+        self.start_turn_btn = util_classes.Button(
+            "Start turn",
+            (battle_classes.Card.card_width + constants.MARGIN) * constants.CARD_COUNT + 150 // 2,
+            constants.MARGIN + 25 // 2, 200, 50, 32)
+        self.home_button = util_classes.Button(
+            "Home", 25, constants.WINDOW_HEIGHT - 75, 100, 50, 32)
 
         # card variables
         self.card_animation_index = 0
@@ -100,7 +105,7 @@ class Battle:
         self.running = game_instance.running
 
         # player health variables
-        self.player_health = classes.PlayerHealth()
+        self.player_health = battle_classes.PlayerHealth()
         self.health_crystals = self.player_health.crystal_list
 
     def run(self):
@@ -156,15 +161,21 @@ class Battle:
                 core_funct.modify_card_list(self.cards, cards_to_modify)
                 self.move_selections = []
 
+    def button_clicks(self):
+
+        # if "start turn" button is collided with mouse position
+        if self.start_turn_btn.colided(pygame.mouse.get_pos()):
+            # end the turn by changing flag and mark down game time during the click
+            self.turn_ended = True
+            self.action_start_time = pygame.time.get_ticks()
+
+        if self.start_turn_btn.colided(pygame.mouse.get_pos()):
+            self.game_instance.current_state = "HomeBase"
+
     def card_on_lane_selection(self):
         from core import core_funct
         # get mouse position
         mouse_pos = pygame.mouse.get_pos()
-        # if "start turn" button is collided with mouse position
-        if self.start_turn_btn.rect.collidepoint(mouse_pos):
-            # end the turn by changing flag and mark down game time during the click
-            self.turn_ended = True
-            self.action_start_time = pygame.time.get_ticks()
 
         if self.selected_card:
             for lane in self.battlefield.lanes:
@@ -222,9 +233,7 @@ class Battle:
 
         self.screen.fill((102, 140, 255))
 
-        # draw start turn button with text
-        self.start_turn_btn.draw(self.screen)
-        self.screen.blit(self.start_turn_btn.font_render, self.start_turn_btn.btn_position)
+        self.draw_buttons()
 
         # drawing health crystals
         for crystal in self.health_crystals:
@@ -256,6 +265,16 @@ class Battle:
             self.card_animation_index += 1
             if self.card_animation_index >= len(self.returning_path):
                 returning_card = None
+
+    def draw_buttons(self):
+
+        # draw "start turn" button
+        self.start_turn_btn.draw(self.screen)
+        self.screen.blit(self.start_turn_btn.font_render, self.start_turn_btn.btn_position)
+
+        # draw home button
+        self.home_button.draw(self.screen)
+        self.screen.blit(self.home_button.font_render, self.home_button.btn_position)
 
     def handle_event(self, event):
         if variables.player_health <= 0:

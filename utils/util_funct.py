@@ -1,5 +1,5 @@
 from variables import constants, variables
-from utils import classes
+from core import battle_classes
 
 
 def add_amnesia_bar(number_of_amnesia_steps: int) -> list:
@@ -10,8 +10,8 @@ def add_amnesia_bar(number_of_amnesia_steps: int) -> list:
     """
     meter = []
     for step in range(number_of_amnesia_steps):
-        starting_x = variables.amnesia_bar_x + (2 * classes.Meter.width) * step
-        meter_box = classes.Meter(starting_x, True)
+        starting_x = variables.amnesia_bar_x + (2 * battle_classes.Meter.width) * step
+        meter_box = battle_classes.Meter(starting_x, True)
         meter.append(meter_box)
     return meter
 

@@ -1,5 +1,5 @@
 import random
-from utils import classes
+from core import battle_classes
 from variables import constants
 from data import entities
 
@@ -86,7 +86,7 @@ def create_card_list() -> list:
     game_cards = []
     for count in range(constants.CARD_COUNT):
         random_item = random.choice(list(entities.card_types.items()))
-        card = classes.Card(150 * count + 1, 0, "gray")
+        card = battle_classes.Card(150 * count + 1, 0, "gray")
 
         # take random card type and damage value from the card type dictionary
         card.type = random_item[0]
