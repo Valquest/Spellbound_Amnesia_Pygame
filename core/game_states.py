@@ -22,6 +22,7 @@ class Game:
         self.battle = Battle(self, self.screen)
         self.main_menu = MainMenu()
         self.home_base = HomeBase(self, self.screen)
+        self.spell_crafting = SpellCrafting(self, self.screen)
 
     def run(self):
         while self.running:
@@ -42,6 +43,8 @@ class Game:
                     self.battle.handle_event(event)
                 case "HomeBase":
                     self.home_base.handle_event(event)
+                case "SpellCrafting":
+                    self.spell_crafting.handle_event(event)
                 case _:
                     pass
 
@@ -50,6 +53,8 @@ class Game:
             case "Battlefield":
                 self.battle.run()
             case "HomeBase":
+                self.home_base.run()
+            case "SpellCrafting":
                 self.home_base.run()
             case _:
                 pass
@@ -60,6 +65,8 @@ class Game:
                 self.battle.draw()
             case "HomeBase":
                 self.home_base.draw()
+            case "SpellCrafting":
+                self.spell_crafting.draw()
             case _:
                 pass
 
@@ -98,7 +105,7 @@ class Battle:
             (battle_classes.Card.card_width + constants.MARGIN) * constants.CARD_COUNT + 150 // 2,
             constants.MARGIN + 25 // 2, 200, 50, 32)
         self.home_button = util_classes.Button(
-            "Home", 25, constants.WINDOW_HEIGHT - 75, 100, 50, 32)
+            "Home Base", 25, constants.WINDOW_HEIGHT - 75, 100, 50, 32)
 
         # card variables
         self.card_animation_index = 0
@@ -318,18 +325,26 @@ class HomeBase:
         # button variables
         self.to_battle_btn = util_classes.Button(
             "To Battle!", 25, 75, 150, 50, 32)
+        self.spell_crafting_btn = util_classes.Button(
+            "Craft Spells", 25, 150, 150, 50, 32)
 
     def run(self):
         x = 0
 
     def draw_buttons(self):
-        # draw home button
+        # draw "to battle" button
         self.to_battle_btn.draw(self.screen)
         self.screen.blit(self.to_battle_btn.font_render, self.to_battle_btn.btn_position)
+
+        # draw "spell crafting" button
+        self.spell_crafting_btn.draw(self.screen)
+        self.screen.blit(self.spell_crafting_btn.font_render, self.spell_crafting_btn.btn_position)
 
     def button_clicks(self):
         if self.to_battle_btn.colided(pygame.mouse.get_pos()):
             self.game_instance.current_state = "Battlefield"
+        if self.spell_crafting_btn.colided(pygame.mouse.get_pos()):
+            self.game_instance.current_state = "SpellCrafting"
 
     def draw(self):
         self.screen.fill((45, 166, 59))
@@ -346,5 +361,35 @@ class MainMenu:
 
 
 class SpellCrafting:
-    def __init__(self):
-        self.me = None
+    def __init__(self, game_instance, screen):
+        # import modules
+        from utils import util_classes
+
+        # CORE VARIABLES
+        # game variables
+        self.game_instance = game_instance
+        self.screen = screen
+
+        # button variables
+        self.home_btn = util_classes.Button(
+            "Home Base", 25, constants.WINDOW_HEIGHT - 75, 150, 50, 32)
+
+    def run(self):
+        x = 0
+
+    def draw_buttons(self):
+        # draw home button
+        self.home_btn.draw(self.screen)
+        self.screen.blit(self.home_btn.font_render, self.home_btn.btn_position)
+
+    def button_clicks(self):
+        if self.home_btn.colided(pygame.mouse.get_pos()):
+            self.game_instance.current_state = "HomeBase"
+
+    def draw(self):
+        self.screen.fill((55, 21, 133))
+        self.draw_buttons()
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONUP:
+            self.button_clicks()
