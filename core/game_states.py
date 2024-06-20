@@ -165,13 +165,10 @@ class Battle:
             self.returning_card = self.selected_card
             self.card_animation_index = 0
             self.selected_card = None
-            print("Card released and path calculated")
 
     def update_card_position(self, event):
         if self.selected_card:
-            print(f"Updating position for card: {self.selected_card}")  # Added for debugging
             self.selected_card.update_position(event.pos[0] + self.card_offset_x, event.pos[1] + self.card_offset_y)
-            print(f"Card position updated to: {self.selected_card.x_cord}, {self.selected_card.y_cord}")
 
     def battle_actions(self):
         from utils import util_funct
@@ -203,8 +200,6 @@ class Battle:
                             enemies_to_move = sorted(lane.get_enemy_list(), reverse=True)
                             for enemy_index in enemies_to_move:
                                 positions = self.battlefield.lanes[lane_index].positions
-                                if positions[enemy_index].enemy.frozen > 0:
-                                    continue  # Skip frozen enemies
                                 final_position_index = enemy_index + 1
                                 final_position = positions[final_position_index] if final_position_index < len(
                                     positions) else None
