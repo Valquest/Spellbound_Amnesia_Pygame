@@ -38,11 +38,14 @@ class StoneInventory:
 
         # magic stone variables
         self.magic_stones = []
-        for stone_data in entities.stone_types:
-            stone = MagicStone(stone_data[0], stone_data[1][0], stone_data[1][1], self.x + self.width / 2, )
-            for stone_ammount in entities.player_inv:
-                stone.ammount = [ammount for stone_type, ammount in stone_ammount if stone_data[0] == stone_type]
+        for stone_name, stone_attributes in entities.stone_types.items():
+            stone = MagicStone(stone_name, stone_attributes["rarity"], stone_attributes["image_name"],
+                               self.x + self.width / 2, self.y + 20, 30, 30)
+            for stone_type, ammount in entities.player_inv.items():
+                if stone_name == stone_type:
+                    stone.ammount = ammount
+                    break
             self.magic_stones.append(stone)
 
-    def draw(self, canvas):
-        pygame.draw.rect(canvas, "Gray", self.rect)
+    def draw(self, screen):
+        pygame.draw.rect(screen, "Gray", self.rect)

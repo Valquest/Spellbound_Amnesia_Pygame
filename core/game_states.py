@@ -378,7 +378,7 @@ class SpellCrafting:
 
         # stone inventory variables
         self.inv = stones.StoneInventory()
-        self.stones = None
+        self.stones = self.inv.magic_stones
 
     def run(self):
         x = 0
@@ -395,13 +395,13 @@ class SpellCrafting:
     def draw(self):
         self.screen.fill((55, 21, 133))
         self.draw_buttons()
+        self.draw_inv_side_bar()
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONUP:
             self.button_clicks()
 
-    def draw_inv_side_bar(self, canvas):
-        self.inv.draw(canvas)
-        self.stones = self.inv.magic_stones
-        for stone in stones:
-            stone.draw()
+    def draw_inv_side_bar(self):
+        self.inv.draw(self.screen)
+        for stone in self.stones:
+            stone.draw(self.screen)
