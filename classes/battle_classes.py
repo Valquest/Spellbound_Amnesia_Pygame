@@ -69,7 +69,7 @@ class Enemy:
         self.frozen = 0
 
     def draw(self, canvas):
-        pygame.draw.rect(canvas, self.color, (self.x_cord, self.y_cord, self.enemy_width, self.enemy_height))
+        pygame.draw.rect(canvas, self.color, self.rect)
 
         # create a font surface object by using font object and text we want to render
         text_surface_object = self.enemy_health_font.render(str(self.health), False, (0, 0, 0))

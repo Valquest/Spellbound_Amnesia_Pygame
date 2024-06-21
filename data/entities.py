@@ -80,3 +80,45 @@ card_types = {
         }
     }
 }
+
+stone_types = {
+    "Stone1": {
+        "rarity": 0.99,
+        "image_name": ""
+    },
+    "Stone2": {
+        "rarity": 0.89,
+        "image_name": ""
+    },
+    "Stone3": {
+        "rarity": 0.79,
+        "image_name": ""
+    },
+    "Stone4": {
+        "rarity": 0.69,
+        "image_name": ""
+    },
+    "Stone5": {
+        "rarity": 0.59,
+        "image_name": ""
+    },
+    "Stone6": {
+        "rarity": 0.49,
+        "image_name": ""
+    },
+    "Stone7": {
+        "rarity": 0.39,
+        "image_name": ""
+    }
+
+}
+
+player_inv = {
+    "Stone1": 2,
+    "Stone2": 3,
+    "Stone3": 1,
+    "Stone4": 5,
+    "Stone5": 1,
+    "Stone6": 2,
+    "Stone7": 10
+}

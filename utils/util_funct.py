@@ -1,5 +1,5 @@
 from variables import constants, variables
-from core import battle_classes
+from classes import battle_classes
 
 
 def add_amnesia_bar(number_of_amnesia_steps: int) -> list:

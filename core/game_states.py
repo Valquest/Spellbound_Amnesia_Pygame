@@ -1,6 +1,7 @@
 import pygame
 
 from variables import constants, variables
+from classes import stones
 
 
 class Game:
@@ -82,8 +83,9 @@ class Battle:
 
         # local imports
         from core import core_funct
-        from utils import util_funct, util_classes
-        from core import battle_classes
+        from utils import util_funct
+        from classes import util_classes
+        from classes import battle_classes
 
         # core class instances initiated
         self.battlefield = battle_classes.Battlefield(constants.LANE_NUMBER)
@@ -315,7 +317,7 @@ class HomeBase:
 
     def __init__(self, game_instance, screen):
         # import modules
-        from utils import util_classes
+        from classes import util_classes
 
         # CORE VARIABLES
         # game variables
@@ -363,7 +365,7 @@ class MainMenu:
 class SpellCrafting:
     def __init__(self, game_instance, screen):
         # import modules
-        from utils import util_classes
+        from classes import util_classes
 
         # CORE VARIABLES
         # game variables
@@ -373,6 +375,10 @@ class SpellCrafting:
         # button variables
         self.home_btn = util_classes.Button(
             "Home Base", 25, constants.WINDOW_HEIGHT - 75, 150, 50, 32)
+
+        # stone inventory variables
+        self.inv = stones.StoneInventory()
+        self.stones = None
 
     def run(self):
         x = 0
@@ -393,3 +399,9 @@ class SpellCrafting:
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONUP:
             self.button_clicks()
+
+    def draw_inv_side_bar(self, canvas):
+        self.inv.draw(canvas)
+        self.stones = self.inv.magic_stones
+        for stone in stones:
+            stone.draw()

@@ -1,6 +1,4 @@
 import pygame
-from core import battle_classes
-from variables import constants
 
 
 class Button:

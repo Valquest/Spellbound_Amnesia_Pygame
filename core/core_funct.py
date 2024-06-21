@@ -1,5 +1,5 @@
 import random
-from core import battle_classes
+from classes import battle_classes
 from variables import constants
 from data import entities
 
