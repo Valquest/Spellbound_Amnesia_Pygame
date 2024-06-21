@@ -30,17 +30,17 @@ class StoneInventory:
 
         # CORE VARIABLES
         # rect variables
-        self.x = 100
-        self.y = 200
+        self.x = 50
+        self.y = 100
         self.width = constants.INVENTORY_WIDTH
         self.height = constants.INVENTORY_HEIGHT
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
         # magic stone variables
         self.magic_stones = []
-        for stone_name, stone_attributes in entities.stone_types.items():
+        for index, (stone_name, stone_attributes) in enumerate(entities.stone_types.items()):
             stone = MagicStone(stone_name, stone_attributes["rarity"], stone_attributes["image_name"],
-                               self.x + self.width / 2, self.y + 20, 30, 30)
+                               self.x + self.width / 2 - 30 / 2, self.y + 40 + (45 * index), 30, 30)
             for stone_type, ammount in entities.player_inv.items():
                 if stone_name == stone_type:
                     stone.ammount = ammount
