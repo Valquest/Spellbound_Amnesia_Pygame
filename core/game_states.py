@@ -56,7 +56,7 @@ class Game:
             case "HomeBase":
                 self.home_base.run()
             case "SpellCrafting":
-                self.home_base.run()
+                self.spell_crafting.run()
             case _:
                 pass
 
@@ -381,7 +381,7 @@ class SpellCrafting:
         self.stones = self.inv.magic_stones
 
     def run(self):
-        x = 0
+        self.inv.update()
 
     def draw_buttons(self):
         # draw home button
@@ -400,6 +400,8 @@ class SpellCrafting:
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONUP:
             self.button_clicks()
+        elif event.type == pygame.MOUSEWHEEL:
+            self.inv.scroll(event)
 
     def draw_inv_side_bar(self):
         self.inv.draw(self.screen)

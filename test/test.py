@@ -39,17 +39,9 @@ running = True
 scroll_speed = 5
 scroll_velocity = 0
 deceleration = 0.94
-min_velocity = 0.1
+min_velocity = 0.01
 tiny_increment_threshold = min_velocity
 tiny_increment_deceleration = 0.999
-
-# Bounce settings
-bounce_active = False
-bounce_amplitudes = [10, -10, 5, -5, 2, -2]
-current_bounce_index = 0
-bounce_velocity = 0
-bounce_damping = 0.9
-
 
 # Game loop
 while running:
@@ -59,9 +51,6 @@ while running:
             running = False
         elif event.type == pygame.MOUSEWHEEL:
             scroll_velocity += event.y * scroll_speed
-            bounce_active = True  # Reset bounce active on new scroll
-            current_bounce_index = 0  # Reset bounce oscillation index
-            bounce_velocity = 0  # Reset bounce velocity on new scroll
 
     # Apply scroll velocity
     if abs(scroll_velocity) > min_velocity:
@@ -73,23 +62,6 @@ while running:
             scroll_velocity *= tiny_increment_deceleration
         else:
             scroll_velocity *= deceleration
-
-    # Apply bounce effect
-    if bounce_active and scroll_velocity < min_velocity:
-        for rect in rects:
-            rect.y += bounce_velocity
-
-        # Apply damping to slow down as it approaches the peak of the bounce
-        bounce_velocity *= bounce_damping
-
-        # Check if bounce should change direction
-        if abs(bounce_velocity) < min_velocity:
-            current_bounce_index += 1
-            if current_bounce_index < len(bounce_amplitudes):
-                bounce_velocity = -bounce_amplitudes[current_bounce_index]
-            else:
-                bounce_velocity = 0
-                bounce_active = False
 
 
 
