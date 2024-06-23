@@ -1,5 +1,5 @@
 import pygame
-import sys
+import math
 
 # Initialize Pygame
 pygame.init()
@@ -15,77 +15,109 @@ GRAY = (200, 200, 200)
 BLACK = (0, 0, 0)
 
 # Large rectangle dimensions
-large_rect = pygame.Rect(300, 150, 200, 300)
+display_rect = pygame.Rect(300, 150, 200, 300)
 
 # Smaller rectangles
 rect_width, rect_height = 180, 50
 num_rects = 10
 rects = [pygame.Rect(310, 160 + i * (rect_height + 10), rect_width, rect_height) for i in range(num_rects)]
 
-# Scroll variables
-scroll_y = 0
-scroll_speed = 10
-
-# Fade area
-fade_height = 20
-
-
-def draw_fading_rects(surface, rects, scroll_y, large_rect, fade_height):
-    for rect in rects:
-        new_rect = rect.move(0, scroll_y)
-
-        # Calculate intersection with large rectangle
-        if new_rect.bottom < large_rect.top or new_rect.top > large_rect.bottom:
-            continue
-
-        temp_surface = pygame.Surface((rect_width, rect_height), pygame.SRCALPHA)
-        temp_surface.fill(GRAY)
-
-        # Apply gradient fading effect at the top
-        if new_rect.top < large_rect.top + fade_height:
-            for i in range(fade_height):
-                alpha = max(0, 255 - int((large_rect.top + fade_height - new_rect.top - i) / fade_height * 255))
-                pygame.draw.line(temp_surface, (200, 200, 200, alpha), (0, i), (rect_width, i))
-
-        # Apply gradient fading effect at the bottom
-        if new_rect.bottom > large_rect.bottom - fade_height:
-            for i in range(fade_height):
-                alpha = max(0, 255 - int((new_rect.bottom - large_rect.bottom + fade_height - i) / fade_height * 255))
-                pygame.draw.line(temp_surface, (200, 200, 200, alpha), (0, rect_height - i - 1),
-                                 (rect_width, rect_height - i - 1))
-
-        # Clip the temporary surface to the part within the large rectangle
-        clip_rect = new_rect.clip(large_rect)
-        clip_temp_surface = temp_surface.subsurface(
-            clip_rect.left - new_rect.left,
-            clip_rect.top - new_rect.top,
-            clip_rect.width,
-            clip_rect.height
-        )
-        surface.blit(clip_temp_surface, clip_rect.topleft)
-
-
 clock = pygame.time.Clock()
+running = True
 
-# Main loop
-while True:
+
+
+
+
+
+
+
+
+
+
+# Scroll settings
+scroll_speed = 5
+scroll_velocity = 0
+deceleration = 0.94
+min_velocity = 0.1
+tiny_increment_threshold = min_velocity
+tiny_increment_deceleration = 0.999
+
+# Bounce settings
+bounce_active = False
+bounce_amplitudes = [10, -10, 5, -5, 2, -2]
+current_bounce_index = 0
+bounce_velocity = 0
+bounce_damping = 0.9
+
+
+# Game loop
+while running:
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 4:  # Scroll up
-                scroll_y += scroll_speed
-            elif event.button == 5:  # Scroll down
-                scroll_y -= scroll_speed
+            running = False
+        elif event.type == pygame.MOUSEWHEEL:
+            scroll_velocity += event.y * scroll_speed
+            bounce_active = True  # Reset bounce active on new scroll
+            current_bounce_index = 0  # Reset bounce oscillation index
+            bounce_velocity = 0  # Reset bounce velocity on new scroll
+
+    # Apply scroll velocity
+    if abs(scroll_velocity) > min_velocity:
+        for rect in rects:
+            rect.y += scroll_velocity
+
+        # Use a less aggressive deceleration for tiny increments
+        if abs(scroll_velocity) < tiny_increment_threshold:
+            scroll_velocity *= tiny_increment_deceleration
+        else:
+            scroll_velocity *= deceleration
+
+    # Apply bounce effect
+    if bounce_active and scroll_velocity < min_velocity:
+        for rect in rects:
+            rect.y += bounce_velocity
+
+        # Apply damping to slow down as it approaches the peak of the bounce
+        bounce_velocity *= bounce_damping
+
+        # Check if bounce should change direction
+        if abs(bounce_velocity) < min_velocity:
+            current_bounce_index += 1
+            if current_bounce_index < len(bounce_amplitudes):
+                bounce_velocity = -bounce_amplitudes[current_bounce_index]
+            else:
+                bounce_velocity = 0
+                bounce_active = False
+
+
+
+
+
+
+
+
+
+
+
 
     screen.fill(WHITE)
 
     # Draw large rectangle
-    pygame.draw.rect(screen, BLACK, large_rect, 2)
+    pygame.draw.rect(screen, BLACK, display_rect, 2)
 
-    # Draw fading rectangles
-    draw_fading_rects(screen, rects, scroll_y, large_rect, fade_height)
+    # Draw only the parts of the rectangles that are within the display rectangle
+    for rect in rects:
+        intersection_rect = display_rect.clip(rect)
+
+        if intersection_rect.width > 0 and intersection_rect.height > 0:
+            # Create a new surface to hold the visible part of the rectangle
+            result_surface = pygame.Surface((intersection_rect.width, intersection_rect.height))
+            result_surface.fill(BLACK)
+
+            # Blit the part of the rectangle that is within the intersection rectangle
+            screen.blit(result_surface, intersection_rect.topleft)
 
     pygame.display.flip()
-    clock.tick(30)
+    clock.tick(60)
