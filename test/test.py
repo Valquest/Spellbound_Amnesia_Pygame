@@ -1,5 +1,4 @@
 import pygame
-import math
 
 # Initialize Pygame
 pygame.init()
@@ -25,16 +24,6 @@ rects = [pygame.Rect(310, 160 + i * (rect_height + 10), rect_width, rect_height)
 clock = pygame.time.Clock()
 running = True
 
-
-
-
-
-
-
-
-
-
-
 # Scroll settings
 scroll_speed = 5
 scroll_velocity = 0
@@ -52,27 +41,29 @@ while running:
         elif event.type == pygame.MOUSEWHEEL:
             scroll_velocity += event.y * scroll_speed
 
-    # Apply scroll velocity
-    if abs(scroll_velocity) > min_velocity:
-        for rect in rects:
-            rect.y += scroll_velocity
+        # Apply scroll velocity
+        if abs(scroll_velocity) > min_velocity:
+            # Check the position of the topmost and bottommost rectangles
+            topmost_rect = rects[0]
+            bottommost_rect = rects[-1]
 
-        # Use a less aggressive deceleration for tiny increments
-        if abs(scroll_velocity) < tiny_increment_threshold:
-            scroll_velocity *= tiny_increment_deceleration
-        else:
-            scroll_velocity *= deceleration
+            # If scrolling up, ensure the topmost rectangle does not go above the top of the large rectangle
+            if scroll_velocity > 0 and topmost_rect.top + scroll_velocity >= display_rect.top:
+                scroll_velocity = (display_rect.top - topmost_rect.top) if topmost_rect.top < display_rect.top else 0
 
+            # If scrolling down, ensure the bottommost rectangle does not go below the bottom of the large rectangle
+            elif scroll_velocity < 0 and bottommost_rect.bottom + scroll_velocity <= display_rect.bottom:
+                scroll_velocity = (
+                            display_rect.bottom - bottommost_rect.bottom) if bottommost_rect.bottom > display_rect.bottom else 0
 
+            for rect in rects:
+                rect.y += scroll_velocity
 
-
-
-
-
-
-
-
-
+            # Use a less aggressive deceleration for tiny increments
+            if abs(scroll_velocity) < tiny_increment_threshold:
+                scroll_velocity *= tiny_increment_deceleration
+            else:
+                scroll_velocity *= deceleration
 
     screen.fill(WHITE)
 

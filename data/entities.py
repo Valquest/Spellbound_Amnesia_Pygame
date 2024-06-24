@@ -109,6 +109,30 @@ stone_types = {
     "Stone7": {
         "rarity": 0.39,
         "image_name": ""
+    },
+    "Stone8": {
+        "rarity": 0.29,
+        "image_name": ""
+    },
+    "Stone9": {
+        "rarity": 0.19,
+        "image_name": ""
+    },
+    "Stone10": {
+        "rarity": 0.18,
+        "image_name": ""
+    },
+    "Stone11": {
+        "rarity": 0.17,
+        "image_name": ""
+    },
+    "Stone12": {
+        "rarity": 0.16,
+        "image_name": ""
+    },
+    "Stone13": {
+        "rarity": 0.15,
+        "image_name": ""
     }
 
 }

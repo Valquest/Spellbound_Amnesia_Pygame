@@ -52,11 +52,11 @@ class Game:
     def update(self):
         match self.current_state:
             case "Battlefield":
-                self.battle.run()
+                self.battle.update()
             case "HomeBase":
-                self.home_base.run()
+                self.home_base.update()
             case "SpellCrafting":
-                self.spell_crafting.run()
+                self.spell_crafting.update()
             case _:
                 pass
 
@@ -129,7 +129,7 @@ class Battle:
         self.player_health = battle_classes.PlayerHealth()
         self.health_crystals = self.player_health.crystal_list
 
-    def run(self):
+    def update(self):
         self.battle_actions()
 
     def battle_actions(self):
@@ -330,7 +330,7 @@ class HomeBase:
         self.spell_crafting_btn = util_classes.Button(
             "Craft Spells", 25, 150, 150, 50, 32)
 
-    def run(self):
+    def update(self):
         x = 0
 
     def draw_buttons(self):
@@ -380,8 +380,31 @@ class SpellCrafting:
         self.inv = stones.StoneInventory()
         self.stones = self.inv.magic_stones
 
-    def run(self):
-        self.inv.update()
+    def update(self):
+        if abs(self.inv.scroll_velocity) > self.inv.min_velocity:
+            # Check the position of the topmost and bottommost rectangles
+            topmost_rect = self.inv.magic_stones[0].rect
+            bottommost_rect = self.inv.magic_stones[-1].rect
+
+            # if scrolling up, ensure the topmost rectangle does not go above the top of the large rectangle
+            if self.inv.scroll_velocity > 0 and topmost_rect.top + self.inv.scroll_velocity >= self.inv.rect.top + 20:
+                self.inv.scroll_velocity = (
+                            self.inv.rect.top - topmost_rect.top) if topmost_rect.top < self.inv.rect.top else 0
+
+            # If scrolling down, ensure the bottommost rectangle does not go below the bottom of the large rectangle
+            elif self.inv.scroll_velocity < 0 and bottommost_rect.bottom + self.inv.scroll_velocity <= self.inv.rect.bottom - 20:
+                self.inv.scroll_velocity = (
+                            self.inv.rect.bottom - bottommost_rect.bottom) if bottommost_rect.bottom > self.inv.rect.bottom else 0
+
+            # print(self.inv.scroll_velocity)
+            for stone in self.inv.magic_stones:
+                stone.rect.y += self.inv.scroll_velocity
+
+            # Use a less aggressive deceleration for tiny increments
+            if abs(self.inv.scroll_velocity) < self.inv.tiny_increment_threshold:
+                self.inv.scroll_velocity *= self.inv.tiny_increment_deceleration
+            else:
+                self.inv.scroll_velocity *= self.inv.deceleration
 
     def draw_buttons(self):
         # draw home button
@@ -401,9 +424,20 @@ class SpellCrafting:
         if event.type == pygame.MOUSEBUTTONUP:
             self.button_clicks()
         elif event.type == pygame.MOUSEWHEEL:
-            self.inv.scroll(event)
+            self.inv.scroll_velocity += event.y * self.inv.scroll_speed
 
     def draw_inv_side_bar(self):
         self.inv.draw(self.screen)
-        for stone in self.stones:
-            stone.draw(self.screen)
+        # for stone in self.stones:
+        #     stone.draw(self.screen)
+
+        # Draw only the parts of the rectangles that are within the display rectangle
+        for stone in self.inv.magic_stones:
+            intersection_rect = self.inv.rect.clip(stone.rect)
+            if intersection_rect.width > 0 and intersection_rect.height > 0:
+                # Create a new surface to hold the visible part of the rectangle
+                result_surface = pygame.Surface((intersection_rect.width, intersection_rect.height))
+                result_surface.fill(stone.rect_color)
+
+                # Blit the part of the rectangle that is within the intersection rectangle
+                self.screen.blit(result_surface, intersection_rect.topleft)
