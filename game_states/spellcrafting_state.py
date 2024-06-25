@@ -23,30 +23,98 @@ class SpellCrafting:
         self.stones = self.inv.magic_stones
 
     def update(self):
+        # if abs(self.inv.scroll_velocity) > self.inv.min_velocity:
+        #     # Check the position of the topmost and bottommost rectangles
+        #     topmost_rect = self.inv.magic_stones[0].rect
+        #     bottommost_rect = self.inv.magic_stones[-1].rect
+        #
+        #     # if scrolling up, ensure the topmost rectangle does not go above the top of the large rectangle
+        #     if self.inv.scroll_velocity > 0 and topmost_rect.top + self.inv.scroll_velocity >= self.inv.rect.top + 20:
+        #         self.inv.scroll_velocity = (
+        #                     self.inv.rect.top - topmost_rect.top) if topmost_rect.top < self.inv.rect.top else 0
+        #
+        #     # If scrolling down, ensure the bottommost rectangle does not go below the bottom of the large rectangle
+        #     elif self.inv.scroll_velocity < 0 and bottommost_rect.bottom + self.inv.scroll_velocity <= self.inv.rect.bottom - 20:
+        #         self.inv.scroll_velocity = (
+        #                     self.inv.rect.bottom - bottommost_rect.bottom) if bottommost_rect.bottom > self.inv.rect.bottom else 0
+        #
+        #     # print(self.inv.scroll_velocity)
+        #     for stone in self.inv.magic_stones:
+        #         stone.rect.y += self.inv.scroll_velocity
+        #
+        #     # Use a less aggressive deceleration for tiny increments
+        #     if abs(self.inv.scroll_velocity) < self.inv.tiny_increment_threshold:
+        #         self.inv.scroll_velocity *= self.inv.tiny_increment_deceleration
+        #     else:
+        #         self.inv.scroll_velocity *= self.inv.deceleration
+        self.funct()
+
+    # scrolling logic
+    """-------------------------------"""
+    def funct(self):
         if abs(self.inv.scroll_velocity) > self.inv.min_velocity:
-            # Check the position of the topmost and bottommost rectangles
-            topmost_rect = self.inv.magic_stones[0].rect
-            bottommost_rect = self.inv.magic_stones[-1].rect
-
-            # if scrolling up, ensure the topmost rectangle does not go above the top of the large rectangle
-            if self.inv.scroll_velocity > 0 and topmost_rect.top + self.inv.scroll_velocity >= self.inv.rect.top + 20:
-                self.inv.scroll_velocity = (
-                            self.inv.rect.top - topmost_rect.top) if topmost_rect.top < self.inv.rect.top else 0
-
-            # If scrolling down, ensure the bottommost rectangle does not go below the bottom of the large rectangle
-            elif self.inv.scroll_velocity < 0 and bottommost_rect.bottom + self.inv.scroll_velocity <= self.inv.rect.bottom - 20:
-                self.inv.scroll_velocity = (
-                            self.inv.rect.bottom - bottommost_rect.bottom) if bottommost_rect.bottom > self.inv.rect.bottom else 0
-
-            # print(self.inv.scroll_velocity)
             for stone in self.inv.magic_stones:
                 stone.rect.y += self.inv.scroll_velocity
 
-            # Use a less aggressive deceleration for tiny increments
+            # Deceleration
             if abs(self.inv.scroll_velocity) < self.inv.tiny_increment_threshold:
                 self.inv.scroll_velocity *= self.inv.tiny_increment_deceleration
             else:
                 self.inv.scroll_velocity *= self.inv.deceleration
+
+            # Hard boundary enforcement during scrolling
+            if self.inv.magic_stones[0].rect.top > self.inv.top_hard_limit:
+                for stone in self.inv.magic_stones:
+                    stone.rect.y = max(stone.rect.y - self.inv.scroll_velocity, self.inv.top_hard_limit + self.inv.magic_stones.index(stone) * (stone.height + 10))
+                scroll_velocity = 0
+            elif self.inv.magic_stones[-1].rect.bottom < self.inv.bottom_hard_limit:
+                for stone in self.inv.magic_stones:
+                    stone.rect.y = min(stone.rect.y - self.inv.scroll_velocity, self.inv.bottom_hard_limit - (len(self.inv.magic_stones) - self.inv.magic_stones.index(stone)) * (stone.height + 10))
+                scroll_velocity = 0
+
+            # Increase resistance the further you scroll past the limit
+            if self.inv.magic_stones[0].rect.top > self.inv.rect.top + self.inv.padding:
+                resistance = self.inv.calculate_resistance(self.inv.magic_stones[0].rect.top, self.inv.rect.top + self.inv.padding, self.inv.max_scroll_offset)
+                self.inv.scroll_velocity *= resistance
+            elif self.inv.magic_stones[-1].rect.bottom < self.inv.rect.bottom - self.inv.padding:
+                resistance = self.inv.calculate_resistance(self.inv.magic_stones[-1].rect.bottom, self.inv.rect.bottom - self.inv.padding, self.inv.max_scroll_offset)
+                self.inv.scroll_velocity *= resistance
+
+        else:
+            scroll_velocity = 0
+
+        # Check for spring back activation
+        if not self.inv.spring_back_active:
+            if self.inv.magic_stones[0].rect.top > self.inv.rect.top + self.inv.padding:
+                self.inv.target_offset = (self.inv.rect.top + self.inv.padding) - self.inv.magic_stones[0].rect.top
+                self.inv.spring_back_active = True
+            elif self.inv.magic_stones[-1].rect.bottom < self.inv.rect.bottom - self.inv.padding:
+                self.inv.target_offset = (self.inv.rect.bottom - self.inv.padding) - self.inv.magic_stones[-1].rect.bottom
+                self.inv.spring_back_active = True
+
+        # Apply spring back
+        if self.inv.spring_back_active:
+            spring_back_factor = 1 + abs(self.inv.target_offset) / self.inv.max_scroll_offset
+            if self.inv.target_offset > 0:
+                resistance = self.inv.calculate_resistance(self.inv.magic_stones[-1].rect.bottom, self.inv.rect.bottom - self.inv.padding, self.inv.max_scroll_offset)
+                for stone in self.inv.magic_stones:
+                    stone.rect.y += self.inv.spring_back_speed * spring_back_factor * resistance
+                if self.inv.magic_stones[-1].rect.bottom >= self.inv.rect.bottom - self.inv.padding:
+                    offset = self.inv.magic_stones[-1].rect.bottom - (self.inv.rect.bottom - self.inv.padding)
+                    for stone in self.inv.magic_stones:
+                        stone.rect.y -= offset
+                    self.inv.spring_back_active = False
+            elif self.inv.target_offset < 0:
+                resistance = self.inv.calculate_resistance(self.inv.magic_stones[0].rect.top, self.inv.rect.top + self.inv.padding, self.inv.max_scroll_offset)
+                for stone in self.inv.magic_stones:
+                    stone.rect.y -= self.inv.spring_back_speed * spring_back_factor * resistance
+                if self.inv.magic_stones[0].rect.top <= self.inv.rect.top + self.inv.padding:
+                    offset = (self.inv.rect.top + self.inv.padding) - self.inv.magic_stones[0].rect.top
+                    for stone in self.inv.magic_stones:
+                        stone.rect.y += offset
+                    self.inv.spring_back_active = False
+
+    """----------------------------------------"""
 
     def draw_buttons(self):
         # draw home button
@@ -67,6 +135,8 @@ class SpellCrafting:
             self.button_clicks()
         elif event.type == pygame.MOUSEWHEEL:
             self.inv.scroll_velocity += event.y * self.inv.scroll_speed
+            # Reset spring back active on new scroll
+            self.inv.spring_back_active = False
 
     def draw_inv_side_bar(self):
         self.inv.draw(self.screen)

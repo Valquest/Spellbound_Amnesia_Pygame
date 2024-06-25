@@ -44,6 +44,18 @@ class StoneInventory:
         self.min_velocity = 0.01
         self.tiny_increment_threshold = self.min_velocity
         self.tiny_increment_deceleration = 0.999
+        self.max_scroll_offset = 100
+        self.padding = 10
+
+        # Hard scroll limits
+        self.scroll_limit_distance = 70
+        self.top_hard_limit = self.rect.top + self.scroll_limit_distance
+        self.bottom_hard_limit = self.rect.bottom - self.scroll_limit_distance
+
+        # Spring back settings
+        self.spring_back_active = False
+        self.spring_back_speed = 2
+        self.target_offset = 0
 
         # magic stone variables
         self.magic_stones = []
@@ -56,5 +68,15 @@ class StoneInventory:
                     break
             self.magic_stones.append(stone)
 
+    # drawing main inv rect
     def draw(self, screen):
         pygame.draw.rect(screen, "Gray", self.rect)
+
+    # Function to calculate resistance based on proximity to limits
+    @staticmethod
+    def calculate_resistance(position, limit, max_offset):
+        offset = abs(position - limit)
+        if offset > max_offset:
+            offset = max_offset
+        resistance = (max_offset - offset) / max_offset
+        return resistance
