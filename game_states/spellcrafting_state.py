@@ -68,7 +68,13 @@ class SpellCrafting:
 
     # scrolling logic
     """-------------------------------"""
+
     def apply_scroll_velocity(self):
+        # Ensure scrolling does not exceed hard limits
+        if (self.inv.scroll_velocity > 0 and self.inv.magic_stones[0].rect.top >= self.inv.top_hard_limit) or \
+                (self.inv.scroll_velocity < 0 and self.inv.magic_stones[-1].rect.bottom <= self.inv.bottom_hard_limit):
+            self.inv.scroll_velocity = 0
+
         if abs(self.inv.scroll_velocity) > self.inv.min_velocity:
             for stone in self.inv.magic_stones:
                 stone.rect.y += self.inv.scroll_velocity
