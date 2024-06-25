@@ -1,5 +1,5 @@
 # project modeules
-from core import game_states
+from game_states import game_states
 
 
 def main():
