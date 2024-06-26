@@ -23,9 +23,9 @@ class SpellCrafting:
         self.stones = self.inv.magic_stones
 
     def update(self):
-        self.apply_scroll_velocity()
-        self.check_spring_back_activation()
-        self.apply_spring_back()
+        self.inv.apply_scroll_velocity()
+        self.inv.check_spring_back_activation()
+        self.inv.apply_spring_back()
 
     def draw(self):
         self.screen.fill((55, 21, 133))
@@ -65,107 +65,3 @@ class SpellCrafting:
 
                 # Blit the part of the rectangle that is within the intersection rectangle
                 self.screen.blit(result_surface, intersection_rect.topleft)
-
-    # scrolling logic
-    """-------------------------------"""
-
-    def apply_scroll_velocity(self):
-        # Ensure scrolling does not exceed hard limits
-        if (self.inv.scroll_velocity > 0 and self.inv.magic_stones[0].rect.top >= self.inv.top_hard_limit) or \
-                (self.inv.scroll_velocity < 0 and self.inv.magic_stones[-1].rect.bottom <= self.inv.bottom_hard_limit):
-            self.inv.scroll_velocity = 0
-
-        if abs(self.inv.scroll_velocity) > self.inv.min_velocity:
-            for stone in self.inv.magic_stones:
-                stone.rect.y += self.inv.scroll_velocity
-
-            # Deceleration
-            if abs(self.inv.scroll_velocity) < self.inv.tiny_increment_threshold:
-                self.inv.scroll_velocity *= self.inv.tiny_increment_deceleration
-            else:
-                self.inv.scroll_velocity *= self.inv.deceleration
-
-            # Hard boundary enforcement during scrolling
-            if self.inv.magic_stones[0].rect.top > self.inv.top_hard_limit:
-                for stone in self.inv.magic_stones:
-                    stone.rect.y = max(
-                        stone.rect.y - self.inv.scroll_velocity,
-                        self.inv.top_hard_limit + self.inv.magic_stones.index(stone) * (stone.height + 10)
-                    )
-                self.inv.scroll_velocity = 0
-            elif self.inv.magic_stones[-1].rect.bottom < self.inv.bottom_hard_limit:
-                for stone in self.inv.magic_stones:
-                    stone.rect.y = min(
-                        stone.rect.y - self.inv.scroll_velocity,
-                        self.inv.bottom_hard_limit - (
-                                    len(self.inv.magic_stones) - self.inv.magic_stones.index(stone)) * (
-                                    stone.height + 10)
-                    )
-                self.inv.scroll_velocity = 0
-
-            # Increase resistance the further you scroll past the limit
-            if self.inv.magic_stones[0].rect.top > self.inv.rect.top + self.inv.padding:
-                resistance = self.calculate_resistance(
-                    self.inv.magic_stones[0].rect.top,
-                    self.inv.rect.top + self.inv.padding,
-                    self.inv.max_scroll_offset
-                )
-                self.inv.scroll_velocity *= resistance
-            elif self.inv.magic_stones[-1].rect.bottom < self.inv.rect.bottom - self.inv.padding:
-                resistance = self.calculate_resistance(
-                    self.inv.magic_stones[-1].rect.bottom,
-                    self.inv.rect.bottom - self.inv.padding,
-                    self.inv.max_scroll_offset
-                )
-                self.inv.scroll_velocity *= resistance
-        else:
-            self.inv.scroll_velocity = 0
-
-    def check_spring_back_activation(self):
-        if not self.inv.spring_back_active:
-            if self.inv.magic_stones[0].rect.top > self.inv.rect.top + self.inv.padding:
-                self.inv.target_offset = (self.inv.rect.top + self.inv.padding) - self.inv.magic_stones[0].rect.top
-                self.inv.spring_back_active = True
-            elif self.inv.magic_stones[-1].rect.bottom < self.inv.rect.bottom - self.inv.padding:
-                self.inv.target_offset = (self.inv.rect.bottom - self.inv.padding) - self.inv.magic_stones[
-                    -1].rect.bottom
-                self.inv.spring_back_active = True
-
-    def apply_spring_back(self):
-        if self.inv.spring_back_active:
-            spring_back_factor = 1 + abs(self.inv.target_offset) / self.inv.max_scroll_offset
-            if self.inv.target_offset > 0:
-                resistance = self.calculate_resistance(
-                    self.inv.magic_stones[-1].rect.bottom,
-                    self.inv.rect.bottom - self.inv.padding,
-                    self.inv.max_scroll_offset
-                )
-                for stone in self.inv.magic_stones:
-                    stone.rect.y += self.inv.spring_back_speed * spring_back_factor * resistance
-                if self.inv.magic_stones[-1].rect.bottom >= self.inv.rect.bottom - self.inv.padding:
-                    offset = self.inv.magic_stones[-1].rect.bottom - (self.inv.rect.bottom - self.inv.padding)
-                    for stone in self.inv.magic_stones:
-                        stone.rect.y -= offset
-                    self.inv.spring_back_active = False
-            elif self.inv.target_offset < 0:
-                resistance = self.calculate_resistance(
-                    self.inv.magic_stones[0].rect.top,
-                    self.inv.rect.top + self.inv.padding,
-                    self.inv.max_scroll_offset
-                )
-                for stone in self.inv.magic_stones:
-                    stone.rect.y -= self.inv.spring_back_speed * spring_back_factor * resistance
-                if self.inv.magic_stones[0].rect.top <= self.inv.rect.top + self.inv.padding:
-                    offset = (self.inv.rect.top + self.inv.padding) - self.inv.magic_stones[0].rect.top
-                    for stone in self.inv.magic_stones:
-                        stone.rect.y += offset
-                    self.inv.spring_back_active = False
-
-    @staticmethod
-    def calculate_resistance(position, limit, max_offset):
-        offset = abs(position - limit)
-        if offset > max_offset:
-            offset = max_offset
-        resistance = (max_offset - offset) / max_offset
-        return resistance ** 2  # Apply the squared resistance for smoother behavior
-    """----------------------------------------"""
