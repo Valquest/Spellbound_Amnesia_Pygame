@@ -133,25 +133,18 @@ class Battle:
                         enemies_on_lane.append(position.enemy)
                 # add card and lane to move selection list
                 for position in lane.positions:
-                    if position.rect.collidepoint(mouse_pos) and not not enemies_on_lane:
+                    if position.rect.collidepoint(mouse_pos) and enemies_on_lane:
                         lane_index = self.battlefield.lanes.index(lane)
-                        # sets variable move_index to -1 so that further conditions avoid iterating
-                        # move_selections if move_index is not set to value above -1
-                        move_index = -1
-                        # checks if cards that are being selected are not already in the list, if they are, lane
-                        # is rewritten on top of the same list item
-                        for index, selection in enumerate(self.move_selections):
-                            if selection[0] == self.selected_card:
-                                move_index = index
-                                break
-                        if move_index != -1:
-                            self.move_selections[move_index][1] = lane_index
-                            move_index = -1
-                        elif len(self.move_selections) < 3:
-                            self.move_selections.append([self.selected_card, lane_index])
-                        else:
-                            self.move_selections.pop(0)
-                            self.move_selections.append([self.selected_card, lane_index])
+
+                        # Check if the selected card is already in move_selections
+                        card_in_moves = any(selection[0] == self.selected_card for selection in self.move_selections)
+
+                        # Clear the move selections list if the card is already present or if it already has 3 entries
+                        if card_in_moves or len(self.move_selections) >= 3:
+                            self.move_selections.clear()
+
+                        # Add the new card and lane index entry at the end of the list
+                        self.move_selections.append([self.selected_card, lane_index])
                         break
 
             # Calculate returning path
