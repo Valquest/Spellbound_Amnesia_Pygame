@@ -138,7 +138,6 @@ class Battle:
                         # sets variable move_index to -1 so that further conditions avoid iterating
                         # move_selections if move_index is not set to value above -1
                         move_index = -1
-                        print(f"Card {self.cards.index(self.selected_card)} touched Lane {lane_index}")
                         # checks if cards that are being selected are not already in the list, if they are, lane
                         # is rewritten on top of the same list item
                         for index, selection in enumerate(self.move_selections):
@@ -202,8 +201,9 @@ class Battle:
 
         # draw card lane selection fonts
         if len(self.move_selections) > 0:
-            for move in self.move_selections:
+            for index, move in enumerate(self.move_selections):
                 move[0].draw_lane_font(self.screen, move[1])
+                move[0].draw_card_turn_text(self.screen, index)
 
         # card return to it's spot animation
         if self.returning_card and self.card_animation_index < len(self.returning_path):

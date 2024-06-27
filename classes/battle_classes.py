@@ -141,6 +141,7 @@ class Card:
     # create a font object
     card_type_font = pygame.font.Font(None, 32)
     card_lane_match_font = pygame.font.Font(None, 26)
+    card_turn_font = pygame.font.Font(None, 20)
 
     def __init__(self, x_cord, y_cord, color):
         self.x_cord = x_cord + constants.MARGIN
@@ -170,6 +171,14 @@ class Card:
         card_lane_rect_position = card_lane_text_surface.get_rect(center=(self.x_cord + self.card_width // 2,
                                                                           self.y_cord + self.card_height // 2 + 50))
         canvas.blit(card_lane_text_surface, card_lane_rect_position)
+
+    def draw_card_turn_text(self, canvas, assigned_lane):
+        # create a font surface for card lane selection
+        text_surface = self.card_lane_match_font.render(f"Turn: {assigned_lane + 1}", False, "black")
+        # position text surface object rectangle in a center
+        rect_position = text_surface.get_rect(center=(
+            self.x_cord + self.card_width // 2, self.y_cord + self.card_height // 2 + 70))
+        canvas.blit(text_surface, rect_position)
 
     def update_position(self, x, y):
         self.x_cord = x
