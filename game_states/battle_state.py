@@ -175,57 +175,83 @@ class Battle:
         if self.home_button.colided(pygame.mouse.get_pos()):
             self.game_instance.current_state = "HomeBase"
 
-    def card_on_lane_selection(self):
+    def card_on_lane_selection(self) -> None:
+        """
+        Handles card selections and modifies move_selection list based on card selections.
+        :return:
+        """
         from core import core_funct
-        # get mouse position
+
+        # Get mouse position
         mouse_pos = pygame.mouse.get_pos()
 
-        if self.selected_card:
-            for lane in self.battlefield.lanes:
-                # check if there are any enemies on that lane, if no, prevent selection
-                enemies_on_lane = []
-                for position in lane.positions:
-                    if position.enemy:
-                        enemies_on_lane.append(position.enemy)
-                # add card and lane to move selection list
-                for position in lane.positions:
-                    if position.rect.collidepoint(mouse_pos) and enemies_on_lane:
-                        lane_index = self.battlefield.lanes.index(lane)
+        # If no card is selected, exit function
+        if not self.selected_card:
+            return
 
-                        # Check if the selected card is already in move_selections
-                        card_in_moves = any(selection[0] == self.selected_card for selection in self.move_selections)
+        # Iterate through lanes to find the first valid lane with enemies
+        for lane in self.battlefield.lanes:
+            enemies_on_lane = [position.enemy for position in lane.positions if position.enemy]
 
-                        # Clear the move selections list if the card is already present or if it already has 3 entries
-                        if card_in_moves or len(self.move_selections) >= 3:
-                            self.move_selections.clear()
+            if not enemies_on_lane:
+                continue
 
-                        # Add the new card and lane index entry at the end of the list
-                        self.move_selections.append([self.selected_card, lane_index])
-                        break
+            for position in lane.positions:
+                if position.rect.collidepoint(mouse_pos):
+                    lane_index = self.battlefield.lanes.index(lane)
 
-            # Calculate returning path
-            self.returning_path = core_funct.calculate_return_path(
-                (self.selected_card.x_cord, self.selected_card.y_cord),
-                (self.selected_card.original_x, self.selected_card.original_y))
-            self.returning_card = self.selected_card
-            self.card_animation_index = 0
-            self.selected_card = None
+                    # Check if the selected card is already in move_selections
+                    card_in_moves = any(selection[0] == self.selected_card for selection in self.move_selections)
 
-    def card_selection(self, event):
-        # for each card checks if mouse button is pushed down when hovering on a card. Selects that card and
-        # stores it to a variable
+                    # Clear the move selections list if the card is already present or if it already has 3 entries
+                    if card_in_moves or len(self.move_selections) >= 3:
+                        self.move_selections.clear()
+
+                    # Add the new card and lane index entry at the end of the list
+                    self.move_selections.append([self.selected_card, lane_index])
+                    self.prepare_card_return(core_funct)
+                    return
+
+    def prepare_card_return(self, core_funct) -> None:
+        """
+        Support function for card_on_lane_selection function.
+        Calculates card return path and other related variables.
+        :param core_funct:
+        :return:
+        """
+        # Calculate returning path
+        self.returning_path = core_funct.calculate_return_path(
+            (self.selected_card.x_cord, self.selected_card.y_cord),
+            (self.selected_card.original_x, self.selected_card.original_y))
+        self.returning_card = self.selected_card
+        self.card_animation_index = 0
+        self.selected_card = None
+
+    def card_selection(self, event) -> None:
+        """
+        For each card check if mouse button is pushed down when hovering on a card. If true, selects that card and
+        stores it to a variable
+        :param event: pygame event
+        :return: None
+        """
+
         for card in self.cards:
-            if card.rect.collidepoint(
-                    event.pos):
+            if card.rect.collidepoint(event.pos):
                 self.selected_card = card
                 self.card_offset_x = card.x_cord - event.pos[0]
                 self.card_offset_y = card.y_cord - event.pos[1]
                 break
 
-    def draw(self):
+    def draw(self) -> None:
+        """
+        Handles drawing all the objects for the battle state.
+        :return: None
+        """
 
+        # setting background color
         self.screen.fill((102, 140, 255))
 
+        # draw buttons
         self.draw_buttons()
 
         # drawing health crystals
@@ -236,7 +262,7 @@ class Battle:
         for item in self.meters:
             item.draw(self.screen)
 
-        # draw positions
+        # draw position grid
         self.battlefield.draw(self.screen)
 
         # drawing enemies
@@ -257,10 +283,12 @@ class Battle:
         if self.returning_card and self.card_animation_index < len(self.returning_path):
             self.returning_card.update_position(*self.returning_path[self.card_animation_index])
             self.card_animation_index += 1
-            if self.card_animation_index >= len(self.returning_path):
-                returning_card = None
 
-    def draw_buttons(self):
+    def draw_buttons(self) -> None:
+        """
+        Handles drawing all the buttons in this game state.
+        :return: None
+        """
 
         # draw "start turn" button
         self.start_turn_btn.draw(self.screen)
@@ -270,7 +298,12 @@ class Battle:
         self.home_button.draw(self.screen)
         self.screen.blit(self.home_button.font_render, self.home_button.btn_position)
 
-    def handle_event(self, event):
+    def handle_event(self, event) -> None:
+        """
+        Handles event triggers for this game state.
+        :param event: Pygame event
+        :return: None
+        """
         if variables.player_health <= 0:
             self.game_instance.running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -281,6 +314,11 @@ class Battle:
         elif event.type == pygame.MOUSEMOTION:
             self.update_card_position(event)
 
-    def update_card_position(self, event):
+    def update_card_position(self, event) -> None:
+        """
+        Updates card position when returning it back to its original position.
+        :param event: Pygme event
+        :return: None
+        """
         if self.selected_card:
             self.selected_card.update_position(event.pos[0] + self.card_offset_x, event.pos[1] + self.card_offset_y)
