@@ -1,12 +1,23 @@
 import pygame
 
-from variables import constants, variables
-from classes import stones
+from variables import constants
 from game_states import battle_state, homebase_state, spellcrafting_state, mainmenu_state
+
+"""
+    This module manages game states. We add new game states, they event handler, updaters and drawers to have transitions
+    between game states.
+    
+    To add a new state, create a state instance and assign it to a variable. Then add state to each of the functions
+    it needs to be added.
+"""
 
 
 class Game:
-
+    """
+    This is a main game state class that handles all the main game states inside of it.
+    Main game initiation happens here and switching between states.
+    This class handles running, updating, drawing, selecting states.
+    """
     def __init__(self):
 
         # main game init
@@ -18,6 +29,7 @@ class Game:
 
         # main game variables
         self.screen = pygame.display.set_mode((constants.WINDOW_WIDTH, constants.WINDOW_HEIGHT))
+        # starting state is set to be home
         self.current_state = "HomeBase"
 
         # core class instances created
@@ -26,7 +38,11 @@ class Game:
         self.home_base = homebase_state.HomeBase(self, self.screen)
         self.spell_crafting = spellcrafting_state.SpellCrafting(self, self.screen)
 
-    def run(self):
+    def run(self) -> None:
+        """
+        Runs all the other functions needed for a pygame visual management.
+        :return: None
+        """
         while self.running:
             self.event_handler()
             self.update()
@@ -35,7 +51,11 @@ class Game:
             self.clock.tick(60)
         pygame.quit()
 
-    def event_handler(self):
+    def event_handler(self) -> None:
+        """
+        Manages event handling functionality for the game states
+        :return: None
+        """
         # poll for events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -50,7 +70,11 @@ class Game:
                 case _:
                     pass
 
-    def update(self):
+    def update(self) -> None:
+        """
+        Runs state method that update states variables, visuals etc.
+        :return: None
+        """
         match self.current_state:
             case "Battlefield":
                 self.battle.update()
@@ -61,7 +85,11 @@ class Game:
             case _:
                 pass
 
-    def render(self):
+    def render(self) -> None:
+        """
+        Runs state method that renders visual information.
+        :return: None
+        """
         match self.current_state:
             case "Battlefield":
                 self.battle.draw()
@@ -72,8 +100,17 @@ class Game:
             case _:
                 pass
 
-    def get_state(self):
+    def get_state(self) -> str:
+        """
+        Gets current state and returns it.
+        :return: String value of a current state.
+        """
         return self.current_state
 
-    def set_state(self, state):
+    def set_state(self, state) -> None:
+        """
+        Sets main game state.
+        :param state: State name entered as a string.
+        :return: None
+        """
         self.current_state = state

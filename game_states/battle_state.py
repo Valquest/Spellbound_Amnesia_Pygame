@@ -2,6 +2,10 @@ import pygame
 
 from variables import constants, variables
 
+"""
+This is a battle state module. It stores all the needed functionality for battles to work.
+"""
+
 
 class Battle:
     def __init__(self, game_instance, screen):

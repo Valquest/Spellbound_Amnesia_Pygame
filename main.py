@@ -1,4 +1,4 @@
-# project modeules
+# project modules
 from game_states import game_states
 
 
