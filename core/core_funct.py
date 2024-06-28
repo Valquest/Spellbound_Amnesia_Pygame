@@ -26,7 +26,7 @@ def first_last_enemy_finder(battlefield, lane_to_search, first_or_last) -> int o
     return enemy_position
 
 
-def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 0, next_to: bool = False) -> int:
+def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 0, next_to: bool = False) -> int or None:
     """
     Functions locates requested enemy index position inside its lane
     :param lane_to_search: lane index number
@@ -39,29 +39,32 @@ def enemy_position_finder(lane_to_search, battlefield, enemy_to_look_for: int = 
     lane = lanes[lane_to_search]
     reversed_positions_list = list(reversed(lane.positions))
     enemy_position_index_list = [index for index, position in enumerate(reversed_positions_list) if position.enemy]
-    last_position = None
-    # checks if requested enemy is within the list or is not the first enemy in the list
-    if enemy_position_index_list:  # Check if the list is not empty
-        if 0 < enemy_to_look_for < len(reversed_positions_list) and len(enemy_position_index_list) > enemy_to_look_for:
-            if next_to:
-                if enemy_position_index_list[enemy_to_look_for] - 1 == enemy_position_index_list[enemy_to_look_for - 1]:
-                    last_position = enemy_position_index_list[enemy_to_look_for]
-                else:
-                    last_position = None
-            else:
-                last_position = enemy_position_index_list[enemy_to_look_for]
-        else:
-            last_position = enemy_position_index_list[0]
-    else:
-        # Handle the case where there are no occupied positions
+
+    if not enemy_position_index_list:  # No enemies found
         return None
 
-    return len(reversed_positions_list) - 1 - last_position if last_position is not None else None
+    if enemy_to_look_for == 0 or enemy_to_look_for >= len(enemy_position_index_list):
+        return enemy_position_index_list[0]
+
+    if next_to and enemy_to_look_for > 0:
+        if enemy_position_index_list[enemy_to_look_for] - 1 == enemy_position_index_list[enemy_to_look_for - 1]:
+            return enemy_position_index_list[enemy_to_look_for]
+        return None
+
+    return enemy_position_index_list[enemy_to_look_for]
 
 
-def calculate_return_path(start_pos, end_pos, steps=20):
+def calculate_return_path(start_pos, end_pos, steps=20) -> list:
+    """
+    Calculates a return path for a card that was just hovering over a lane and needs to return back to original position.
+    :param start_pos: Cards start position as a list containing x and y positions.
+    :param end_pos: Cards current position as a list containing x and y positions.
+    :param steps: Number of steps card needs to take to return back.
+    :return: A list of positions card needs to appear in to smoothly return back.
+    """
     path = []
     for step in range(steps):
+        # ensures that t varies linearly from 0 to 1 over the number of steps
         t = step / (steps - 1)
         # calculate curved path using a quadratic Bezier curve
         mid_x = (start_pos[0] + end_pos[0]) / 2
@@ -72,7 +75,13 @@ def calculate_return_path(start_pos, end_pos, steps=20):
     return path
 
 
-def enemy_list_sorter(enemy_list):
+def enemy_list_sorter(enemy_list) -> list:
+    """
+    Sorts enemy list so they are arranged in order that each position for for row 1 is arranged first, followed by lane 2
+    and lane 3
+    :param enemy_list:
+    :return: a sorted enemy list
+    """
     # return a new list sorted in a priority order y and then x coordinates
     return sorted(enemy_list, key=lambda enemy: (enemy.y_cord, enemy.x_cord))
 
