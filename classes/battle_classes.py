@@ -149,6 +149,7 @@ class Card:
         self.color = color
         self.original_x = self.x_cord
         self.original_y = self.y_cord
+        self.rect = pygame.Rect(self.x_cord, self.y_cord, self.card_width, self.card_height)
 
         # this variable is not used, might not need it in the future, function parameter needs to
         # go, in that case
