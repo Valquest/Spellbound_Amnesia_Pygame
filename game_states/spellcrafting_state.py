@@ -30,6 +30,7 @@ class SpellCrafting:
         self.inv.apply_scroll_velocity()
         self.inv.check_spring_back_activation()
         self.inv.apply_spring_back()
+        self.inv.move_stone()
 
     def draw(self) -> None:
         """
@@ -47,10 +48,15 @@ class SpellCrafting:
         """
         if event.type == pygame.MOUSEBUTTONUP:
             self.button_clicks()
+            # releases stone when mouse is released
+            self.inv.release_stone()
         elif event.type == pygame.MOUSEWHEEL:
             self.inv.scroll_velocity += event.y * self.inv.scroll_speed
-            # Reset spring back active on new scroll
+            # reset spring back active on new scroll
             self.inv.spring_back_active = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            # when player uses his mouse to move stone from inventory
+            self.inv.select_stone()
 
     """_____________ SUPPORT FUNCTIONS _____________"""
     def draw_buttons(self) -> None:

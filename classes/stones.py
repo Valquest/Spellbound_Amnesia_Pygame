@@ -47,12 +47,12 @@ class StoneInventory:
         self.max_scroll_offset = 100
         self.padding = 20
 
-        # Hard scroll limits
+        # hard scroll limits
         self.scroll_limit_distance = 70
         self.top_hard_limit = self.rect.top + self.scroll_limit_distance
         self.bottom_hard_limit = self.rect.bottom - self.scroll_limit_distance
 
-        # Spring back settings
+        # spring back settings
         self.spring_back_active = False
         self.spring_back_speed = 2
         self.target_offset = 0
@@ -68,14 +68,14 @@ class StoneInventory:
                     break
             self.magic_stones.append(stone)
 
+        # stone movement variables
+        self.stone_in_motion = None
+
     # drawing main inv rect
     def draw(self, screen):
         pygame.draw.rect(screen, "Gray", self.rect)
 
-        # scrolling logic
-
-    """-------------------------------"""
-
+    """---------Scrolling logic---------"""
     def apply_scroll_velocity(self):
         # Ensure scrolling does not exceed hard limits
         if (self.scroll_velocity > 0 and self.magic_stones[0].rect.top >= self.top_hard_limit) or \
@@ -177,3 +177,23 @@ class StoneInventory:
         return resistance ** 2  # Apply the squared resistance for smoother behavior
 
     """----------------------------------------"""
+
+    """----------Moving Stones logic-----------"""
+
+    def select_stone(self):
+        for stone in self.magic_stones:
+            if stone.rect.collidepoint(pygame.mouse.get_pos()):
+                self.stone_in_motion = stone
+                print(f"Selected stone: {self.stone_in_motion}")
+
+    def move_stone(self):
+        mouse_pos = pygame.mouse.get_pos()
+        print(self.stone_in_motion)
+        if self.stone_in_motion:
+            print(self.stone_in_motion.x)
+            self.stone_in_motion.x = mouse_pos[0]
+            print(self.stone_in_motion.x)
+            self.stone_in_motion.y = mouse_pos[1]
+
+    def release_stone(self):
+        return
