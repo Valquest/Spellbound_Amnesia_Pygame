@@ -108,11 +108,12 @@ class Battle:
         from utils import util_funct
 
         """
-        checks if it is time to damage enemies. Damaging happens on first step of the cycle, 0, 3 and 6. If current_action
-        is 5, 5//3 is 1 since we round down. 6//3 is 2, so it means we are on turn 2 and we use second card in move_selection
+        checks if it is time to damage enemies. Damaging happens on first step of the cycle, 0, 3 and 6. If 
+        current_action is 5, 5//3 is 1 since we round down. 6//3 is 2, so it means we are on turn 2 and we use second 
+        card in move_selection
         """
         if self.current_action // 3 < len(self.move_selections):
-            # if current_action is 6 we -1 and get 5 // 3 is 1, meaning that are still on turn 1 and proper action is selected
+            # if current_action is 6 we // 3 is 2, meaning that we are on turn 2
             action = self.move_selections[self.current_action // 3]
             current_card = action[0]
             current_lane = action[1]
@@ -133,7 +134,7 @@ class Battle:
             positions = self.battlefield.lanes[lane_index].positions
             for enemy_index in enemies_to_move:
                 final_position_index = enemy_index + 1
-                final_position = positions[final_position_index] # commenting this out for now. If not needed, delete. (if final_position_index < len(positions) else None)
+                final_position = positions[final_position_index]  # commenting this out for now. If not needed, delete. (if final_position_index < len(positions) else None)
                 spells.move_enemy(enemy_index, lane_index, 1, 1, self.battlefield)
                 if final_position is None and positions[enemy_index].enemy is None:
                     self.player_health.remove_hp()

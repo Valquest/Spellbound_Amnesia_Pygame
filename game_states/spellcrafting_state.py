@@ -1,6 +1,6 @@
 import pygame
 
-from variables import constants, variables
+from variables import constants
 from classes import stones
 
 
@@ -22,17 +22,29 @@ class SpellCrafting:
         self.inv = stones.StoneInventory()
         self.stones = self.inv.magic_stones
 
-    def update(self):
+    def update(self) -> None:
+        """
+        Handles any updates inside of this game class.
+        :return: None
+        """
         self.inv.apply_scroll_velocity()
         self.inv.check_spring_back_activation()
         self.inv.apply_spring_back()
 
-    def draw(self):
+    def draw(self) -> None:
+        """
+        Handles any drawing inside of this game class.
+        :return: None
+        """
         self.screen.fill((55, 21, 133))
         self.draw_buttons()
         self.draw_inv_side_bar()
 
-    def handle_event(self, event):
+    def handle_event(self, event) -> None:
+        """
+        Handles any pygame events inside of this game class.
+        :return: None
+        """
         if event.type == pygame.MOUSEBUTTONUP:
             self.button_clicks()
         elif event.type == pygame.MOUSEWHEEL:
@@ -41,20 +53,29 @@ class SpellCrafting:
             self.inv.spring_back_active = False
 
     """_____________ SUPPORT FUNCTIONS _____________"""
-    def draw_buttons(self):
+    def draw_buttons(self) -> None:
+        """
+        Handles drawing any buttons.
+        :return: None
+        """
         # draw home button
         self.home_btn.draw(self.screen)
         self.screen.blit(self.home_btn.font_render, self.home_btn.btn_position)
 
-    def button_clicks(self):
+    def button_clicks(self) -> None:
+        """
+        Handles catching any bottn click events.
+        :return: None
+        """
         if self.home_btn.colided(pygame.mouse.get_pos()):
             self.game_instance.current_state = "HomeBase"
 
-    def draw_inv_side_bar(self):
+    def draw_inv_side_bar(self) -> None:
+        """
+        Handles drawing players inventory sidebar and items.
+        :return: None
+        """
         self.inv.draw(self.screen)
-        # for stone in self.stones:
-        #     stone.draw(self.screen)
-
         # Draw only the parts of the rectangles that are within the display rectangle
         for stone in self.inv.magic_stones:
             intersection_rect = self.inv.rect.clip(stone.rect)

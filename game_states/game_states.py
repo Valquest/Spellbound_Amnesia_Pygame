@@ -4,8 +4,8 @@ from variables import constants
 from game_states import battle_state, homebase_state, spellcrafting_state, mainmenu_state
 
 """
-    This module manages game states. We add new game states, they event handler, updaters and drawers to have transitions
-    between game states.
+    This module manages game states. We add new game states, they event handler, updaters and drawers to have 
+    transitions between game states.
     
     To add a new state, create a state instance and assign it to a variable. Then add state to each of the functions
     it needs to be added.
