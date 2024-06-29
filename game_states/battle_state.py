@@ -193,7 +193,6 @@ class Battle:
         # Iterate through lanes to find the first valid lane with enemies
         for lane in self.battlefield.lanes:
             enemies_on_lane = [position.enemy for position in lane.positions if position.enemy]
-
             if not enemies_on_lane:
                 continue
 
@@ -210,8 +209,9 @@ class Battle:
 
                     # Add the new card and lane index entry at the end of the list
                     self.move_selections.append([self.selected_card, lane_index])
-                    self.prepare_card_return(core_funct)
-                    return
+
+        # calculating the return path for a selected card
+        self.prepare_card_return(core_funct)
 
     def prepare_card_return(self, core_funct) -> None:
         """

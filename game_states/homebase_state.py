@@ -19,7 +19,7 @@ class HomeBase:
             "Craft Spells", 25, 150, 150, 50, 32)
 
     @staticmethod
-    def update(self) -> None:
+    def update() -> None:
         """
         To be populated.
         :return: None

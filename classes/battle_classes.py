@@ -15,6 +15,7 @@ class Position:
         self.x = x
         self.y = y
         self.rect = pygame.Rect(x, y, Position.width, Position.height)
+        #self.enemy = None
 
 
 class Lane:

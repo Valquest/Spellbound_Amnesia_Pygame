@@ -72,6 +72,7 @@ def calculate_return_path(start_pos, end_pos, steps=20) -> list:
         x = (1 - t)**2 * start_pos[0] + 2 * (1 - t) * t * mid_x + t**2 * end_pos[0]
         y = (1 - t)**2 * start_pos[1] + 2 * (1 - t) * t * mid_y + t**2 * end_pos[1]
         path.append((x, y))
+
     return path
 
 
