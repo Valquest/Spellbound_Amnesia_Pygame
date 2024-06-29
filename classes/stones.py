@@ -180,20 +180,27 @@ class StoneInventory:
 
     """----------Moving Stones logic-----------"""
 
-    def select_stone(self):
+    def select_stone(self) -> None:
+        """
+        Assigns a stone to stone_in_motion variable when player selects a stone with mouse
+        :return: None
+        """
         for stone in self.magic_stones:
             if stone.rect.collidepoint(pygame.mouse.get_pos()):
                 self.stone_in_motion = stone
                 print(f"Selected stone: {self.stone_in_motion}")
 
-    def move_stone(self):
-        mouse_pos = pygame.mouse.get_pos()
-        print(self.stone_in_motion)
+    def move_stone(self) -> None:
+        """
+        Moves selected stone to current mouse position while stone in motion is selected
+        :return: None
+        """
         if self.stone_in_motion:
-            print(self.stone_in_motion.x)
-            self.stone_in_motion.x = mouse_pos[0]
-            print(self.stone_in_motion.x)
-            self.stone_in_motion.y = mouse_pos[1]
+            mouse_pos = pygame.mouse.get_pos()
+            stone_width = self.stone_in_motion.width
+            stone_height = self.stone_in_motion.height
+            self.stone_in_motion.rect.x = mouse_pos[0] - stone_width / 2
+            self.stone_in_motion.rect.y = mouse_pos[1] - stone_height / 2
 
     def release_stone(self):
         return
