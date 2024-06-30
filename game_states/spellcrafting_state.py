@@ -50,8 +50,6 @@ class SpellCrafting:
         if event.type == pygame.MOUSEBUTTONUP and event.button not in (4, 5):
             self.button_clicks()
             self.inv.releasing_stone()
-            # releases stone when mouse is released
-            self.inv.release_stone()
         elif event.type == pygame.MOUSEWHEEL:
             self.inv.scroll_velocity += event.y * self.inv.scroll_speed
             # reset spring back active on new scroll
@@ -86,6 +84,10 @@ class SpellCrafting:
         self.inv.draw(self.screen)
         # Draw only the parts of the rectangles that are within the display rectangle
         for stone in self.inv.magic_stones:
+            # check if stone is selected and being moved, then draw that rect anywhere
+            if stone == self.inv.selected_stone or stone == self.inv.falling_stone:
+                stone.draw(self.screen)
+                continue
             intersection_rect = self.inv.rect.clip(stone.rect)
             if intersection_rect.width > 0 and intersection_rect.height > 0:
                 # Create a new surface to hold the visible part of the rectangle

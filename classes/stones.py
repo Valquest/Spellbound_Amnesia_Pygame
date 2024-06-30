@@ -83,6 +83,7 @@ class StoneInventory:
 
     """---------Scrolling logic---------"""
     def apply_scroll_velocity(self):
+        # check if any items are selected or falling, if yes, exit function
         if self.falling_stone or self.selected_stone:
             return
         # Ensure scrolling does not exceed hard limits
@@ -150,6 +151,7 @@ class StoneInventory:
                 self.spring_back_active = True
 
     def apply_spring_back(self):
+        # check if any items are selected or falling, if yes, exit function
         if self.falling_stone or self.selected_stone:
             return
         if self.spring_back_active:
@@ -203,6 +205,8 @@ class StoneInventory:
         for stone in self.magic_stones:
             if stone.rect.collidepoint(pygame.mouse.get_pos()):
                 self.selected_stone = stone
+        # set scroll velocity to 0 to prevent bug where scrolling happens on item return to inv
+        self.scroll_velocity = 0
 
     def move_stone(self) -> None:
         """
@@ -235,6 +239,3 @@ class StoneInventory:
             self.falling_stone.rect.y = self.falling_stone.y
             self.falling_stone = None
             self.stone_fall_velocity = 0
-
-    def release_stone(self):
-        return
