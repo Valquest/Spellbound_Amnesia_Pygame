@@ -69,7 +69,12 @@ class StoneInventory:
             self.magic_stones.append(stone)
 
         # stone movement variables
-        self.stone_in_motion = None
+        self.selected_stone = None
+        self.falling_stone = None
+        self.stone_fall_velocity = 0
+        self.fall_acceleration = 10
+        self.fall_acceleration_increment = 1
+        self.fall_acceleration_multiplier = 0.9
 
     # drawing main inv rect
     def draw(self, screen):
@@ -77,6 +82,8 @@ class StoneInventory:
 
     """---------Scrolling logic---------"""
     def apply_scroll_velocity(self):
+        if self.falling_stone or self.selected_stone:
+            return
         # Ensure scrolling does not exceed hard limits
         if (self.scroll_velocity > 0 and self.magic_stones[0].rect.top >= self.top_hard_limit) or \
                 (self.scroll_velocity < 0 and self.magic_stones[-1].rect.bottom <= self.bottom_hard_limit):
@@ -129,6 +136,8 @@ class StoneInventory:
             self.scroll_velocity = 0
 
     def check_spring_back_activation(self):
+        if self.falling_stone or self.selected_stone:
+            return
         if not self.spring_back_active:
             if self.magic_stones[0].rect.top > self.rect.top + self.padding:
                 self.target_offset = (self.rect.top + self.padding) - self.magic_stones[0].rect.top
@@ -139,6 +148,8 @@ class StoneInventory:
                 self.spring_back_active = True
 
     def apply_spring_back(self):
+        if self.falling_stone or self.selected_stone:
+            return
         if self.spring_back_active:
             spring_back_factor = 1 + abs(self.target_offset) / self.max_scroll_offset
             if self.target_offset > 0:
@@ -185,22 +196,44 @@ class StoneInventory:
         Assigns a stone to stone_in_motion variable when player selects a stone with mouse
         :return: None
         """
+        if self.falling_stone:
+            return
         for stone in self.magic_stones:
             if stone.rect.collidepoint(pygame.mouse.get_pos()):
-                self.stone_in_motion = stone
-                print(f"Selected stone: {self.stone_in_motion}")
+                self.selected_stone = stone
 
     def move_stone(self) -> None:
         """
         Moves selected stone to current mouse position while stone in motion is selected
         :return: None
         """
-        if self.stone_in_motion:
+        if self.selected_stone:
             mouse_pos = pygame.mouse.get_pos()
-            stone_width = self.stone_in_motion.width
-            stone_height = self.stone_in_motion.height
-            self.stone_in_motion.rect.x = mouse_pos[0] - stone_width / 2
-            self.stone_in_motion.rect.y = mouse_pos[1] - stone_height / 2
+            stone_width = self.selected_stone.width
+            stone_height = self.selected_stone.height
+            self.selected_stone.rect.x = mouse_pos[0] - stone_width / 2
+            self.selected_stone.rect.y = mouse_pos[1] - stone_height / 2
+
+    def releasing_stone(self):
+        if not self.selected_stone:
+            return
+        self.falling_stone, self.selected_stone = self.selected_stone, None
+
+    def stone_fall(self):
+        print(self.falling_stone)
+        if not self.falling_stone:
+            return
+        if self.stone_fall_velocity <= self.fall_acceleration:
+            self.stone_fall_velocity += self.fall_acceleration_increment * self.fall_acceleration_multiplier
+        print(self.stone_fall_velocity)
+        self.falling_stone.rect.y += self.stone_fall_velocity
+        self.stone_reset()
+
+    def stone_reset(self):
+        if self.falling_stone.rect.y > constants.WINDOW_HEIGHT:
+            self.falling_stone.rect.x = self.falling_stone.x
+            self.falling_stone.rect.y = self.falling_stone.y
+            self.falling_stone = None
 
     def release_stone(self):
         return

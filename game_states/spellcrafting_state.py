@@ -31,6 +31,7 @@ class SpellCrafting:
         self.inv.check_spring_back_activation()
         self.inv.apply_spring_back()
         self.inv.move_stone()
+        self.inv.stone_fall()
 
     def draw(self) -> None:
         """
@@ -48,6 +49,7 @@ class SpellCrafting:
         """
         if event.type == pygame.MOUSEBUTTONUP:
             self.button_clicks()
+            self.inv.releasing_stone()
             # releases stone when mouse is released
             self.inv.release_stone()
         elif event.type == pygame.MOUSEWHEEL:
