@@ -47,7 +47,7 @@ class SpellCrafting:
         Handles any pygame events inside of this game class.
         :return: None
         """
-        if event.type == pygame.MOUSEBUTTONUP:
+        if event.type == pygame.MOUSEBUTTONUP and event.button not in (4, 5):
             self.button_clicks()
             self.inv.releasing_stone()
             # releases stone when mouse is released
@@ -56,7 +56,7 @@ class SpellCrafting:
             self.inv.scroll_velocity += event.y * self.inv.scroll_speed
             # reset spring back active on new scroll
             self.inv.spring_back_active = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button not in (4, 5):
             # when player uses his mouse to move stone from inventory
             self.inv.select_stone()
 

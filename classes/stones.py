@@ -21,6 +21,7 @@ class MagicStone:
         self.height = height
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.rect_color = "White"
+        self.scroll_y_pos = 0
 
     def draw(self, canvas):
         pygame.draw.rect(canvas, self.rect_color, self.rect)
@@ -73,7 +74,7 @@ class StoneInventory:
         self.falling_stone = None
         self.stone_fall_velocity = 0
         self.fall_acceleration = 10
-        self.fall_acceleration_increment = 1
+        self.fall_acceleration_increment = 0.2
         self.fall_acceleration_multiplier = 0.9
 
     # drawing main inv rect
@@ -136,6 +137,7 @@ class StoneInventory:
             self.scroll_velocity = 0
 
     def check_spring_back_activation(self):
+        # check if any items are selected or falling, if yes, exit function
         if self.falling_stone or self.selected_stone:
             return
         if not self.spring_back_active:
@@ -220,12 +222,10 @@ class StoneInventory:
         self.falling_stone, self.selected_stone = self.selected_stone, None
 
     def stone_fall(self):
-        print(self.falling_stone)
         if not self.falling_stone:
             return
         if self.stone_fall_velocity <= self.fall_acceleration:
             self.stone_fall_velocity += self.fall_acceleration_increment * self.fall_acceleration_multiplier
-        print(self.stone_fall_velocity)
         self.falling_stone.rect.y += self.stone_fall_velocity
         self.stone_reset()
 
@@ -234,6 +234,7 @@ class StoneInventory:
             self.falling_stone.rect.x = self.falling_stone.x
             self.falling_stone.rect.y = self.falling_stone.y
             self.falling_stone = None
+            self.stone_fall_velocity = 0
 
     def release_stone(self):
         return
