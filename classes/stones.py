@@ -72,6 +72,7 @@ class StoneInventory:
         # stone movement variables
         self.selected_stone = None
         self.falling_stone = None
+        self.mouse_speed = 0
         self.stone_move_velocity = 0
         self.stone_move_acceleration = 10
         self.stone_move_acceleration_increment = 0.2
@@ -212,21 +213,59 @@ class StoneInventory:
         # set scroll velocity to 0 to prevent bug where scrolling happens on item return to inv
         self.scroll_velocity = 0
 
+    # def move_stone(self) -> None:
+    #     """
+    #     Moves selected stone to current mouse position while stone in motion is selected
+    #     :return: None
+    #     """
+    #     if self.selected_stone:
+    #         mouse_pos = pygame.mouse.get_pos()
+    #         stone_width = self.selected_stone.width
+    #         stone_height = self.selected_stone.height
+    #         x_direction = self.selected_stone.rect.x
+    #         self.selected_stone.rect.x = mouse_pos[0] - stone_width / 2
+    #         self.selected_stone.rect.y = mouse_pos[1] - stone_height / 2
+
     def move_stone(self) -> None:
         """
-        Moves selected stone to current mouse position while stone in motion is selected
+        Moves selected stone to current mouse position with acceleration and deceleration
         :return: None
         """
         if self.selected_stone:
-            mouse_speed = self.get_mouse_rel(self)
             mouse_pos = pygame.mouse.get_pos()
-            stone_width = self.selected_stone.width
-            stone_height = self.selected_stone.height
-            if self.selected_stone.rect.x == mouse_pos[0] - stone_width / 2 and self.selected_stone.rect.y == mouse_pos[1] - stone_height / 2:
-                self.selected_stone.rect.x += self.stone_move_velocity * mouse_speed
-                self.selected_stone.rect.y += self.stone_move_velocity * mouse_speed
-            # self.selected_stone.rect.x = mouse_pos[0] - stone_width / 2
-            # self.selected_stone.rect.y = mouse_pos[1] - stone_height / 2
+            stone_rect = self.selected_stone.rect
+            stone_center_x = stone_rect.x + stone_rect.width / 2
+            stone_center_y = stone_rect.y + stone_rect.height / 2
+
+            # Calculate distance to the mouse position
+            distance_x = mouse_pos[0] - stone_center_x
+            distance_y = mouse_pos[1] - stone_center_y
+
+            # Calculate the distance to the mouse position
+            distance = (distance_x ** 2 + distance_y ** 2) ** 0.5
+
+            # Increase velocity based on the distance, with a cap
+            max_velocity = 10  # Adjust this value to control max speed
+            self.stone_move_velocity = min(self.stone_move_acceleration * distance, max_velocity)
+
+            # Normalize direction and apply velocity
+            if distance > 0:
+                direction_x = distance_x / distance
+                direction_y = distance_y / distance
+
+                # Apply the velocity to the stone's position
+                stone_rect.x += direction_x * self.stone_move_velocity
+                stone_rect.y += direction_y * self.stone_move_velocity
+
+                # Decelerate when closer to the mouse
+                if abs(distance_x) < self.stone_move_velocity:
+                    stone_rect.x = mouse_pos[0] - stone_rect.width / 2
+                if abs(distance_y) < self.stone_move_velocity:
+                    stone_rect.y = mouse_pos[1] - stone_rect.height / 2
+
+                # Ensure the stone can pass by the mouse
+                if distance < self.stone_move_acceleration:
+                    self.stone_move_velocity *= -1  # Invert the velocity to pass by the mouse
 
     def releasing_stone(self):
         if not self.selected_stone:
@@ -257,13 +296,12 @@ class StoneInventory:
             self.stone_fall_velocity = 0
 
     @staticmethod
-    def get_mouse_rel(self):
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEMOTION:
-                dx, dy = event.rel
-                speed = (dx ** 2 + dy ** 2) ** (1/2)  # pythagorian formula
-                print(speed)
-                return speed
+    def get_mouse_speed(event_rel):
+        dx, dy = event_rel
+        speed = (dx ** 2 + dy ** 2) ** (1 / 2)  # Pythagorean formula
+        print(f"Mouse speed: {speed}, dx: {dx}, dy: {dy}")
+        return speed
+
 
 class Mortar:
     def __init__(self):

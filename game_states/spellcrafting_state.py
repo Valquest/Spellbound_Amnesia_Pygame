@@ -61,6 +61,8 @@ class SpellCrafting:
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button not in (4, 5):
             # when player uses his mouse to move stone from inventory
             self.inv.select_stone()
+        elif event.type == pygame.MOUSEMOTION:
+            self.inv.get_mouse_speed(event.rel)
 
     """_____________ SUPPORT FUNCTIONS _____________"""
     def draw_buttons(self) -> None:
