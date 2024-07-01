@@ -225,17 +225,38 @@ class StoneInventory:
             return
         self.falling_stone, self.selected_stone = self.selected_stone, None
 
-    def stone_fall(self):
+    def stone_fall(self, mortar):
         if not self.falling_stone:
             return
         if self.stone_fall_velocity <= self.fall_acceleration:
             self.stone_fall_velocity += self.fall_acceleration_increment * self.fall_acceleration_multiplier
         self.falling_stone.rect.y += self.stone_fall_velocity
-        self.stone_reset()
+        self.stone_reset(mortar)
 
-    def stone_reset(self):
+    def stone_reset(self, mortar):
+        if self.falling_stone.rect.y > mortar.rect.y:
+            mortar.ingredients.append(self.falling_stone)
+            print(f"Total ingredients: {mortar.ingredients}")
+            self.falling_stone.rect.x = self.falling_stone.x
+            self.falling_stone.rect.y = self.falling_stone.y
+            self.falling_stone = None
+            self.stone_fall_velocity = 0
+            return
         if self.falling_stone.rect.y > constants.WINDOW_HEIGHT:
             self.falling_stone.rect.x = self.falling_stone.x
             self.falling_stone.rect.y = self.falling_stone.y
             self.falling_stone = None
             self.stone_fall_velocity = 0
+
+
+class Mortar:
+    def __init__(self):
+        self.width = 400
+        self.height = 50
+        self.x = (constants.WINDOW_WIDTH - self.width) / 2
+        self.y = (constants.WINDOW_HEIGHT - self.height) / 2
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.ingredients = []
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, "white", self.rect)

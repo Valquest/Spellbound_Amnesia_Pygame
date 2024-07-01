@@ -22,6 +22,9 @@ class SpellCrafting:
         self.inv = stones.StoneInventory()
         self.stones = self.inv.magic_stones
 
+        # mortar instance
+        self.mortar = stones.Mortar()
+
     def update(self) -> None:
         """
         Handles any updates inside of this game class.
@@ -31,7 +34,7 @@ class SpellCrafting:
         self.inv.check_spring_back_activation()
         self.inv.apply_spring_back()
         self.inv.move_stone()
-        self.inv.stone_fall()
+        self.inv.stone_fall(self.mortar)
 
     def draw(self) -> None:
         """
@@ -41,6 +44,7 @@ class SpellCrafting:
         self.screen.fill((55, 21, 133))
         self.draw_buttons()
         self.draw_inv_side_bar()
+        self.draw_mortar()
 
     def handle_event(self, event) -> None:
         """
@@ -96,3 +100,6 @@ class SpellCrafting:
 
                 # Blit the part of the rectangle that is within the intersection rectangle
                 self.screen.blit(result_surface, intersection_rect.topleft)
+
+    def draw_mortar(self):
+        self.mortar.draw(self.screen)
