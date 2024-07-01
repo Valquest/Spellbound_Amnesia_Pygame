@@ -72,6 +72,10 @@ class StoneInventory:
         # stone movement variables
         self.selected_stone = None
         self.falling_stone = None
+        self.stone_move_velocity = 0
+        self.stone_move_acceleration = 10
+        self.stone_move_acceleration_increment = 0.2
+        self.stone_move_acceleration_multiplier = 0.9
         self.stone_fall_velocity = 0
         self.fall_acceleration = 10
         self.fall_acceleration_increment = 0.2
@@ -214,11 +218,15 @@ class StoneInventory:
         :return: None
         """
         if self.selected_stone:
+            mouse_speed = self.get_mouse_rel(self)
             mouse_pos = pygame.mouse.get_pos()
             stone_width = self.selected_stone.width
             stone_height = self.selected_stone.height
-            self.selected_stone.rect.x = mouse_pos[0] - stone_width / 2
-            self.selected_stone.rect.y = mouse_pos[1] - stone_height / 2
+            if self.selected_stone.rect.x == mouse_pos[0] - stone_width / 2 and self.selected_stone.rect.y == mouse_pos[1] - stone_height / 2:
+                self.selected_stone.rect.x += self.stone_move_velocity * mouse_speed
+                self.selected_stone.rect.y += self.stone_move_velocity * mouse_speed
+            # self.selected_stone.rect.x = mouse_pos[0] - stone_width / 2
+            # self.selected_stone.rect.y = mouse_pos[1] - stone_height / 2
 
     def releasing_stone(self):
         if not self.selected_stone:
@@ -248,6 +256,14 @@ class StoneInventory:
             self.falling_stone = None
             self.stone_fall_velocity = 0
 
+    @staticmethod
+    def get_mouse_rel(self):
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEMOTION:
+                dx, dy = event.rel
+                speed = (dx ** 2 + dy ** 2) ** (1/2)  # pythagorian formula
+                print(speed)
+                return speed
 
 class Mortar:
     def __init__(self):
