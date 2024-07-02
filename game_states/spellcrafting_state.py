@@ -94,13 +94,26 @@ class SpellCrafting:
             if stone == self.inv.selected_stone or stone == self.inv.falling_stone:
                 stone.draw(self.screen)
                 continue
+
+            # Calculate the intersection rectangle between the inventory and the stone rect
             intersection_rect = self.inv.rect.clip(stone.rect)
+
             if intersection_rect.width > 0 and intersection_rect.height > 0:
                 # Create a new surface to hold the visible part of the rectangle
-                result_surface = pygame.Surface((intersection_rect.width, intersection_rect.height))
-                result_surface.fill(stone.rect_color)
+                result_surface = pygame.Surface((intersection_rect.width, intersection_rect.height), pygame.SRCALPHA)
 
-                # Blit the part of the rectangle that is within the intersection rectangle
+                # Calculate the area of the stone image to blit
+                stone_image_area = pygame.Rect(
+                    intersection_rect.x - stone.rect.x,
+                    intersection_rect.y - stone.rect.y,
+                    intersection_rect.width,
+                    intersection_rect.height
+                )
+
+                # Blit the part of the stone image that is within the intersection rectangle
+                result_surface.blit(stone.image, (0, 0), stone_image_area)
+
+                # Blit the result surface onto the screen
                 self.screen.blit(result_surface, intersection_rect.topleft)
 
     def draw_mortar(self):
