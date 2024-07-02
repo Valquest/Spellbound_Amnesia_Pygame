@@ -5,8 +5,11 @@ from variables import constants
 
 
 class MagicStone:
-    def __init__(self, stone_type, rarity, image_name, x_pos, y_pos, width, height):
+    # Load the shared image once for all instances
+    image_path = r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
+    shared_image = None
 
+    def __init__(self, stone_type, rarity, image_name, x_pos, y_pos, width, height):
         # CORE VARIABLES
         # stone variables
         self.stone_type = stone_type
@@ -23,8 +26,16 @@ class MagicStone:
         self.rect_color = "White"
         self.scroll_y_pos = 0
 
+        # Assign the shared image to the stone
+        if MagicStone.shared_image:
+            print("Assigning shared image to stone...")
+            self.original_image = pygame.transform.scale(MagicStone.shared_image, (self.width, self.height))
+            self.image = self.original_image
+        else:
+            print("Shared image is None!")
+
     def draw(self, canvas):
-        pygame.draw.rect(canvas, self.rect_color, self.rect)
+        canvas.blit(self.image, self.rect.topleft)
 
 
 class StoneInventory:
@@ -76,8 +87,9 @@ class StoneInventory:
         self.stone_move_velocity = pygame.math.Vector2(0, 0)
         self.stone_move_acceleration = 10
         self.stone_move_acceleration_increment = 0.2
-        self.stone_move_acceleration_multiplier = 0.9
+        self.stone_move_acceleration_multiplier = 0.90
         self.damping_factor = 0.95  # Damping factor to simulate deceleration
+        self.angle = 0
 
         # stone fall movement variables
         self.stone_fall_velocity = 0
@@ -231,7 +243,8 @@ class StoneInventory:
 
     def move_stone(self) -> None:
         """
-        Moves selected stone to current mouse position with acceleration and deceleration
+        Moves selected stone to current mouse position with acceleration and deceleration.
+        Rotates the stone based on velocity changes.
         :return: None
         """
         if self.selected_stone:
@@ -250,7 +263,7 @@ class StoneInventory:
                 direction = direction.normalize()
 
             # Apply acceleration based on the distance with a cap
-            max_acceleration = 0.5  # Adjust this value to control acceleration strength
+            max_acceleration = 0.01 * distance  # Adjust this value to control acceleration strength
             acceleration = direction * min(self.stone_move_acceleration_increment * distance, max_acceleration)
 
             # Update velocity with applied acceleration
@@ -266,6 +279,26 @@ class StoneInventory:
             # Ensure the stone can pass by the mouse and continue moving
             if distance < self.stone_move_velocity.length():
                 self.stone_move_velocity *= -1  # Invert the velocity to pass by the mouse
+
+            # Add a condition to stop jittering
+            stop_threshold = 2
+            if distance < stop_threshold:
+                self.stone_move_velocity = pygame.math.Vector2(0, 0)
+                stone_rect.center = mouse_pos
+
+            # # Rotation based on velocity changes
+            # angular_velocity = self.stone_move_velocity.length() * 0.1  # Adjust the multiplier as needed
+            # if self.stone_move_velocity.x < 0:
+            #     self.angle -= angular_velocity
+            # else:
+            #     self.angle += angular_velocity
+            #
+            # # Apply damping to the rotation
+            # self.angle *= self.damping_factor
+
+            # Rotate the stone's rectangle (simulated by rotating around the center)
+            # rotated_rect = pygame.transform.rotate(pygame.Surface((stone_rect.width, stone_rect.height)), self.angle)
+            # self.selected_stone.rect = rotated_rect.get_rect(center=stone_rect.center)
 
     def releasing_stone(self):
         if not self.selected_stone:

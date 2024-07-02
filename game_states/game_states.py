@@ -32,6 +32,9 @@ class Game:
         # starting state is set to be home
         self.current_state = "HomeBase"
 
+        # initializing other game elements
+        self.init_images()
+
         # core class instances created
         self.battle = battle_state.Battle(self, self.screen)
         self.main_menu = mainmenu_state.MainMenu()
@@ -114,3 +117,13 @@ class Game:
         :return: None
         """
         self.current_state = state
+
+    def init_images(self) -> None:
+        from classes import stones
+        # Load the shared image once Pygame is initialized
+        try:
+            stones.MagicStone.shared_image = pygame.image.load(
+                stones.MagicStone.image_path).convert_alpha()
+            print(f"Image loaded successfully: {stones.MagicStone.image_path}")
+        except pygame.error as e:
+            print(f"Failed to load image: {e}")
