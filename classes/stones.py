@@ -73,10 +73,13 @@ class StoneInventory:
         self.selected_stone = None
         self.falling_stone = None
         self.mouse_speed = 0
-        self.stone_move_velocity = 0
+        self.stone_move_velocity = pygame.math.Vector2(0, 0)
         self.stone_move_acceleration = 10
         self.stone_move_acceleration_increment = 0.2
         self.stone_move_acceleration_multiplier = 0.9
+        self.damping_factor = 0.95  # Damping factor to simulate deceleration
+
+        # stone fall movement variables
         self.stone_fall_velocity = 0
         self.fall_acceleration = 10
         self.fall_acceleration_increment = 0.2
@@ -234,38 +237,35 @@ class StoneInventory:
         if self.selected_stone:
             mouse_pos = pygame.mouse.get_pos()
             stone_rect = self.selected_stone.rect
-            stone_center_x = stone_rect.x + stone_rect.width / 2
-            stone_center_y = stone_rect.y + stone_rect.height / 2
+            stone_center = pygame.math.Vector2(stone_rect.center)
 
-            # Calculate distance to the mouse position
-            distance_x = mouse_pos[0] - stone_center_x
-            distance_y = mouse_pos[1] - stone_center_y
+            # Calculate the direction vector towards the mouse position
+            direction = pygame.math.Vector2(mouse_pos) - stone_center
 
             # Calculate the distance to the mouse position
-            distance = (distance_x ** 2 + distance_y ** 2) ** 0.5
+            distance = direction.length()
 
-            # Increase velocity based on the distance, with a cap
-            max_velocity = 10  # Adjust this value to control max speed
-            self.stone_move_velocity = min(self.stone_move_acceleration * distance, max_velocity)
-
-            # Normalize direction and apply velocity
+            # Normalize the direction vector
             if distance > 0:
-                direction_x = distance_x / distance
-                direction_y = distance_y / distance
+                direction = direction.normalize()
 
-                # Apply the velocity to the stone's position
-                stone_rect.x += direction_x * self.stone_move_velocity
-                stone_rect.y += direction_y * self.stone_move_velocity
+            # Apply acceleration based on the distance with a cap
+            max_acceleration = 0.5  # Adjust this value to control acceleration strength
+            acceleration = direction * min(self.stone_move_acceleration_increment * distance, max_acceleration)
 
-                # Decelerate when closer to the mouse
-                if abs(distance_x) < self.stone_move_velocity:
-                    stone_rect.x = mouse_pos[0] - stone_rect.width / 2
-                if abs(distance_y) < self.stone_move_velocity:
-                    stone_rect.y = mouse_pos[1] - stone_rect.height / 2
+            # Update velocity with applied acceleration
+            self.stone_move_velocity += acceleration
 
-                # Ensure the stone can pass by the mouse
-                if distance < self.stone_move_acceleration:
-                    self.stone_move_velocity *= -1  # Invert the velocity to pass by the mouse
+            # Apply damping to simulate deceleration
+            self.stone_move_velocity *= self.damping_factor
+
+            # Apply the velocity to the stone's position
+            stone_rect.centerx += self.stone_move_velocity.x
+            stone_rect.centery += self.stone_move_velocity.y
+
+            # Ensure the stone can pass by the mouse and continue moving
+            if distance < self.stone_move_velocity.length():
+                self.stone_move_velocity *= -1  # Invert the velocity to pass by the mouse
 
     def releasing_stone(self):
         if not self.selected_stone:
@@ -281,7 +281,8 @@ class StoneInventory:
         self.stone_reset(mortar)
 
     def stone_reset(self, mortar):
-        if self.falling_stone.rect.y > mortar.rect.y:
+        if (mortar.rect.x < self.falling_stone.rect.x < mortar.rect.x + mortar.width and
+                self.falling_stone.rect.y > mortar.rect.y):
             mortar.ingredients.append(self.falling_stone)
             print(f"Total ingredients: {mortar.ingredients}")
             self.falling_stone.rect.x = self.falling_stone.x
@@ -299,7 +300,6 @@ class StoneInventory:
     def get_mouse_speed(event_rel):
         dx, dy = event_rel
         speed = (dx ** 2 + dy ** 2) ** (1 / 2)  # Pythagorean formula
-        print(f"Mouse speed: {speed}, dx: {dx}, dy: {dy}")
         return speed
 
 
