@@ -30,6 +30,10 @@ class MagicStone:
         self.original_image = pygame.transform.scale(MagicStone.shared_image, (self.width, self.height))
         self.image = self.original_image
 
+        # inv ammount of stones variables
+        self.stone_ammount_font = pygame.font.Font(None, 32)
+        self.font_render = self.stone_ammount_font.render(f"{self.ammount}X", True, (0, 0, 0))
+
     def draw(self, canvas):
         canvas.blit(self.image, self.rect.topleft)
 
@@ -44,6 +48,7 @@ class StoneInventory:
         self.width = constants.INVENTORY_WIDTH
         self.height = constants.INVENTORY_HEIGHT
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        pygame.font.init()
 
         # scroll settings
         self.scroll_speed = 5
@@ -260,7 +265,7 @@ class StoneInventory:
             stone_rect.centery += self.stone_move_velocity.y
 
             # Stop threshold for smooth stopping near the mouse
-            stop_threshold = 5  # Increase threshold for smoother stopping
+            stop_threshold = 2  # Increase threshold for smoother stopping
 
             # Smooth stopping near the mouse position
             if distance < stop_threshold:
