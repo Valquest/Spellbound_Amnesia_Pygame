@@ -93,9 +93,6 @@ class SpellCrafting:
             # check if stone is selected and being moved, then draw that rect anywhere
             if stone == self.inv.selected_stone or stone == self.inv.falling_stone:
                 stone.draw(self.screen)
-                # # Blit the font rendered text on the stone
-                # font_position = (stone.rect.left, stone.rect.bottom - stone.font_render.get_height())
-                # self.screen.blit(stone.font_render, font_position)
                 continue
 
             # Calculate the intersection rectangle between the inventory and the stone rect

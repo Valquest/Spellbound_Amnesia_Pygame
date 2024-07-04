@@ -91,6 +91,7 @@ class StoneInventory:
         self.stone_move_acceleration_multiplier = 0.90
         self.damping_factor = 0.78  # Damping factor to simulate deceleration
         self.angle = 0
+        self.rotation_angle_velocity = 0
 
         # stone fall movement variables
         self.stone_fall_velocity = 0
@@ -275,7 +276,7 @@ class StoneInventory:
                     stone_rect.center = mouse_pos
 
             # Call the rotation function
-            #self.rotate_stone()
+            self.rotate_stone()
 
     def rotate_stone(self) -> None:
         """
@@ -284,20 +285,33 @@ class StoneInventory:
         :return: None
         """
         if self.selected_stone:
-            # Rotation based on velocity changes
-            angular_velocity = self.stone_move_velocity.length() * 0.1  # Adjust the multiplier as needed
+            # Calculate the pivot point (middle of the stone's top and center positions)
+            stone_rect = self.selected_stone.rect
+            pivot_point = (stone_rect.centerx, stone_rect.top + stone_rect.height // 1.85)
+
+            # Calculate angular velocity based on stone's velocity
+            angular_velocity = self.stone_move_velocity.length() * 0.5  # Adjust the multiplier as needed
+
+            # Determine the direction of rotation based on mouse movement (inverted for more intuitive rotation)
             if self.stone_move_velocity.x < 0:
-                self.angle -= angular_velocity
+                self.rotation_angle_velocity += angular_velocity
             else:
-                self.angle += angular_velocity
+                self.rotation_angle_velocity -= angular_velocity
 
-            # Apply damping to the rotation
-            self.angle *= self.damping_factor
+            # Apply damping to the angular velocity
+            self.rotation_angle_velocity *= self.damping_factor
 
-            # Rotate the stone's image
+            # Update the angle based on angular velocity
+            self.angle += self.rotation_angle_velocity
+
+            # Apply pendulum-like damping to swing back to original position
+            self.rotation_angle_velocity -= self.angle * 0.01  # Adjust the damping factor as needed
+
+            # Rotate the stone's image around the pivot point
             self.selected_stone.image = pygame.transform.rotate(self.selected_stone.original_image, self.angle)
-            self.selected_stone.rect = self.selected_stone.image.get_rect(
-                center=self.selected_stone.rect.center)
+            new_rect = self.selected_stone.image.get_rect(center=self.selected_stone.rect.center)
+            offset = pygame.math.Vector2(pivot_point) - pygame.math.Vector2(new_rect.center)
+            self.selected_stone.rect = new_rect.move(offset)
 
     def releasing_stone(self):
         if not self.selected_stone:
