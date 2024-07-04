@@ -74,7 +74,7 @@ class StoneInventory:
         self.magic_stones = []
         for index, (stone_name, stone_attributes) in enumerate(entities.stone_types.items()):
             stone = MagicStone(stone_name, stone_attributes["rarity"], stone_attributes["image_name"],
-                               self.x + self.width / 2 - 30 / 2, self.y + 20 + (45 * index), 30, 30)
+                               self.x + self.width / 2 - 40 / 2, self.y + 20 + (60 * index), 40, 40)
             for stone_type, amount in entities.player_inv.items():
                 if stone_name == stone_type:
                     stone.ammount = amount
@@ -89,7 +89,7 @@ class StoneInventory:
         self.stone_move_acceleration = 10
         self.stone_move_acceleration_increment = 0.2
         self.stone_move_acceleration_multiplier = 0.90
-        self.damping_factor = 0.90  # Damping factor to simulate deceleration
+        self.damping_factor = 0.78  # Damping factor to simulate deceleration
         self.angle = 0
 
         # stone fall movement variables
@@ -251,7 +251,7 @@ class StoneInventory:
                 direction = direction.normalize()
 
             # Apply acceleration based on the distance with a cap
-            max_acceleration = 0.01 * distance  # Adjust this value to control acceleration strength
+            max_acceleration = 0.06 * distance  # Adjust this value to control acceleration strength
             acceleration = direction * min(self.stone_move_acceleration_increment * distance, max_acceleration)
 
             # Update velocity with applied acceleration
