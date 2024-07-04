@@ -34,8 +34,8 @@ class MagicStone:
         self.stone_ammount_font = pygame.font.Font(None, 32)
         self.font_render = self.stone_ammount_font.render(f"{self.ammount}X", True, (0, 0, 0))
 
-    def draw(self, canvas):
-        canvas.blit(self.image, self.rect.topleft)
+    def draw(self, screen):
+        screen.blit(self.image, self.rect.topleft)
 
 
 class StoneInventory:

@@ -93,6 +93,9 @@ class SpellCrafting:
             # check if stone is selected and being moved, then draw that rect anywhere
             if stone == self.inv.selected_stone or stone == self.inv.falling_stone:
                 stone.draw(self.screen)
+                # # Blit the font rendered text on the stone
+                # font_position = (stone.rect.left, stone.rect.bottom - stone.font_render.get_height())
+                # self.screen.blit(stone.font_render, font_position)
                 continue
 
             # Calculate the intersection rectangle between the inventory and the stone rect
@@ -115,6 +118,31 @@ class SpellCrafting:
 
                 # Blit the result surface onto the screen
                 self.screen.blit(result_surface, intersection_rect.topleft)
+
+                # Calculate the position for the font
+                font_position = (stone.rect.right - 20, stone.rect.bottom - 10)
+
+                # Calculate the intersection rectangle for the font
+                font_intersection_rect = self.inv.rect.clip(pygame.Rect(font_position, stone.font_render.get_size()))
+
+                if font_intersection_rect.width > 0 and font_intersection_rect.height > 0:
+                    # Create a new surface to hold the visible part of the font
+                    font_result_surface = pygame.Surface((font_intersection_rect.width, font_intersection_rect.height),
+                                                         pygame.SRCALPHA)
+
+                    # Calculate the area of the font image to blit
+                    font_image_area = pygame.Rect(
+                        font_intersection_rect.x - font_position[0],
+                        font_intersection_rect.y - font_position[1],
+                        font_intersection_rect.width,
+                        font_intersection_rect.height
+                    )
+
+                    # Blit the part of the font image that is within the intersection rectangle
+                    font_result_surface.blit(stone.font_render, (0, 0), font_image_area)
+
+                    # Blit the font result surface onto the screen
+                    self.screen.blit(font_result_surface, font_intersection_rect.topleft)
 
     def draw_mortar(self):
         self.mortar.draw(self.screen)
