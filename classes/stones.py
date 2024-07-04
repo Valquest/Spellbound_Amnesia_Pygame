@@ -287,6 +287,8 @@ class StoneInventory:
         if self.selected_stone:
             # Calculate the pivot point (middle of the stone's top and center positions)
             stone_rect = self.selected_stone.rect
+            print(f"stone_rect.top: {stone_rect.top}")
+            print(f"stone_rect.height: {stone_rect.height}")
             pivot_point = (stone_rect.centerx, stone_rect.top + stone_rect.height // 1.85)
 
             # Calculate angular velocity based on stone's velocity
@@ -333,14 +335,21 @@ class StoneInventory:
             print(f"Total ingredients: {mortar.ingredients}")
             self.falling_stone.rect.x = self.falling_stone.x
             self.falling_stone.rect.y = self.falling_stone.y
-            self.falling_stone = None
             self.stone_fall_velocity = 0
+            self.rotation_angle_velocity = 0
+            self.angle = 0
+            self.falling_stone.image = pygame.transform.rotate(self.falling_stone.original_image, self.angle)
+            self.falling_stone = None
             return
         if self.falling_stone.rect.y > constants.WINDOW_HEIGHT:
             self.falling_stone.rect.x = self.falling_stone.x
             self.falling_stone.rect.y = self.falling_stone.y
-            self.falling_stone = None
             self.stone_fall_velocity = 0
+            self.rotation_angle_velocity = 0
+            self.angle = 0
+            self.falling_stone.image = pygame.transform.rotate(self.falling_stone.original_image, self.angle)
+            self.falling_stone = None
+
 
     @staticmethod
     def get_mouse_speed(event_rel):
