@@ -84,55 +84,55 @@ card_types = {
 stone_types = {
     "Stone1": {
         "rarity": 0.99,
-        "image_name": ""
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
     },
     "Stone2": {
         "rarity": 0.89,
-        "image_name": ""
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
     },
     "Stone3": {
         "rarity": 0.79,
-        "image_name": ""
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
     },
     "Stone4": {
         "rarity": 0.69,
-        "image_name": ""
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
     },
     "Stone5": {
         "rarity": 0.59,
-        "image_name": ""
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
     },
     "Stone6": {
         "rarity": 0.49,
-        "image_name": ""
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
     },
     "Stone7": {
         "rarity": 0.39,
-        "image_name": ""
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
     },
     "Stone8": {
         "rarity": 0.29,
-        "image_name": ""
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
     },
     "Stone9": {
         "rarity": 0.19,
-        "image_name": ""
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
     },
     "Stone10": {
         "rarity": 0.18,
-        "image_name": ""
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
     },
     "Stone11": {
         "rarity": 0.17,
-        "image_name": ""
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
     },
     "Stone12": {
         "rarity": 0.16,
-        "image_name": ""
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
     },
     "Stone13": {
         "rarity": 0.15,
-        "image_name": ""
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
     }
 
 }

@@ -32,14 +32,14 @@ class Game:
         # starting state is set to be home
         self.current_state = "HomeBase"
 
-        # initializing other game elements
-        self.init_images()
-
         # core class instances created
         self.battle = battle_state.Battle(self, self.screen)
         self.main_menu = mainmenu_state.MainMenu()
         self.home_base = homebase_state.HomeBase(self, self.screen)
         self.spell_crafting = spellcrafting_state.SpellCrafting(self, self.screen)
+
+        # initializing other game elements
+        self.init_images()
 
     def run(self) -> None:
         """
@@ -121,9 +121,5 @@ class Game:
     def init_images(self) -> None:
         from classes import stones
         # Load the shared image once Pygame is initialized
-        try:
-            stones.MagicStone.shared_image = pygame.image.load(
-                stones.MagicStone.image_path).convert_alpha()
-            print(f"Image loaded successfully: {stones.MagicStone.image_path}")
-        except pygame.error as e:
-            print(f"Failed to load image: {e}")
+        for image in self.spell_crafting.inv.inv_images:
+            image = pygame.image.load(image).convert_alpha()

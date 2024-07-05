@@ -6,15 +6,15 @@ from variables import constants
 
 class MagicStone:
     # Load the shared image once for all instances
-    image_path = r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
+    # image_path = r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
     shared_image = None
 
-    def __init__(self, stone_type, rarity, image_name, x_pos, y_pos, width, height):
+    def __init__(self, stone_type, rarity, image_path, x_pos, y_pos, width, height):
         # CORE VARIABLES
         # stone variables
         self.stone_type = stone_type
         self.rarity = rarity
-        self.image_name = image_name
+        self.image_path = image_path
         self.ammount = 0
 
         # rectangle variables
@@ -72,8 +72,13 @@ class StoneInventory:
 
         # magic stone variables
         self.magic_stones = []
+
+        # images to load
+        self.inv_images = []
+
         for index, (stone_name, stone_attributes) in enumerate(entities.stone_types.items()):
-            stone = MagicStone(stone_name, stone_attributes["rarity"], stone_attributes["image_name"],
+            self.inv_images.append(stone_attributes["image_path"])
+            stone = MagicStone(stone_name, stone_attributes["rarity"], stone_attributes["image_path"],
                                self.x + self.width / 2 - 40 / 2, self.y + 20 + (60 * index), 40, 40)
             for stone_type, amount in entities.player_inv.items():
                 if stone_name == stone_type:
