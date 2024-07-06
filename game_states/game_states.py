@@ -38,9 +38,6 @@ class Game:
         self.home_base = homebase_state.HomeBase(self, self.screen)
         self.spell_crafting = spellcrafting_state.SpellCrafting(self, self.screen)
 
-        # initializing other game elements
-        self.init_images()
-
     def run(self) -> None:
         """
         Runs all the other functions needed for a pygame visual management.
@@ -117,9 +114,3 @@ class Game:
         :return: None
         """
         self.current_state = state
-
-    def init_images(self) -> None:
-        from classes import stones
-        # Load the shared image once Pygame is initialized
-        for image in self.spell_crafting.inv.inv_images:
-            image = pygame.image.load(image).convert_alpha()
