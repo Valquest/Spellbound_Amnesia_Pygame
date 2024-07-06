@@ -91,7 +91,7 @@ class SpellCrafting:
         # Draw only the parts of the circles that are within the display rectangle
         for stone in self.inv.magic_stones:
             # Check if stone is selected and being moved, then draw that circle anywhere
-            if stone == self.inv.selected_stone or stone == self.inv.falling_stone:
+            if stone in self.inv.selected_stones or any(falling_stone[0] == stone for falling_stone in self.inv.falling_stones):
                 stone.draw(self.screen)
                 continue
 

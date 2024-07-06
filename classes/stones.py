@@ -79,8 +79,8 @@ class StoneInventory:
             self.magic_stones.append(stone)
 
         # stone movement variables
-        self.selected_stone = None
-        self.falling_stone = None
+        self.selected_stones = []
+        self.falling_stones = []
         self.mouse_speed = 0
         self.stone_move_velocity = pygame.math.Vector2(0, 0)
         self.stone_move_acceleration = 10
@@ -105,7 +105,7 @@ class StoneInventory:
 
     def apply_scroll_velocity(self):
         # check if any items are selected or falling, if yes, exit function
-        if self.falling_stone or self.selected_stone:
+        if self.falling_stones or self.selected_stones:
             return
         # Ensure scrolling does not exceed hard limits
         if (self.scroll_velocity > 0 and self.magic_stones[0].center[1] - self.magic_stones[
@@ -161,7 +161,7 @@ class StoneInventory:
 
     def check_spring_back_activation(self):
         # Check if any items are selected or falling, if yes, exit function
-        if self.falling_stone or self.selected_stone:
+        if self.falling_stones or self.selected_stones:
             return
         if not self.spring_back_active:
             if self.magic_stones[0].center[1] - self.magic_stones[0].radius > self.rect.top + self.padding:
@@ -175,7 +175,7 @@ class StoneInventory:
 
     def apply_spring_back(self):
         # check if any items are selected or falling, if yes, exit function
-        if self.falling_stone or self.selected_stone:
+        if self.falling_stones or self.selected_stones:
             return
         if self.spring_back_active:
             spring_back_factor = 1 + abs(self.target_offset) / self.max_scroll_offset
@@ -224,27 +224,25 @@ class StoneInventory:
 
     def select_stone(self) -> None:
         """
-        Assigns a stone to stone_in_motion variable when player selects a stone with mouse
+        Assigns a stone to the selected_stones list when the player selects a stone with the mouse.
         :return: None
         """
-        if self.falling_stone:
-            return
         mouse_pos = pygame.mouse.get_pos()
         for stone in self.magic_stones:
             distance = pygame.math.Vector2(mouse_pos).distance_to(pygame.math.Vector2(stone.center))
-            if distance <= stone.radius:
-                self.selected_stone = stone
+            if distance <= stone.radius and stone not in self.selected_stones:
+                self.selected_stones.append(stone)
                 break
         # set scroll velocity to 0 to prevent bug where scrolling happens on item return to inv
         self.scroll_velocity = 0
 
     def move_stone(self) -> None:
-        if self.selected_stone:
+        for stone in self.selected_stones:
             mouse_pos = pygame.mouse.get_pos()
-            stone_center = self.selected_stone.center
+            stone_center = stone.center
 
             # Define the offset above the center
-            offset = self.selected_stone.radius // self.offset
+            offset = stone.radius // self.offset
 
             # Calculate the pivot point above the center of the stone
             pivot_point = pygame.math.Vector2(stone_center[0], stone_center[1] - offset)
@@ -271,7 +269,7 @@ class StoneInventory:
 
             # Apply the velocity to the stone's position
             stone_center = (stone_center[0] + self.stone_move_velocity.x, stone_center[1] + self.stone_move_velocity.y)
-            self.selected_stone.center = stone_center
+            stone.center = stone_center
 
             # Smooth stopping near the mouse position
             stop_threshold = 5  # Increased threshold for smoother stopping
@@ -282,101 +280,92 @@ class StoneInventory:
                     self.stone_move_velocity = pygame.math.Vector2(0, 0)
                     # Set stone_center directly to mouse_pos adjusted by offset when close enough
                     stone_center = (mouse_pos[0], mouse_pos[1] + offset)
-                    self.selected_stone.center = stone_center
+                    stone.center = stone_center
 
             # Call the rotation function with the current mouse position
-            self.rotate_stone(mouse_pos)
+            self.rotate_stone(stone, mouse_pos)
 
-    def rotate_stone(self, mouse_pos) -> None:
+    def rotate_stone(self, stone, mouse_pos) -> None:
         """
         Rotates the selected stone based on its velocity and mouse movement.
+        :param stone: The stone to rotate.
         :param mouse_pos: Current position of the mouse.
         :return: None
         """
-        if self.selected_stone:
-            stone_center = self.selected_stone.center
+        stone_center = stone.center
 
-            # Calculate the direction of mouse movement
-            direction = pygame.math.Vector2(mouse_pos) - pygame.math.Vector2(stone_center)
+        # Calculate the direction of mouse movement
+        direction = pygame.math.Vector2(mouse_pos) - pygame.math.Vector2(stone_center)
 
-            # Calculate angular force based on mouse movement
-            angular_force = direction.length() * 0.035  # Increase the multiplier for more sensitivity
+        # Calculate angular force based on mouse movement
+        angular_force = direction.length() * 0.035  # Increase the multiplier for more sensitivity
 
-            # Determine the direction of the applied force
-            if direction.x < 0:
-                self.rotation_angle_velocity += angular_force
-            else:
-                self.rotation_angle_velocity -= angular_force
+        # Determine the direction of the applied force
+        if direction.x < 0:
+            self.rotation_angle_velocity += angular_force
+        else:
+            self.rotation_angle_velocity -= angular_force
 
-            # Apply stronger damping to simulate friction and ensure stopping
-            self.rotation_angle_velocity *= 0.92  # Increase this value for stronger damping
+        # Apply stronger damping to simulate friction and ensure stopping
+        self.rotation_angle_velocity *= 0.92  # Increase this value for stronger damping
 
-            # Update the angle based on angular velocity
-            self.angle += self.rotation_angle_velocity
-
-            # Apply pendulum-like damping to swing back to original position
-            self.rotation_angle_velocity -= self.angle * 0.05  # Adjust the damping factor as needed
-
-            # Rotate the stone's image around its center
-            self.selected_stone.image = pygame.transform.rotate(self.selected_stone.original_image, self.angle)
-            new_rect = self.selected_stone.image.get_rect(center=stone_center)
-
-            # Update the stone's rect based on the new rect position
-            self.selected_stone.rect = new_rect
-
-            # Ensure the rect is updated correctly
-            self.selected_stone.rect.center = stone_center
-
-    def releasing_stone(self):
-        if not self.selected_stone:
-            return
-        self.falling_stone, self.selected_stone = self.selected_stone, None
-        # Retain the rotational and movement velocity when releasing the stone
-        self.falling_stone_velocity = self.stone_move_velocity
-
-    def stone_fall(self, mortar):
-        if not self.falling_stone:
-            return
-
-        # Apply gravity towards the bottom of the screen
-        gravity = pygame.math.Vector2(0, 0.5)  # Adjust the gravity value as needed
-        self.falling_stone_velocity += gravity
-
-        # Update the falling stone's position based on its velocity
-        self.falling_stone.center = (self.falling_stone.center[0] + self.falling_stone_velocity.x,
-                                     self.falling_stone.center[1] + self.falling_stone_velocity.y)
-        self.falling_stone.rect.center = self.falling_stone.center
-
-        # Update rotation based on retained angular velocity
+        # Update the angle based on angular velocity
         self.angle += self.rotation_angle_velocity
-        self.rotation_angle_velocity *= 0.98  # Apply some damping to the rotational velocity
+
+        # Apply pendulum-like damping to swing back to original position
+        self.rotation_angle_velocity -= self.angle * 0.05  # Adjust the damping factor as needed
 
         # Rotate the stone's image around its center
-        self.falling_stone.image = pygame.transform.rotate(self.falling_stone.original_image, self.angle)
-        new_rect = self.falling_stone.image.get_rect(center=self.falling_stone.center)
-        self.falling_stone.rect = new_rect
+        stone.image = pygame.transform.rotate(stone.original_image, self.angle)
+        new_rect = stone.image.get_rect(center=stone_center)
 
-        self.stone_reset(mortar)
+        # Update the stone's rect based on the new rect position
+        stone.rect = new_rect
 
-    def stone_reset(self, mortar):
-        if (mortar.rect.x < self.falling_stone.center[0] < mortar.rect.x + mortar.width and
-                self.falling_stone.center[1] - self.falling_stone.radius > mortar.rect.y):
-            mortar.ingredients.append(self.falling_stone)
-            print(f"Total ingredients: {mortar.ingredients}")
-            self.falling_stone.center = (self.falling_stone.x, self.falling_stone.y)
-            self.stone_fall_velocity = 0
-            self.rotation_angle_velocity = 0
-            self.angle = 0
-            self.falling_stone.image = pygame.transform.rotate(self.falling_stone.original_image, self.angle)
-            self.falling_stone = None
+        # Ensure the rect is updated correctly
+        stone.rect.center = stone_center
+
+    def releasing_stone(self):
+        if not self.selected_stones:
             return
-        if self.falling_stone.center[1] - self.falling_stone.radius > constants.WINDOW_HEIGHT:
-            self.falling_stone.center = (self.falling_stone.x, self.falling_stone.y)
-            self.stone_fall_velocity = 0
-            self.rotation_angle_velocity = 0
-            self.angle = 0
-            self.falling_stone.image = pygame.transform.rotate(self.falling_stone.original_image, self.angle)
-            self.falling_stone = None
+        for stone in self.selected_stones:
+            self.falling_stones.append((stone, self.stone_move_velocity, self.rotation_angle_velocity))
+        self.selected_stones.clear()
+
+    def stone_fall(self, mortar):
+        for stone, velocity, rotation_velocity in self.falling_stones:
+            # Apply gravity towards the bottom of the screen
+            gravity = pygame.math.Vector2(0, 0.5)  # Adjust the gravity value as needed
+            velocity += gravity
+
+            # Update the falling stone's position based on its velocity
+            stone.center = (stone.center[0] + velocity.x, stone.center[1] + velocity.y)
+            stone.rect.center = stone.center
+
+            # Update rotation based on retained angular velocity
+            self.angle += rotation_velocity
+            rotation_velocity *= 0.98  # Apply some damping to the rotational velocity
+
+            # Rotate the stone's image around its center
+            stone.image = pygame.transform.rotate(stone.original_image, self.angle)
+            new_rect = stone.image.get_rect(center=stone.center)
+            stone.rect = new_rect
+
+        self.falling_stones = [(stone, velocity, rotation_velocity) for stone, velocity, rotation_velocity in
+                               self.falling_stones if not self.stone_reset(stone, mortar)]
+
+    @staticmethod
+    def stone_reset(stone, mortar):
+        if (mortar.rect.x < stone.center[0] < mortar.rect.x + mortar.width and
+                stone.center[1] - stone.radius > mortar.rect.y):
+            mortar.ingredients.append(stone)
+            print(f"Total ingredients: {mortar.ingredients}")
+            stone.center = (stone.x, stone.y)
+            return True
+        if stone.center[1] - stone.radius > constants.WINDOW_HEIGHT:
+            stone.center = (stone.x, stone.y)
+            return True
+        return False
 
     @staticmethod
     def get_mouse_speed(event_rel):
