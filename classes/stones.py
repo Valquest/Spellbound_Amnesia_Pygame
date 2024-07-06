@@ -25,13 +25,14 @@ class MagicStone:
         original_image = pygame.transform.scale(pygame.image.load(self.image_path), (2 * self.radius, 2 * self.radius))
         self.original_image = original_image
         self.image = self.original_image
+        self.rect = self.image.get_rect(center=self.center)
 
         # inv ammount of stones variables
         self.stone_ammount_font = pygame.font.Font(None, 32)
         self.font_render = self.stone_ammount_font.render(f"{self.ammount}X", True, (0, 0, 0))
 
     def draw(self, screen):
-        screen.blit(self.image, (self.center[0] - self.radius, self.center[1] - self.radius))
+        screen.blit(self.image, self.rect.topleft)
 
 
 class StoneInventory:
@@ -70,7 +71,7 @@ class StoneInventory:
 
         for index, (stone_name, stone_attributes) in enumerate(entities.stone_types.items()):
             stone = MagicStone(stone_name, stone_attributes["rarity"], stone_attributes["image_path"],
-                               self.x + self.width / 2, self.y + 20 + (60 * index), 20)
+                               self.x + self.width / 2, self.y + 40 + (60 * index), 20)
             for stone_type, amount in entities.player_inv.items():
                 if stone_name == stone_type:
                     stone.ammount = amount
@@ -272,13 +273,9 @@ class StoneInventory:
             stone_center = (stone_center[0] + self.stone_move_velocity.x, stone_center[1] + self.stone_move_velocity.y)
             self.selected_stone.center = stone_center
 
-            # Recalculate the pivot point after moving
-            pivot_point = pygame.math.Vector2(stone_center[0], stone_center[1] - offset)
-
-            # Stop threshold for smooth stopping near the mouse
+            # Smooth stopping near the mouse position
             stop_threshold = 5  # Increased threshold for smoother stopping
 
-            # Smooth stopping near the mouse position
             if distance < stop_threshold:
                 self.stone_move_velocity *= 0.5  # Faster deceleration the closer the item is
                 if self.stone_move_velocity.length() < 0.1:
@@ -287,26 +284,32 @@ class StoneInventory:
                     stone_center = (mouse_pos[0], mouse_pos[1] + offset)
                     self.selected_stone.center = stone_center
 
-            # Call the rotation function
-            self.rotate_stone(stone_center)
+            # Call the rotation function with the current mouse position
+            self.rotate_stone(mouse_pos)
 
-    def rotate_stone(self, pivot_point) -> None:
+    def rotate_stone(self, mouse_pos) -> None:
         """
-        Rotates the selected stone based on its velocity.
+        Rotates the selected stone based on its velocity and mouse movement.
+        :param mouse_pos: Current position of the mouse.
         :return: None
         """
         if self.selected_stone:
-            # Calculate angular velocity based on stone's velocity
-            angular_velocity = self.stone_move_velocity.length() * 0.5  # Adjust the multiplier as needed
+            stone_center = self.selected_stone.center
 
-            # Determine the direction of rotation based on mouse movement (inverted for more intuitive rotation)
-            if self.stone_move_velocity.x < 0:
-                self.rotation_angle_velocity += angular_velocity
+            # Calculate the direction of mouse movement
+            direction = pygame.math.Vector2(mouse_pos) - pygame.math.Vector2(stone_center)
+
+            # Calculate angular force based on mouse movement
+            angular_force = direction.length() * 0.001  # Adjust the multiplier for sensitivity
+
+            # Determine the direction of the applied force
+            if direction.x < 0:
+                self.rotation_angle_velocity += angular_force
             else:
-                self.rotation_angle_velocity -= angular_velocity
+                self.rotation_angle_velocity -= angular_force
 
-            # Apply damping to the angular velocity
-            self.rotation_angle_velocity *= self.damping_factor
+            # Apply stronger damping to simulate friction and ensure stopping
+            self.rotation_angle_velocity *= 0.95  # Increase this value for stronger damping
 
             # Update the angle based on angular velocity
             self.angle += self.rotation_angle_velocity
@@ -314,12 +317,15 @@ class StoneInventory:
             # Apply pendulum-like damping to swing back to original position
             self.rotation_angle_velocity -= self.angle * 0.01  # Adjust the damping factor as needed
 
-            # Rotate the stone's image around the fixed pivot point
+            # Rotate the stone's image around its center
             self.selected_stone.image = pygame.transform.rotate(self.selected_stone.original_image, self.angle)
-            new_rect = self.selected_stone.image.get_rect(center=pivot_point)
+            new_rect = self.selected_stone.image.get_rect(center=stone_center)
 
-            # Update the stone's center based on the new rect position
-            self.selected_stone.center = new_rect.center
+            # Update the stone's rect based on the new rect position
+            self.selected_stone.rect = new_rect
+
+            # Ensure the rect is updated correctly
+            self.selected_stone.rect.center = stone_center
 
     def releasing_stone(self):
         if not self.selected_stone:
@@ -333,6 +339,7 @@ class StoneInventory:
             self.stone_fall_velocity += self.fall_acceleration_increment * self.fall_acceleration_multiplier
         self.falling_stone.center = (self.falling_stone.center[0],
                                      self.falling_stone.center[1] + self.stone_fall_velocity)
+        self.falling_stone.rect.center = self.falling_stone.center
         self.stone_reset(mortar)
 
     def stone_reset(self, mortar):
