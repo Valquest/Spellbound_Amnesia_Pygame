@@ -31,8 +31,21 @@ class MagicStone:
         self.stone_ammount_font = pygame.font.Font(None, 32)
         self.font_render = self.stone_ammount_font.render(f"{self.ammount}X", True, (0, 0, 0))
 
+        # Movement and rotation variables
+        self.velocity = pygame.math.Vector2(0, 0)
+        self.rotation_angle_velocity = 0
+        self.angle = 0
+
     def draw(self, screen):
         screen.blit(self.image, self.rect.topleft)
+
+    def reset_position_and_rotation(self):
+        self.center = (self.x, self.y)
+        self.velocity = pygame.math.Vector2(0, 0)
+        self.rotation_angle_velocity = 0
+        self.angle = 0
+        self.image = pygame.transform.rotate(self.original_image, self.angle)
+        self.rect = self.image.get_rect(center=self.center)
 
 
 class StoneInventory:
@@ -233,7 +246,6 @@ class StoneInventory:
             if distance <= stone.radius and stone not in self.selected_stones:
                 self.selected_stones.append(stone)
                 break
-        # set scroll velocity to 0 to prevent bug where scrolling happens on item return to inv
         self.scroll_velocity = 0
 
     def move_stone(self) -> None:
@@ -241,113 +253,71 @@ class StoneInventory:
             mouse_pos = pygame.mouse.get_pos()
             stone_center = stone.center
 
-            # Define the offset above the center
             offset = stone.radius // self.offset
-
-            # Calculate the pivot point above the center of the stone
             pivot_point = pygame.math.Vector2(stone_center[0], stone_center[1] - offset)
-
-            # Calculate the direction vector towards the mouse position
             direction = pygame.math.Vector2(mouse_pos) - pivot_point
-
-            # Calculate the distance to the mouse position
             distance = direction.length()
 
-            # Normalize the direction vector
             if distance > 0:
                 direction = direction.normalize()
 
-            # Apply acceleration based on the distance with a cap
-            max_acceleration = 0.06 * distance  # Adjust this value to control acceleration strength
+            max_acceleration = 0.06 * distance
             acceleration = direction * min(self.stone_move_acceleration_increment * distance, max_acceleration)
+            stone.velocity += acceleration
+            stone.velocity *= self.damping_factor
 
-            # Update velocity with applied acceleration
-            self.stone_move_velocity += acceleration
-
-            # Apply damping to simulate deceleration
-            self.stone_move_velocity *= self.damping_factor
-
-            # Apply the velocity to the stone's position
-            stone_center = (stone_center[0] + self.stone_move_velocity.x, stone_center[1] + self.stone_move_velocity.y)
+            stone_center = (stone_center[0] + stone.velocity.x, stone_center[1] + stone.velocity.y)
             stone.center = stone_center
 
-            # Smooth stopping near the mouse position
-            stop_threshold = 5  # Increased threshold for smoother stopping
-
+            stop_threshold = 5
             if distance < stop_threshold:
-                self.stone_move_velocity *= 0.5  # Faster deceleration the closer the item is
-                if self.stone_move_velocity.length() < 0.1:
-                    self.stone_move_velocity = pygame.math.Vector2(0, 0)
-                    # Set stone_center directly to mouse_pos adjusted by offset when close enough
+                stone.velocity *= 0.5
+                if stone.velocity.length() < 0.1:
+                    stone.velocity = pygame.math.Vector2(0, 0)
                     stone_center = (mouse_pos[0], mouse_pos[1] + offset)
                     stone.center = stone_center
 
-            # Call the rotation function with the current mouse position
             self.rotate_stone(stone, mouse_pos)
 
-    def rotate_stone(self, stone, mouse_pos) -> None:
-        """
-        Rotates the selected stone based on its velocity and mouse movement.
-        :param stone: The stone to rotate.
-        :param mouse_pos: Current position of the mouse.
-        :return: None
-        """
+    @staticmethod
+    def rotate_stone(stone, mouse_pos) -> None:
         stone_center = stone.center
-
-        # Calculate the direction of mouse movement
         direction = pygame.math.Vector2(mouse_pos) - pygame.math.Vector2(stone_center)
+        angular_force = direction.length() * 0.035
 
-        # Calculate angular force based on mouse movement
-        angular_force = direction.length() * 0.035  # Increase the multiplier for more sensitivity
-
-        # Determine the direction of the applied force
         if direction.x < 0:
-            self.rotation_angle_velocity += angular_force
+            stone.rotation_angle_velocity += angular_force
         else:
-            self.rotation_angle_velocity -= angular_force
+            stone.rotation_angle_velocity -= angular_force
 
-        # Apply stronger damping to simulate friction and ensure stopping
-        self.rotation_angle_velocity *= 0.92  # Increase this value for stronger damping
+        stone.rotation_angle_velocity *= 0.92
+        stone.angle += stone.rotation_angle_velocity
+        stone.rotation_angle_velocity -= stone.angle * 0.05
 
-        # Update the angle based on angular velocity
-        self.angle += self.rotation_angle_velocity
-
-        # Apply pendulum-like damping to swing back to original position
-        self.rotation_angle_velocity -= self.angle * 0.05  # Adjust the damping factor as needed
-
-        # Rotate the stone's image around its center
-        stone.image = pygame.transform.rotate(stone.original_image, self.angle)
+        stone.image = pygame.transform.rotate(stone.original_image, stone.angle)
         new_rect = stone.image.get_rect(center=stone_center)
-
-        # Update the stone's rect based on the new rect position
         stone.rect = new_rect
-
-        # Ensure the rect is updated correctly
         stone.rect.center = stone_center
 
     def releasing_stone(self):
         if not self.selected_stones:
             return
         for stone in self.selected_stones:
-            self.falling_stones.append((stone, self.stone_move_velocity, self.rotation_angle_velocity))
+            self.falling_stones.append((stone, stone.velocity, stone.rotation_angle_velocity))
         self.selected_stones.clear()
 
     def stone_fall(self, mortar):
         for stone, velocity, rotation_velocity in self.falling_stones:
-            # Apply gravity towards the bottom of the screen
-            gravity = pygame.math.Vector2(0, 0.5)  # Adjust the gravity value as needed
+            gravity = pygame.math.Vector2(0, 0.5)
             velocity += gravity
 
-            # Update the falling stone's position based on its velocity
             stone.center = (stone.center[0] + velocity.x, stone.center[1] + velocity.y)
             stone.rect.center = stone.center
 
-            # Update rotation based on retained angular velocity
-            self.angle += rotation_velocity
-            rotation_velocity *= 0.98  # Apply some damping to the rotational velocity
+            stone.angle += rotation_velocity
+            rotation_velocity *= 0.98
 
-            # Rotate the stone's image around its center
-            stone.image = pygame.transform.rotate(stone.original_image, self.angle)
+            stone.image = pygame.transform.rotate(stone.original_image, stone.angle)
             new_rect = stone.image.get_rect(center=stone.center)
             stone.rect = new_rect
 
@@ -360,14 +330,10 @@ class StoneInventory:
                 stone.center[1] - stone.radius > mortar.rect.y):
             mortar.ingredients.append(stone)
             print(f"Total ingredients: {mortar.ingredients}")
-            stone.center = (stone.x, stone.y)
-            stone.image = pygame.transform.rotate(stone.original_image, 0)  # Reset the rotation to upright position
-            stone.rect = stone.image.get_rect(center=stone.center)  # Update rect to match new image
+            stone.reset_position_and_rotation()
             return True
         if stone.center[1] - stone.radius > constants.WINDOW_HEIGHT:
-            stone.center = (stone.x, stone.y)
-            stone.image = pygame.transform.rotate(stone.original_image, 0)  # Reset the rotation to upright position
-            stone.rect = stone.image.get_rect(center=stone.center)  # Update rect to match new image
+            stone.reset_position_and_rotation()
             return True
         return False
 
