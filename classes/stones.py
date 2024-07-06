@@ -238,7 +238,6 @@ class StoneInventory:
         self.scroll_velocity = 0
 
     def move_stone(self) -> None:
-        # Adjusting only the position setting part
         if self.selected_stone:
             mouse_pos = pygame.mouse.get_pos()
             stone_center = self.selected_stone.center
@@ -246,11 +245,11 @@ class StoneInventory:
             # Define the offset above the center
             offset = self.selected_stone.radius // self.offset
 
-            # Calculate the initial pivot point above the center of the stone
-            initial_pivot_point = pygame.math.Vector2(stone_center[0], stone_center[1] - offset)
+            # Calculate the pivot point above the center of the stone
+            pivot_point = pygame.math.Vector2(stone_center[0], stone_center[1] - offset)
 
             # Calculate the direction vector towards the mouse position
-            direction = pygame.math.Vector2(mouse_pos) - initial_pivot_point
+            direction = pygame.math.Vector2(mouse_pos) - pivot_point
 
             # Calculate the distance to the mouse position
             distance = direction.length()
@@ -274,25 +273,24 @@ class StoneInventory:
             self.selected_stone.center = stone_center
 
             # Recalculate the pivot point after moving
-            final_pivot_point = pygame.math.Vector2(stone_center[0], stone_center[1] - offset)
+            pivot_point = pygame.math.Vector2(stone_center[0], stone_center[1] - offset)
 
             # Stop threshold for smooth stopping near the mouse
-            stop_threshold = 2  # Increase threshold for smoother stopping
+            stop_threshold = 5  # Increased threshold for smoother stopping
 
             # Smooth stopping near the mouse position
             if distance < stop_threshold:
                 self.stone_move_velocity *= 0.5  # Faster deceleration the closer the item is
                 if self.stone_move_velocity.length() < 0.1:
                     self.stone_move_velocity = pygame.math.Vector2(0, 0)
-                    # Do not set stone_rect.center to mouse_pos directly
-                    stone_center = (stone_center[0] + direction.x * stop_threshold,
-                                    stone_center[1] + direction.y * stop_threshold)
+                    # Set stone_center directly to mouse_pos adjusted by offset when close enough
+                    stone_center = (mouse_pos[0], mouse_pos[1] + offset)
                     self.selected_stone.center = stone_center
 
             # Call the rotation function
-            # self.rotate_stone(stone_center)
+            self.rotate_stone(stone_center)
 
-    def rotate_stone(self, stone_center) -> None:
+    def rotate_stone(self, pivot_point) -> None:
         """
         Rotates the selected stone based on its velocity.
         :return: None
@@ -316,15 +314,12 @@ class StoneInventory:
             # Apply pendulum-like damping to swing back to original position
             self.rotation_angle_velocity -= self.angle * 0.01  # Adjust the damping factor as needed
 
-            # Rotate the stone's image around its center
+            # Rotate the stone's image around the fixed pivot point
             self.selected_stone.image = pygame.transform.rotate(self.selected_stone.original_image, self.angle)
-            new_rect = self.selected_stone.image.get_rect(center=stone_center)
+            new_rect = self.selected_stone.image.get_rect(center=pivot_point)
 
-            # Adjust the stone's rect to reflect the new rotated position
-            self.selected_stone.rect = new_rect
-
-            # Ensure the rect is updated correctly
-            self.selected_stone.rect.center = new_rect.center
+            # Update the stone's center based on the new rect position
+            self.selected_stone.center = new_rect.center
 
     def releasing_stone(self):
         if not self.selected_stone:
