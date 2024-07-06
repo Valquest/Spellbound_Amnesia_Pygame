@@ -36,11 +36,14 @@ class MagicStone:
         self.rotation_angle_velocity = 0
         self.angle = 0
 
+        # Position where the stone was picked up
+        self.pickup_position = (self.x, self.y)
+
     def draw(self, screen):
         screen.blit(self.image, self.rect.topleft)
 
     def reset_position_and_rotation(self):
-        self.center = (self.x, self.y)
+        self.center = self.pickup_position
         self.velocity = pygame.math.Vector2(0, 0)
         self.rotation_angle_velocity = 0
         self.angle = 0
@@ -246,6 +249,7 @@ class StoneInventory:
         for stone in self.magic_stones:
             distance = pygame.math.Vector2(mouse_pos).distance_to(pygame.math.Vector2(stone.center))
             if distance <= stone.radius * selection_radius_multiplier and stone not in self.selected_stones:
+                stone.pickup_position = stone.center  # Record the pickup position
                 self.selected_stones.append(stone)
                 break
         self.scroll_velocity = 0
