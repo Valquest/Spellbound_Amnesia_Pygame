@@ -361,9 +361,13 @@ class StoneInventory:
             mortar.ingredients.append(stone)
             print(f"Total ingredients: {mortar.ingredients}")
             stone.center = (stone.x, stone.y)
+            stone.image = pygame.transform.rotate(stone.original_image, 0)  # Reset the rotation to upright position
+            stone.rect = stone.image.get_rect(center=stone.center)  # Update rect to match new image
             return True
         if stone.center[1] - stone.radius > constants.WINDOW_HEIGHT:
             stone.center = (stone.x, stone.y)
+            stone.image = pygame.transform.rotate(stone.original_image, 0)  # Reset the rotation to upright position
+            stone.rect = stone.image.get_rect(center=stone.center)  # Update rect to match new image
             return True
         return False
 
