@@ -241,9 +241,11 @@ class StoneInventory:
         :return: None
         """
         mouse_pos = pygame.mouse.get_pos()
+        selection_radius_multiplier = 1.5  # Adjust this value to increase the selection area
+
         for stone in self.magic_stones:
             distance = pygame.math.Vector2(mouse_pos).distance_to(pygame.math.Vector2(stone.center))
-            if distance <= stone.radius and stone not in self.selected_stones:
+            if distance <= stone.radius * selection_radius_multiplier and stone not in self.selected_stones:
                 self.selected_stones.append(stone)
                 break
         self.scroll_velocity = 0
