@@ -331,15 +331,31 @@ class StoneInventory:
         if not self.selected_stone:
             return
         self.falling_stone, self.selected_stone = self.selected_stone, None
+        # Retain the rotational and movement velocity when releasing the stone
+        self.falling_stone_velocity = self.stone_move_velocity
 
     def stone_fall(self, mortar):
         if not self.falling_stone:
             return
-        if self.stone_fall_velocity <= self.fall_acceleration:
-            self.stone_fall_velocity += self.fall_acceleration_increment * self.fall_acceleration_multiplier
-        self.falling_stone.center = (self.falling_stone.center[0],
-                                     self.falling_stone.center[1] + self.stone_fall_velocity)
+
+        # Apply gravity towards the bottom of the screen
+        gravity = pygame.math.Vector2(0, 0.5)  # Adjust the gravity value as needed
+        self.falling_stone_velocity += gravity
+
+        # Update the falling stone's position based on its velocity
+        self.falling_stone.center = (self.falling_stone.center[0] + self.falling_stone_velocity.x,
+                                     self.falling_stone.center[1] + self.falling_stone_velocity.y)
         self.falling_stone.rect.center = self.falling_stone.center
+
+        # Update rotation based on retained angular velocity
+        self.angle += self.rotation_angle_velocity
+        self.rotation_angle_velocity *= 0.98  # Apply some damping to the rotational velocity
+
+        # Rotate the stone's image around its center
+        self.falling_stone.image = pygame.transform.rotate(self.falling_stone.original_image, self.angle)
+        new_rect = self.falling_stone.image.get_rect(center=self.falling_stone.center)
+        self.falling_stone.rect = new_rect
+
         self.stone_reset(mortar)
 
     def stone_reset(self, mortar):
