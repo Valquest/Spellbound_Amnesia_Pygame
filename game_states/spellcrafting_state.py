@@ -88,24 +88,26 @@ class SpellCrafting:
         :return: None
         """
         self.inv.draw(self.screen)
-        # Draw only the parts of the rectangles that are within the display rectangle
+        # Draw only the parts of the circles that are within the display rectangle
         for stone in self.inv.magic_stones:
-            # check if stone is selected and being moved, then draw that rect anywhere
+            # Check if stone is selected and being moved, then draw that circle anywhere
             if stone == self.inv.selected_stone or stone == self.inv.falling_stone:
                 stone.draw(self.screen)
                 continue
 
-            # Calculate the intersection rectangle between the inventory and the stone rect
-            intersection_rect = self.inv.rect.clip(stone.rect)
+            # Calculate the intersection rectangle between the inventory and the stone circle's bounding rect
+            stone_rect = pygame.Rect(stone.center[0] - stone.radius, stone.center[1] - stone.radius,
+                                     2 * stone.radius, 2 * stone.radius)
+            intersection_rect = self.inv.rect.clip(stone_rect)
 
             if intersection_rect.width > 0 and intersection_rect.height > 0:
-                # Create a new surface to hold the visible part of the rectangle
+                # Create a new surface to hold the visible part of the circle
                 result_surface = pygame.Surface((intersection_rect.width, intersection_rect.height), pygame.SRCALPHA)
 
                 # Calculate the area of the stone image to blit
                 stone_image_area = pygame.Rect(
-                    intersection_rect.x - stone.rect.x,
-                    intersection_rect.y - stone.rect.y,
+                    intersection_rect.x - stone_rect.x,
+                    intersection_rect.y - stone_rect.y,
                     intersection_rect.width,
                     intersection_rect.height
                 )
@@ -117,7 +119,7 @@ class SpellCrafting:
                 self.screen.blit(result_surface, intersection_rect.topleft)
 
                 # Calculate the position for the font
-                font_position = (stone.rect.right - 20, stone.rect.bottom - 10)
+                font_position = (stone.center[0] + stone.radius - 20, stone.center[1] + stone.radius - 10)
 
                 # Calculate the intersection rectangle for the font
                 font_intersection_rect = self.inv.rect.clip(pygame.Rect(font_position, stone.font_render.get_size()))

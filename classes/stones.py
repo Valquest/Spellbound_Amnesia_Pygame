@@ -5,7 +5,7 @@ from variables import constants
 
 
 class MagicStone:
-    def __init__(self, stone_type, rarity, image_path, x_pos, y_pos, width, height):
+    def __init__(self, stone_type, rarity, image_path, x_pos, y_pos, radius):
         # CORE VARIABLES
         # stone variables
         self.stone_type = stone_type
@@ -13,17 +13,17 @@ class MagicStone:
         self.image_path = image_path
         self.ammount = 0
 
-        # rectangle variables
+        # Circle variables
         self.x = x_pos
         self.y = y_pos
-        self.width = width
-        self.height = height
-        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.radius = radius
+        self.center = (self.x, self.y)
         self.rect_color = "White"
         self.scroll_y_pos = 0
 
         # Load the image for this specific stone
-        self.original_image = pygame.transform.scale(pygame.image.load(self.image_path), (self.width, self.height))
+        original_image = pygame.transform.scale(pygame.image.load(self.image_path), (2 * self.radius, 2 * self.radius))
+        self.original_image = original_image
         self.image = self.original_image
 
         # inv ammount of stones variables
@@ -31,12 +31,11 @@ class MagicStone:
         self.font_render = self.stone_ammount_font.render(f"{self.ammount}X", True, (0, 0, 0))
 
     def draw(self, screen):
-        screen.blit(self.image, self.rect.topleft)
+        screen.blit(self.image, (self.center[0] - self.radius, self.center[1] - self.radius))
 
 
 class StoneInventory:
     def __init__(self):
-
         # CORE VARIABLES
         # rect variables
         self.x = 50
@@ -71,7 +70,7 @@ class StoneInventory:
 
         for index, (stone_name, stone_attributes) in enumerate(entities.stone_types.items()):
             stone = MagicStone(stone_name, stone_attributes["rarity"], stone_attributes["image_path"],
-                               self.x + self.width / 2 - 40 / 2, self.y + 20 + (60 * index), 40, 40)
+                               self.x + self.width / 2, self.y + 20 + (60 * index), 20)
             for stone_type, amount in entities.player_inv.items():
                 if stone_name == stone_type:
                     stone.ammount = amount
@@ -102,18 +101,21 @@ class StoneInventory:
         pygame.draw.rect(screen, "Gray", self.rect)
 
     """---------Scrolling logic---------"""
+
     def apply_scroll_velocity(self):
         # check if any items are selected or falling, if yes, exit function
         if self.falling_stone or self.selected_stone:
             return
         # Ensure scrolling does not exceed hard limits
-        if (self.scroll_velocity > 0 and self.magic_stones[0].rect.top >= self.top_hard_limit) or \
-                (self.scroll_velocity < 0 and self.magic_stones[-1].rect.bottom <= self.bottom_hard_limit):
+        if (self.scroll_velocity > 0 and self.magic_stones[0].center[1] - self.magic_stones[
+            0].radius >= self.top_hard_limit) or \
+                (self.scroll_velocity < 0 and self.magic_stones[-1].center[1] + self.magic_stones[
+                    -1].radius <= self.bottom_hard_limit):
             self.scroll_velocity = 0
 
         if abs(self.scroll_velocity) > self.min_velocity:
             for stone in self.magic_stones:
-                stone.rect.y += self.scroll_velocity
+                stone.center = (stone.center[0], stone.center[1] + self.scroll_velocity)
 
             # Deceleration
             if abs(self.scroll_velocity) < self.tiny_increment_threshold:
@@ -122,34 +124,33 @@ class StoneInventory:
                 self.scroll_velocity *= self.deceleration
 
             # Hard boundary enforcement during scrolling
-            if self.magic_stones[0].rect.top > self.top_hard_limit:
+            if self.magic_stones[0].center[1] - self.magic_stones[0].radius > self.top_hard_limit:
                 for stone in self.magic_stones:
-                    stone.rect.y = max(
-                        stone.rect.y - self.scroll_velocity,
-                        self.top_hard_limit + self.magic_stones.index(stone) * (stone.height + 10)
-                    )
+                    stone.center = (stone.center[0], max(
+                        stone.center[1] - self.scroll_velocity,
+                        self.top_hard_limit + self.magic_stones.index(stone) * (2 * stone.radius + 10)
+                    ))
                 self.scroll_velocity = 0
-            elif self.magic_stones[-1].rect.bottom < self.bottom_hard_limit:
+            elif self.magic_stones[-1].center[1] + self.magic_stones[-1].radius < self.bottom_hard_limit:
                 for stone in self.magic_stones:
-                    stone.rect.y = min(
-                        stone.rect.y - self.scroll_velocity,
+                    stone.center = (stone.center[0], min(
+                        stone.center[1] - self.scroll_velocity,
                         self.bottom_hard_limit - (
-                                len(self.magic_stones) - self.magic_stones.index(stone)) * (
-                                stone.height + 10)
-                    )
+                                len(self.magic_stones) - self.magic_stones.index(stone)) * (2 * stone.radius + 10)
+                    ))
                 self.scroll_velocity = 0
 
             # Increase resistance the further you scroll past the limit
-            if self.magic_stones[0].rect.top > self.rect.top + self.padding:
+            if self.magic_stones[0].center[1] - self.magic_stones[0].radius > self.rect.top + self.padding:
                 resistance = self.calculate_resistance(
-                    self.magic_stones[0].rect.top,
+                    self.magic_stones[0].center[1] - self.magic_stones[0].radius,
                     self.rect.top + self.padding,
                     self.max_scroll_offset
                 )
                 self.scroll_velocity *= resistance
-            elif self.magic_stones[-1].rect.bottom < self.rect.bottom - self.padding:
+            elif self.magic_stones[-1].center[1] + self.magic_stones[-1].radius < self.rect.bottom - self.padding:
                 resistance = self.calculate_resistance(
-                    self.magic_stones[-1].rect.bottom,
+                    self.magic_stones[-1].center[1] + self.magic_stones[-1].radius,
                     self.rect.bottom - self.padding,
                     self.max_scroll_offset
                 )
@@ -158,16 +159,17 @@ class StoneInventory:
             self.scroll_velocity = 0
 
     def check_spring_back_activation(self):
-        # check if any items are selected or falling, if yes, exit function
+        # Check if any items are selected or falling, if yes, exit function
         if self.falling_stone or self.selected_stone:
             return
         if not self.spring_back_active:
-            if self.magic_stones[0].rect.top > self.rect.top + self.padding:
-                self.target_offset = (self.rect.top + self.padding) - self.magic_stones[0].rect.top
+            if self.magic_stones[0].center[1] - self.magic_stones[0].radius > self.rect.top + self.padding:
+                self.target_offset = (self.rect.top + self.padding) - (
+                            self.magic_stones[0].center[1] - self.magic_stones[0].radius)
                 self.spring_back_active = True
-            elif self.magic_stones[-1].rect.bottom < self.rect.bottom - self.padding:
-                self.target_offset = (self.rect.bottom - self.padding) - self.magic_stones[
-                    -1].rect.bottom
+            elif self.magic_stones[-1].center[1] + self.magic_stones[-1].radius < self.rect.bottom - self.padding:
+                self.target_offset = (self.rect.bottom - self.padding) - (
+                            self.magic_stones[-1].center[1] + self.magic_stones[-1].radius)
                 self.spring_back_active = True
 
     def apply_spring_back(self):
@@ -178,29 +180,33 @@ class StoneInventory:
             spring_back_factor = 1 + abs(self.target_offset) / self.max_scroll_offset
             if self.target_offset > 0:
                 resistance = self.calculate_resistance(
-                    self.magic_stones[-1].rect.bottom,
+                    self.magic_stones[-1].center[1] + self.magic_stones[-1].radius,
                     self.rect.bottom - self.scroll_limit_distance,
                     self.max_scroll_offset
                 )
                 for stone in self.magic_stones:
-                    stone.rect.y += self.spring_back_speed * spring_back_factor * resistance
-                if self.magic_stones[-1].rect.bottom >= self.rect.bottom - self.padding:
-                    offset = self.magic_stones[-1].rect.bottom - (self.rect.bottom - self.padding)
+                    stone.center = (stone.center[0], stone.center[1] +
+                                    self.spring_back_speed * spring_back_factor * resistance)
+                if self.magic_stones[-1].center[1] + self.magic_stones[-1].radius >= self.rect.bottom - self.padding:
+                    offset = (self.magic_stones[-1].center[1] + self.magic_stones[-1].radius) - (
+                                self.rect.bottom - self.padding)
                     for stone in self.magic_stones:
-                        stone.rect.y -= offset
+                        stone.center = (stone.center[0], stone.center[1] - offset)
                     self.spring_back_active = False
             elif self.target_offset < 0:
                 resistance = self.calculate_resistance(
-                    self.magic_stones[0].rect.top,
+                    self.magic_stones[0].center[1] - self.magic_stones[0].radius,
                     self.rect.top + self.scroll_limit_distance,
                     self.max_scroll_offset
                 )
                 for stone in self.magic_stones:
-                    stone.rect.y -= self.spring_back_speed * spring_back_factor * resistance
-                if self.magic_stones[0].rect.top <= self.rect.top + self.padding:
-                    offset = (self.rect.top + self.padding) - self.magic_stones[0].rect.top
+                    stone.center = (stone.center[0], stone.center[1] -
+                                    self.spring_back_speed * spring_back_factor * resistance)
+                if self.magic_stones[0].center[1] - self.magic_stones[0].radius <= self.rect.top + self.padding:
+                    offset = (self.rect.top + self.padding) - (
+                                self.magic_stones[0].center[1] - self.magic_stones[0].radius)
                     for stone in self.magic_stones:
-                        stone.rect.y += offset
+                        stone.center = (stone.center[0], stone.center[1] + offset)
                     self.spring_back_active = False
 
     @staticmethod
@@ -222,28 +228,26 @@ class StoneInventory:
         """
         if self.falling_stone:
             return
+        mouse_pos = pygame.mouse.get_pos()
         for stone in self.magic_stones:
-            if stone.rect.collidepoint(pygame.mouse.get_pos()):
+            distance = pygame.math.Vector2(mouse_pos).distance_to(pygame.math.Vector2(stone.center))
+            if distance <= stone.radius:
                 self.selected_stone = stone
+                break
         # set scroll velocity to 0 to prevent bug where scrolling happens on item return to inv
         self.scroll_velocity = 0
 
     def move_stone(self) -> None:
-        """
-        Moves the selected stone to the current mouse position with acceleration and deceleration.
-        Calls the rotation function to handle the stone's rotation.
-        :return: None
-        """
+        # Adjusting only the position setting part
         if self.selected_stone:
             mouse_pos = pygame.mouse.get_pos()
-            stone_rect = self.selected_stone.rect
+            stone_center = self.selected_stone.center
 
             # Define the offset above the center
-            offset = stone_rect.height // self.offset
+            offset = self.selected_stone.radius // self.offset
 
             # Calculate the initial pivot point above the center of the stone
-            initial_pivot_point = pygame.math.Vector2(stone_rect.centerx, stone_rect.centery - offset)
-            print(f"Initial Pivot y: {initial_pivot_point.y}")
+            initial_pivot_point = pygame.math.Vector2(stone_center[0], stone_center[1] - offset)
 
             # Calculate the direction vector towards the mouse position
             direction = pygame.math.Vector2(mouse_pos) - initial_pivot_point
@@ -266,12 +270,11 @@ class StoneInventory:
             self.stone_move_velocity *= self.damping_factor
 
             # Apply the velocity to the stone's position
-            stone_rect.centerx += self.stone_move_velocity.x
-            stone_rect.centery += self.stone_move_velocity.y
+            stone_center = (stone_center[0] + self.stone_move_velocity.x, stone_center[1] + self.stone_move_velocity.y)
+            self.selected_stone.center = stone_center
 
             # Recalculate the pivot point after moving
-            final_pivot_point = pygame.math.Vector2(stone_rect.centerx, stone_rect.centery - offset)
-            print(f"Final Pivot y: {final_pivot_point.y}")
+            final_pivot_point = pygame.math.Vector2(stone_center[0], stone_center[1] - offset)
 
             # Stop threshold for smooth stopping near the mouse
             stop_threshold = 2  # Increase threshold for smoother stopping
@@ -282,13 +285,14 @@ class StoneInventory:
                 if self.stone_move_velocity.length() < 0.1:
                     self.stone_move_velocity = pygame.math.Vector2(0, 0)
                     # Do not set stone_rect.center to mouse_pos directly
-                    stone_rect.centerx += direction.x * stop_threshold
-                    stone_rect.centery += direction.y * stop_threshold
+                    stone_center = (stone_center[0] + direction.x * stop_threshold,
+                                    stone_center[1] + direction.y * stop_threshold)
+                    self.selected_stone.center = stone_center
 
             # Call the rotation function
-            self.rotate_stone(stone_rect)
+            # self.rotate_stone(stone_center)
 
-    def rotate_stone(self, stone_rect) -> None:
+    def rotate_stone(self, stone_center) -> None:
         """
         Rotates the selected stone based on its velocity.
         :return: None
@@ -314,7 +318,7 @@ class StoneInventory:
 
             # Rotate the stone's image around its center
             self.selected_stone.image = pygame.transform.rotate(self.selected_stone.original_image, self.angle)
-            new_rect = self.selected_stone.image.get_rect(center=stone_rect.center)
+            new_rect = self.selected_stone.image.get_rect(center=stone_center)
 
             # Adjust the stone's rect to reflect the new rotated position
             self.selected_stone.rect = new_rect
@@ -332,25 +336,24 @@ class StoneInventory:
             return
         if self.stone_fall_velocity <= self.fall_acceleration:
             self.stone_fall_velocity += self.fall_acceleration_increment * self.fall_acceleration_multiplier
-        self.falling_stone.rect.y += self.stone_fall_velocity
+        self.falling_stone.center = (self.falling_stone.center[0],
+                                     self.falling_stone.center[1] + self.stone_fall_velocity)
         self.stone_reset(mortar)
 
     def stone_reset(self, mortar):
-        if (mortar.rect.x < self.falling_stone.rect.x < mortar.rect.x + mortar.width and
-                self.falling_stone.rect.y > mortar.rect.y):
+        if (mortar.rect.x < self.falling_stone.center[0] < mortar.rect.x + mortar.width and
+                self.falling_stone.center[1] - self.falling_stone.radius > mortar.rect.y):
             mortar.ingredients.append(self.falling_stone)
             print(f"Total ingredients: {mortar.ingredients}")
-            self.falling_stone.rect.x = self.falling_stone.x
-            self.falling_stone.rect.y = self.falling_stone.y
+            self.falling_stone.center = (self.falling_stone.x, self.falling_stone.y)
             self.stone_fall_velocity = 0
             self.rotation_angle_velocity = 0
             self.angle = 0
             self.falling_stone.image = pygame.transform.rotate(self.falling_stone.original_image, self.angle)
             self.falling_stone = None
             return
-        if self.falling_stone.rect.y > constants.WINDOW_HEIGHT:
-            self.falling_stone.rect.x = self.falling_stone.x
-            self.falling_stone.rect.y = self.falling_stone.y
+        if self.falling_stone.center[1] - self.falling_stone.radius > constants.WINDOW_HEIGHT:
+            self.falling_stone.center = (self.falling_stone.x, self.falling_stone.y)
             self.stone_fall_velocity = 0
             self.rotation_angle_velocity = 0
             self.angle = 0
