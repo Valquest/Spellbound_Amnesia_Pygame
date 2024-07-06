@@ -300,7 +300,7 @@ class StoneInventory:
             direction = pygame.math.Vector2(mouse_pos) - pygame.math.Vector2(stone_center)
 
             # Calculate angular force based on mouse movement
-            angular_force = direction.length() * 0.001  # Adjust the multiplier for sensitivity
+            angular_force = direction.length() * 0.035  # Increase the multiplier for more sensitivity
 
             # Determine the direction of the applied force
             if direction.x < 0:
@@ -309,13 +309,13 @@ class StoneInventory:
                 self.rotation_angle_velocity -= angular_force
 
             # Apply stronger damping to simulate friction and ensure stopping
-            self.rotation_angle_velocity *= 0.95  # Increase this value for stronger damping
+            self.rotation_angle_velocity *= 0.92  # Increase this value for stronger damping
 
             # Update the angle based on angular velocity
             self.angle += self.rotation_angle_velocity
 
             # Apply pendulum-like damping to swing back to original position
-            self.rotation_angle_velocity -= self.angle * 0.01  # Adjust the damping factor as needed
+            self.rotation_angle_velocity -= self.angle * 0.05  # Adjust the damping factor as needed
 
             # Rotate the stone's image around its center
             self.selected_stone.image = pygame.transform.rotate(self.selected_stone.original_image, self.angle)
