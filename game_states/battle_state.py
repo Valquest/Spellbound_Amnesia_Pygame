@@ -37,6 +37,10 @@ class Battle:
             constants.MARGIN + 25 // 2, 200, 50, 32)
         self.home_button = util_classes.Button(
             "Home Base", 25, constants.WINDOW_HEIGHT - 75, 100, 50, 32)
+        self.reset_choices = util_classes.Button(
+            "Reset",
+            (battle_classes.Card.card_width + constants.MARGIN) * constants.CARD_COUNT + 150 // 2,
+            150, 100, 50, 32)
 
         # card variables
         self.card_animation_index = 0
@@ -178,6 +182,9 @@ class Battle:
         if self.home_button.colided(pygame.mouse.get_pos()):
             self.game_instance.current_state = "HomeBase"
 
+        if self.reset_choices.colided(pygame.mouse.get_pos()):
+            self.move_selections = []
+
     def card_on_lane_selection(self) -> None:
         """
         Handles card selections and modifies move_selection list based on card selections.
@@ -192,15 +199,10 @@ class Battle:
         if not self.selected_card:
             return
 
-        # Iterate through lanes to find the first valid lane with enemies
-        for lane in self.battlefield.lanes:
-            enemies_on_lane = [position.enemy for position in lane.positions if position.enemy]
-            if not enemies_on_lane:
-                continue
-
-            for position in lane.positions:
+        def check_positions(current_lane):
+            for position in current_lane.positions:
                 if position.rect.collidepoint(mouse_pos):
-                    lane_index = self.battlefield.lanes.index(lane)
+                    current_lane_index = self.battlefield.lanes.index(lane)
 
                     # Check if the selected card is already in move_selections
                     card_in_moves = any(selection[0] == self.selected_card for selection in self.move_selections)
@@ -210,9 +212,19 @@ class Battle:
                         self.move_selections.clear()
 
                     # Add the new card and lane index entry at the end of the list
-                    self.move_selections.append([self.selected_card, lane_index])
+                    self.move_selections.append([self.selected_card, current_lane_index])
+                    return True
+            return False
 
-        # calculating the return path for a selected card
+        # Iterate through lanes to find the first valid lane with enemies
+        for lane_index, lane in enumerate(self.battlefield.lanes):
+            enemies_on_lane = [position.enemy for position in lane.positions if position.enemy]
+            if not enemies_on_lane:
+                continue
+            if check_positions(lane):
+                break
+
+        # Ensure the final line is always executed
         self.prepare_card_return(core_funct)
 
     def prepare_card_return(self, core_funct) -> None:
@@ -300,6 +312,10 @@ class Battle:
         # draw home button
         self.home_button.draw(self.screen)
         self.screen.blit(self.home_button.font_render, self.home_button.btn_position)
+
+        # draw reset button
+        self.reset_choices.draw(self.screen)
+        self.screen.blit(self.reset_choices.font_render, self.reset_choices.btn_position)
 
     def handle_event(self, event) -> None:
         """
