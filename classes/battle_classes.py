@@ -15,7 +15,6 @@ class Position:
         self.x = x
         self.y = y
         self.rect = pygame.Rect(x, y, Position.width, Position.height)
-        #self.enemy = None
 
 
 class Lane:
@@ -60,14 +59,16 @@ class Enemy:
     # create a font object
     enemy_health_font = pygame.font.Font(None, 36)
 
-    def __init__(self, x_cord, y_cord, color):
+    def __init__(self, x_cord, y_cord, health, skills, sprite, color):
         # x and y coordinates adjusted by entity width
         self.x_cord = x_cord - self.enemy_width / 2
         self.y_cord = y_cord - self.enemy_height / 2
-        self.color = color
         self.rect = pygame.Rect(self.x_cord, self.y_cord, self.enemy_width, self.enemy_height)
-        # frozen status prevents from moving enemy
-        self.frozen = 0
+        self.frozen = 0  # frozen status prevents from moving enemy
+        self.health = health
+        self.skills = skills
+        self.sprite = sprite
+        self.color = color
 
     def draw(self, canvas):
         pygame.draw.rect(canvas, self.color, self.rect)
@@ -94,24 +95,30 @@ class Hoard:
         self.setup_enemies(self.enemy_count)
 
     def setup_enemies(self, new_enemy_count):
+        from data import entities
         for _ in range(new_enemy_count):
-            # generate random light color for enemies
-            color = (random.randint(100, 255), random.randint(100, 255), random.randint(100, 255))
             # randomise a row to generate enemy in
             random_lane = random.randint(0, constants.LANE_NUMBER - 1)
             lane = self.lanes[random_lane]
 
             for index, position in enumerate(lane.positions):
-                if position.enemy is None:
-                    position = lane.positions[index]
-                    center_x, center_y = position.rect.center
-                    enemy = Enemy(center_x, center_y, color)
-                    position.enemy = enemy
-                    enemy.health = random.randint(1, 3)
-                    self.enemy_list.append(enemy)
-                    break
+                if position.enemy is not None:
+                    continue
+                # get a random enemies data
+                enemy_type, val = random.choice(list(entities.enemy_types.items()))
+                health = val["Health"]
+                skill = val["Skills"]
+                sprite = val["Sprite"]
+                color = val["Color"]
+                position = lane.positions[index]
+                center_x, center_y = position.rect.center
+                enemy = Enemy(center_x, center_y, health, skill, sprite, color)
+                position.enemy = enemy
+                self.enemy_list.append(enemy)
+                break
 
     def create_enemy(self, new_enemy_count):
+        from data import entities
         for _ in range(new_enemy_count):
             # generate random light color for enemies
             color = (random.randint(100, 255), random.randint(100, 255), random.randint(100, 255))
@@ -124,9 +131,13 @@ class Hoard:
             lane = self.lanes[random_lane]
             position = lane.positions[0]
             center_x, center_y = position.rect.center
-            enemy = Enemy(center_x, center_y, color)
+            enemy_type, val = random.choice(list(entities.enemy_types.items()))
+            health = val["Health"]
+            skill = val["Skills"]
+            sprite = val["Sprite"]
+            color = val["Color"]
+            enemy = Enemy(center_x, center_y, health, skill, sprite, color)
             position.enemy = enemy
-            enemy.health = random.randint(1, 3)
             self.enemy_list.append(enemy)
 
 

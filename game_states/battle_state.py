@@ -134,7 +134,8 @@ class Battle:
             positions = self.battlefield.lanes[lane_index].positions
             for enemy_index in enemies_to_move:
                 final_position_index = enemy_index + 1
-                final_position = positions[final_position_index]  # commenting this out for now. If not needed, delete. (if final_position_index < len(positions) else None)
+                # checks if item has passed the end line of the row
+                final_position = positions[final_position_index] if final_position_index < len(positions) else None
                 spells.move_enemy(enemy_index, lane_index, 1, 1, self.battlefield)
                 if final_position is None and positions[enemy_index].enemy is None:
                     self.player_health.remove_hp()
