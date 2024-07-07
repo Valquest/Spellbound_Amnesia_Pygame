@@ -141,12 +141,13 @@ class Battle:
                     self.player_health.remove_hp()
 
     def create_enemies(self) -> None:
+        import random
         """
         Support function for battle_actions function
         Create enemies.
         :return: None
         """
-        self.battlefield.hoard.create_enemy(1)
+        self.battlefield.hoard.create_enemy(random.randint(0, 3))
 
     def end_turn(self) -> None:
         """
