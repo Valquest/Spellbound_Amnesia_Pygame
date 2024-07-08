@@ -78,7 +78,7 @@ def calculate_return_path(start_pos, end_pos, steps=20) -> list:
 
 def enemy_list_sorter(enemy_list) -> list:
     """
-    Sorts enemy list so they are arranged in order that each position for for row 1 is arranged first, followed by lane 2
+    Sorts enemy list, so they are arranged in order that each position for for row 1 is arranged first, followed by lane 2
     and lane 3
     :param enemy_list:
     :return: a sorted enemy list

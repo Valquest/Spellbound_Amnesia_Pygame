@@ -85,6 +85,13 @@ class Enemy:
         self.y_cord = y - self.enemy_height / 2
         self.rect.topleft = (self.x_cord, self.y_cord)
 
+    def item_drop_animation(self, screen):
+        from data import entities
+        from classes import stones
+        stone_type, val = entities.stone_types.keys(self.drop)
+        image_path = val["image_path"]
+        original_image = pygame.transform.scale(pygame.image.load(image_path), (2 * self.radius, 2 * self.radius))
+
 
 # hoard class generates enemy instances
 class Hoard:
