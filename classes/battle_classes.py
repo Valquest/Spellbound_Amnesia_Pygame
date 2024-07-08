@@ -54,7 +54,6 @@ class Battlefield:
 class Enemy:
     enemy_width = 50
     enemy_height = 50
-    health = 1
 
     # create a font object
     enemy_health_font = pygame.font.Font(None, 36)
@@ -69,6 +68,7 @@ class Enemy:
         self.skills = skills
         self.sprite = sprite
         self.color = color
+        self.drop = None
 
     def draw(self, canvas):
         pygame.draw.rect(canvas, self.color, self.rect)
@@ -115,6 +115,11 @@ class Hoard:
                 enemy = Enemy(center_x, center_y, health, skill, sprite, color)
                 position.enemy = enemy
                 self.enemy_list.append(enemy)
+                # get random stone
+                stone_type, stone_val = random.choice(list(entities.stone_types.items()))
+                drop_chance = random.uniform(0, 1)
+                if drop_chance * stone_val["rarity"] > 0.14:
+                    self.enemy_list[-1].drop = stone_type
                 break
 
     def create_enemy(self, new_enemy_count):

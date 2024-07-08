@@ -96,11 +96,11 @@ stone_types = {
     },
     "Stone4": {
         "rarity": 0.69,
-        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone4.png"
     },
     "Stone5": {
         "rarity": 0.59,
-        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone1.png"
+        "image_path": r"C:\Users\Dovyd\PycharmProjects\Spellbound_Amnesia\assets\Stones\Stone5.png"
     },
     "Stone6": {
         "rarity": 0.49,
