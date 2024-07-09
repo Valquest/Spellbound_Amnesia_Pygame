@@ -69,6 +69,10 @@ class Battle:
         :return: None
         """
         self.battle_actions()
+        if self.battlefield.hoard.drop_animations:
+            animation_list = self.battlefield.hoard.drop_animations
+            for enemy in animation_list:
+                enemy.animate_item_drop(animation_list)
 
     def battle_actions(self) -> None:
         """

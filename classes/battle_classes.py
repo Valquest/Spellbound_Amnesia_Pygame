@@ -76,9 +76,8 @@ class Enemy:
         # item drop variables
         self.drop = "Stone1"
         self.image = None
-        self.image_radius = 20
         self.image_y = self.y_cord
-        self.image_alpha = 0
+        self.image_alpha = 255
         self.animation_height = self.y_cord - 100  # 100px abobe the enemy rect
         self.animation_fade_in = self.y_cord - 20
         self.animation_fade_out = self.y_cord - 60
@@ -106,17 +105,19 @@ class Enemy:
         from data import entities
         val = entities.stone_types.get(self.drop)
         image_path = val["image_path"]
-        self.image = pygame.transform.scale(pygame.image.load(
-            image_path), (2 * self.image_radius, 2 * self.image_radius))
+        self.image = pygame.image.load(image_path)
 
-    def animate_item_drop(self):
+    def animate_item_drop(self, animation_list):
+        print(f"Image loaded: {self.image}")
+        print(f"Image size: {self.image.get_size()}")
+        print(f"Image alpha: {self.image.get_alpha()}")
         self.screen.blit(self.image, (self.x_cord, self.image_y))
-        if self.image_y <= self.animation_height:
-            return
-        if self.image_y > self.animation_fade_in and self.image_alpha < 255:
-            self.image_alpha += 25
-            self.image.set_alpha(self.image_alpha)
-            self.screen.blit(self.image, (self.x_cord, self.image_y))
+        # if self.image_y <= self.animation_height:
+        #     return
+        # if self.image_y > self.animation_fade_in and self.image_alpha < 255:
+        #     self.image_alpha += 25
+        #     self.image.set_alpha(self.image_alpha)
+        #     self.screen.blit(self.image, (self.x_cord, self.image_y))
 
 
 # hoard class generates enemy instances
@@ -127,6 +128,7 @@ class Hoard:
         self.enemy_list = []
         self.lanes = lanes
         self.setup_enemies(self.enemy_count)
+        self.drop_animations = []
 
     def setup_enemies(self, new_enemy_count):
         from data import entities
