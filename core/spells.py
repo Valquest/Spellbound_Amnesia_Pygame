@@ -65,6 +65,8 @@ def damage_enemy(lane_index, battlefield, damage=1, enemy_to_damage=None):
             if enemy == positions[enemy_to_damage_index].enemy:
                 enemy.health -= damage
                 if enemy.health <= 0:
+                    if enemy.drop is not None:
+                        enemy.animate_item_drop()
                     # Remove references to the enemy in the battlefield
                     for lane in battlefield.lanes:
                         for position in lane.positions:

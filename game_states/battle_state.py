@@ -283,7 +283,7 @@ class Battle:
 
         # drawing enemies
         for enemy in self.enemies:
-            enemy.draw(self.screen)
+            enemy.draw()
 
         # drawing cards
         for card in self.cards:

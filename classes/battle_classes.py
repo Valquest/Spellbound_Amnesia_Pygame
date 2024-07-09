@@ -40,6 +40,8 @@ class Battlefield:
     def __init__(self, lane_count, screen):
         self.lanes = []
         self.screen = screen
+        # item drop animation variables
+        self.animations = []
         for lane_index in range(lane_count):
             lane = Lane(lane_index)
             self.lanes.append(lane)
@@ -72,38 +74,49 @@ class Enemy:
         self.screen = screen
 
         # item drop variables
-        self.drop = None
+        self.drop = "Stone1"
         self.image = None
         self.image_radius = 20
+        self.image_y = self.y_cord
+        self.image_alpha = 0
+        self.animation_height = self.y_cord - 100  # 100px abobe the enemy rect
+        self.animation_fade_in = self.y_cord - 20
+        self.animation_fade_out = self.y_cord - 60
 
-    def draw(self, screen):
-
+    def draw(self):
         # load image if drop is not none
         if self.drop is not None:
-            self.load_item_drop_img(self.screen)
+            self.load_item_drop_img()
 
-        pygame.draw.rect(screen, self.color, self.rect)
+        pygame.draw.rect(self.screen, self.color, self.rect)
 
         # create a font surface object by using font object and text we want to render
         text_surface_object = self.enemy_health_font.render(str(self.health), False, (0, 0, 0))
         # center text surface object rectangle in a center
         text_rect_position = text_surface_object.get_rect(center=(self.x_cord + self.enemy_width // 2, self.y_cord +
                                                                   self.enemy_height // 2))
-        screen.blit(text_surface_object, text_rect_position)
-        if self.drop is not None:
-            screen.blit(self.image, (self.x_cord, self.y_cord - 20))
+        self.screen.blit(text_surface_object, text_rect_position)
 
     def update_position(self, x, y):
         self.x_cord = x - self.enemy_width / 2
         self.y_cord = y - self.enemy_height / 2
         self.rect.topleft = (self.x_cord, self.y_cord)
 
-    def load_item_drop_img(self, screen):
+    def load_item_drop_img(self):
         from data import entities
         val = entities.stone_types.get(self.drop)
         image_path = val["image_path"]
         self.image = pygame.transform.scale(pygame.image.load(
             image_path), (2 * self.image_radius, 2 * self.image_radius))
+
+    def animate_item_drop(self):
+        self.screen.blit(self.image, (self.x_cord, self.image_y))
+        if self.image_y <= self.animation_height:
+            return
+        if self.image_y > self.animation_fade_in and self.image_alpha < 255:
+            self.image_alpha += 25
+            self.image.set_alpha(self.image_alpha)
+            self.screen.blit(self.image, (self.x_cord, self.image_y))
 
 
 # hoard class generates enemy instances
