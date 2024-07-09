@@ -17,7 +17,8 @@ class Battle:
         from classes import battle_classes
 
         # core class instances initiated
-        self.battlefield = battle_classes.Battlefield(constants.LANE_NUMBER)
+        self.screen = screen  # needed for some class instances
+        self.battlefield = battle_classes.Battlefield(constants.LANE_NUMBER, self.screen)
         self.cards = core_funct.create_card_list()
         self.meters = util_funct.add_amnesia_bar(constants.AMNESIA_BAR_COUNT)
 
@@ -278,7 +279,7 @@ class Battle:
             item.draw(self.screen)
 
         # draw position grid
-        self.battlefield.draw(self.screen)
+        self.battlefield.draw()
 
         # drawing enemies
         for enemy in self.enemies:

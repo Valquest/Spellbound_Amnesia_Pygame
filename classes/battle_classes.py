@@ -37,17 +37,18 @@ class Lane:
 
 
 class Battlefield:
-    def __init__(self, lane_count):
+    def __init__(self, lane_count, screen):
         self.lanes = []
+        self.screen = screen
         for lane_index in range(lane_count):
             lane = Lane(lane_index)
             self.lanes.append(lane)
-        self.hoard = Hoard(random.randint(4, 8), self.lanes)
+        self.hoard = Hoard(random.randint(4, 8), self.lanes, self.screen)
 
-    def draw(self, canvas):
+    def draw(self):
         for lane in self.lanes:
             for position in lane.positions:
-                pygame.draw.rect(canvas, "black", position.rect, constants.BORDER_THICKNESS)
+                pygame.draw.rect(self.screen, "black", position.rect, constants.BORDER_THICKNESS)
 
 
 # Enemy class
@@ -58,7 +59,7 @@ class Enemy:
     # create a font object
     enemy_health_font = pygame.font.Font(None, 36)
 
-    def __init__(self, x_cord, y_cord, health, skills, sprite, color):
+    def __init__(self, x_cord, y_cord, health, skills, sprite, color, screen):
         # x and y coordinates adjusted by entity width
         self.x_cord = x_cord - self.enemy_width / 2
         self.y_cord = y_cord - self.enemy_height / 2
@@ -68,34 +69,47 @@ class Enemy:
         self.skills = skills
         self.sprite = sprite
         self.color = color
-        self.drop = None
+        self.screen = screen
 
-    def draw(self, canvas):
-        pygame.draw.rect(canvas, self.color, self.rect)
+        # item drop variables
+        self.drop = None
+        self.image = None
+        self.image_radius = 20
+
+    def draw(self, screen):
+
+        # load image if drop is not none
+        if self.drop is not None:
+            self.load_item_drop_img(self.screen)
+
+        pygame.draw.rect(screen, self.color, self.rect)
 
         # create a font surface object by using font object and text we want to render
         text_surface_object = self.enemy_health_font.render(str(self.health), False, (0, 0, 0))
         # center text surface object rectangle in a center
         text_rect_position = text_surface_object.get_rect(center=(self.x_cord + self.enemy_width // 2, self.y_cord +
                                                                   self.enemy_height // 2))
-        canvas.blit(text_surface_object, text_rect_position)
+        screen.blit(text_surface_object, text_rect_position)
+        if self.drop is not None:
+            screen.blit(self.image, (self.x_cord, self.y_cord - 20))
 
     def update_position(self, x, y):
         self.x_cord = x - self.enemy_width / 2
         self.y_cord = y - self.enemy_height / 2
         self.rect.topleft = (self.x_cord, self.y_cord)
 
-    def item_drop_animation(self, screen):
+    def load_item_drop_img(self, screen):
         from data import entities
-        from classes import stones
-        stone_type, val = entities.stone_types.keys(self.drop)
+        val = entities.stone_types.get(self.drop)
         image_path = val["image_path"]
-        original_image = pygame.transform.scale(pygame.image.load(image_path), (2 * self.radius, 2 * self.radius))
+        self.image = pygame.transform.scale(pygame.image.load(
+            image_path), (2 * self.image_radius, 2 * self.image_radius))
 
 
 # hoard class generates enemy instances
 class Hoard:
-    def __init__(self, temp_var_num_of_enemies, lanes):
+    def __init__(self, temp_var_num_of_enemies, lanes, screen):
+        self.screen = screen
         self.enemy_count = temp_var_num_of_enemies
         self.enemy_list = []
         self.lanes = lanes
@@ -119,7 +133,7 @@ class Hoard:
                 color = val["Color"]
                 position = lane.positions[index]
                 center_x, center_y = position.rect.center
-                enemy = Enemy(center_x, center_y, health, skill, sprite, color)
+                enemy = Enemy(center_x, center_y, health, skill, sprite, color, self.screen)
                 position.enemy = enemy
                 self.enemy_list.append(enemy)
                 # get random stone
@@ -148,7 +162,7 @@ class Hoard:
             skill = val["Skills"]
             sprite = val["Sprite"]
             color = val["Color"]
-            enemy = Enemy(center_x, center_y, health, skill, sprite, color)
+            enemy = Enemy(center_x, center_y, health, skill, sprite, color, self.screen)
             position.enemy = enemy
             self.enemy_list.append(enemy)
 
@@ -316,6 +330,7 @@ class PlayerHealth:
 
 
 class Elements:
-    def __init__(self):
-        self.battlefield = Battlefield(constants.LANE_NUMBER)
+    def __init__(self, screen):
+        self.screen = screen
+        self.battlefield = Battlefield(constants.LANE_NUMBER, self.screen)
         self.player_health = PlayerHealth()
