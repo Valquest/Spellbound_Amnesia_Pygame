@@ -11,7 +11,7 @@ class MagicStone:
         self.stone_type = stone_type
         self.rarity = rarity
         self.image_path = image_path
-        self.ammount = 0
+        self.ammount = entities.player_inv[self.stone_type]
 
         # Circle variables
         self.x = x_pos
@@ -49,6 +49,9 @@ class MagicStone:
         self.angle = 0
         self.image = pygame.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect(center=self.center)
+
+    def update_inv_ammount(self):
+        self.ammount = entities.player_inv[self.stone_type]
 
 
 class StoneInventory:
@@ -361,3 +364,13 @@ class Mortar:
 
     def draw(self, screen):
         pygame.draw.rect(screen, "white", self.rect)
+
+
+class PlayerInventory:
+    def __init__(self):
+        self.items = entities.player_inv
+
+    @staticmethod
+    def add_stone(stone_type, stone):
+        entities.player_inv[stone_type] += 1
+        stone.update_inv_ammount()

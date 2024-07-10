@@ -20,6 +20,7 @@ class SpellCrafting:
 
         # stone inventory variables
         self.inv = stones.StoneInventory()
+        self.player_inv = stones.PlayerInventory()
         self.stones = self.inv.magic_stones
 
         # mortar instance

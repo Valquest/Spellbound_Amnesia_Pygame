@@ -166,11 +166,11 @@ player_inv = {
     "Stone4": 5,
     "Stone5": 1,
     "Stone6": 2,
-    "Stone7": 10,
-    "Stone8": 10,
-    "Stone9": 10,
-    "Stone10": 10,
-    "Stone11": 10,
-    "Stone12": 10,
-    "Stone13": 10
+    "Stone7": 0,
+    "Stone8": 0,
+    "Stone9": 0,
+    "Stone10": 0,
+    "Stone11": 0,
+    "Stone12": 0,
+    "Stone13": 0
 }

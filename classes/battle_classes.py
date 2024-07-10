@@ -107,7 +107,7 @@ class Enemy:
         image_path = val["image_path"]
         self.image = pygame.image.load(image_path)
 
-    def animate_item_drop(self, animation_list):
+    def animate_item_drop(self, animation_list, spell_crafting_instance):
         fade_in = True
         if fade_in:
             if self.image_alpha <= 255 and self.image_y > self.animation_fade_in:
@@ -121,6 +121,9 @@ class Enemy:
             self.image.set_alpha(self.image_alpha)
             self.image_y -= 0.5
         elif not fade_in:
+            magic_stone_list = spell_crafting_instance.inv.magic_stones
+            stone = next((stone for stone in magic_stone_list if stone.stone_type == self.drop), None)
+            spell_crafting_instance.player_inv.add_stone(self.drop, stone)
             animation_list.remove(self)
 
 

@@ -159,7 +159,7 @@ class Battle:
         if self.battlefield.hoard.drop_animations:
             animation_list = self.battlefield.hoard.drop_animations
             for enemy in animation_list:
-                enemy.animate_item_drop(animation_list)
+                enemy.animate_item_drop(animation_list, self.game_instance.spell_crafting)
 
     def end_turn(self) -> None:
         """
