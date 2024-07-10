@@ -69,13 +69,7 @@ class Battle:
         :return: None
         """
         self.battle_actions()
-        if self.battlefield.hoard.drop_animations:
-            animation_list = self.battlefield.hoard.drop_animations
-            for enemy in animation_list:
-                if enemy.image_y > enemy.animation_fade_in and 0 < enemy.image_alpha < 255:
-                    enemy.image_alpha -= 25
-                    enemy.image.set_alpha(enemy.image_alpha)
-                enemy.image_y -= 1
+        self.update_enemy_drops()
 
     def battle_actions(self) -> None:
         """
@@ -160,6 +154,12 @@ class Battle:
         :return: None
         """
         self.battlefield.hoard.create_enemy(random.randint(0, 3))
+
+    def update_enemy_drops(self):
+        if self.battlefield.hoard.drop_animations:
+            animation_list = self.battlefield.hoard.drop_animations
+            for enemy in animation_list:
+                enemy.animate_item_drop(animation_list)
 
     def end_turn(self) -> None:
         """

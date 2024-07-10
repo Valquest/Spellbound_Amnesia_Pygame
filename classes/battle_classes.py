@@ -77,10 +77,10 @@ class Enemy:
         self.drop = "Stone1"
         self.image = None
         self.image_y = self.y_cord
-        self.image_alpha = 255
-        self.animation_height = self.y_cord - 100  # 100px abobe the enemy rect
-        self.animation_fade_in = self.y_cord - 20
-        self.animation_fade_out = self.y_cord - 60
+        self.image_alpha = 50
+        self.animation_height = self.y_cord - 180  # abobe the enemy rect
+        self.animation_fade_in = self.y_cord - 10
+        self.animation_fade_out = self.y_cord - 80
 
     def draw(self):
         # load image if drop is not none
@@ -108,13 +108,20 @@ class Enemy:
         self.image = pygame.image.load(image_path)
 
     def animate_item_drop(self, animation_list):
-        self.screen.blit(self.image, (self.x_cord, self.image_y))
-        # if self.image_y <= self.animation_height:
-        #     return
-        # if self.image_y > self.animation_fade_in and self.image_alpha < 255:
-        #     self.image_alpha += 25
-        #     self.image.set_alpha(self.image_alpha)
-        #     self.screen.blit(self.image, (self.x_cord, self.image_y))
+        fade_in = True
+        if fade_in:
+            if self.image_alpha <= 255 and self.image_y > self.animation_fade_in:
+                self.image_alpha += 10
+                self.image.set_alpha(self.image_alpha)
+                self.image_y -= 0.5
+            else:
+                fade_in = False
+        if self.image_y > self.animation_fade_out and 0 < self.image_alpha <= 255 and not fade_in:
+            self.image_alpha -= 3
+            self.image.set_alpha(self.image_alpha)
+            self.image_y -= 0.5
+        elif not fade_in:
+            animation_list.remove(self)
 
 
 # hoard class generates enemy instances
