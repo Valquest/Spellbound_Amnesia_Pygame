@@ -108,9 +108,6 @@ class Enemy:
         self.image = pygame.image.load(image_path)
 
     def animate_item_drop(self, animation_list):
-        print(f"Image loaded: {self.image}")
-        print(f"Image size: {self.image.get_size()}")
-        print(f"Image alpha: {self.image.get_alpha()}")
         self.screen.blit(self.image, (self.x_cord, self.image_y))
         # if self.image_y <= self.animation_height:
         #     return

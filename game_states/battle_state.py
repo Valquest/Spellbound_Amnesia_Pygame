@@ -72,7 +72,10 @@ class Battle:
         if self.battlefield.hoard.drop_animations:
             animation_list = self.battlefield.hoard.drop_animations
             for enemy in animation_list:
-                enemy.animate_item_drop(animation_list)
+                if enemy.image_y > enemy.animation_fade_in and 0 < enemy.image_alpha < 255:
+                    enemy.image_alpha -= 25
+                    enemy.image.set_alpha(enemy.image_alpha)
+                enemy.image_y -= 1
 
     def battle_actions(self) -> None:
         """
@@ -303,6 +306,11 @@ class Battle:
         if self.returning_card and self.card_animation_index < len(self.returning_path):
             self.returning_card.update_position(*self.returning_path[self.card_animation_index])
             self.card_animation_index += 1
+
+        # draw drop items on enemy death
+        if self.battlefield.hoard.drop_animations:
+            for enemy in self.battlefield.hoard.drop_animations:
+                self.screen.blit(enemy.image, (enemy.x_cord, enemy.image_y))
 
     def draw_buttons(self) -> None:
         """
