@@ -344,6 +344,7 @@ class StoneInventory:
         if (mortar.rect.x < stone.center[0] < mortar.rect.x + mortar.width and
                 stone.center[1] - stone.radius > mortar.rect.y):
             mortar.ingredients.append(stone)
+            stone.player_inv_instance.remove_stone(stone)
             print(f"Total ingredients: {mortar.ingredients}")
             stone.reset_position_and_rotation()
             return True
@@ -392,3 +393,11 @@ class PlayerInventory:
         self.inventory[stone_type] += 1
         self.save_player_inventory(self.inventory)
         stone.update_inv_ammount()
+
+    def remove_stone(self, stone):
+        if stone.ammount > 0:
+            print(stone.ammount)
+            self.inventory[stone.stone_type] -= 1
+            self.save_player_inventory(self.inventory)
+            print(stone.ammount)
+            stone.update_inv_ammount()
