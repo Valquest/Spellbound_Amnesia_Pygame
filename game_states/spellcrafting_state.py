@@ -19,8 +19,9 @@ class SpellCrafting:
             "Home Base", 25, constants.WINDOW_HEIGHT - 75, 150, 50, 32)
 
         # stone inventory variables
-        self.inv = stones.StoneInventory()
         self.player_inv = stones.PlayerInventory()
+        self.inv = stones.StoneInventory(self.player_inv)
+        self.player_inv.spellcraft_instance = self.inv
         self.stones = self.inv.magic_stones
 
         # mortar instance

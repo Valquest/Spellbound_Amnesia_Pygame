@@ -5,13 +5,15 @@ from variables import constants
 
 
 class MagicStone:
-    def __init__(self, stone_type, rarity, image_path, x_pos, y_pos, radius):
+    def __init__(self, stone_type, rarity, image_path, x_pos, y_pos, radius, player_inv_instance):
         # CORE VARIABLES
+        self.player_inv_instance = player_inv_instance
+
         # stone variables
         self.stone_type = stone_type
         self.rarity = rarity
         self.image_path = image_path
-        self.ammount = entities.player_inv[self.stone_type]
+        self.ammount = self.player_inv_instance.inventory[self.stone_type]
 
         # Circle variables
         self.x = x_pos
@@ -51,11 +53,12 @@ class MagicStone:
         self.rect = self.image.get_rect(center=self.center)
 
     def update_inv_ammount(self):
-        self.ammount = entities.player_inv[self.stone_type]
+        self.ammount = self.player_inv_instance.inventory[self.stone_type]
+        self.font_render = self.stone_ammount_font.render(f"{self.ammount}X", True, (0, 0, 0))
 
 
 class StoneInventory:
-    def __init__(self):
+    def __init__(self, player_inv_instance):
         # CORE VARIABLES
         # rect variables
         self.x = 50
@@ -88,9 +91,12 @@ class StoneInventory:
         # magic stone variables
         self.magic_stones = []
 
+        # player inventory instance
+        self.player_inv_instance = player_inv_instance
+
         for index, (stone_name, stone_attributes) in enumerate(entities.stone_types.items()):
             stone = MagicStone(stone_name, stone_attributes["rarity"], stone_attributes["image_path"],
-                               self.x + self.width / 2, self.y + 40 + (60 * index), 20)
+                               self.x + self.width / 2, self.y + 40 + (60 * index), 20, self.player_inv_instance)
             for stone_type, amount in entities.player_inv.items():
                 if stone_name == stone_type:
                     stone.ammount = amount
@@ -368,9 +374,21 @@ class Mortar:
 
 class PlayerInventory:
     def __init__(self):
-        self.items = entities.player_inv
+        self.inv_file_path = r"./data/player_inv.json"
+        self.inventory = self.load_player_inventory()
+        self.spellcraft_instance = None
 
-    @staticmethod
-    def add_stone(stone_type, stone):
-        entities.player_inv[stone_type] += 1
+    def load_player_inventory(self):
+        import json
+        with open(self.inv_file_path, 'r') as file:
+            return json.load(file)
+
+    def save_player_inventory(self, inventory):
+        import json
+        with open(self.inv_file_path, 'w') as file:
+            json.dump(inventory, file, indent=4)
+
+    def add_stone(self, stone_type, stone):
+        self.inventory[stone_type] += 1
+        self.save_player_inventory(self.inventory)
         stone.update_inv_ammount()
