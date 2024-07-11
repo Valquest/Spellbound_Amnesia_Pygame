@@ -362,15 +362,56 @@ class StoneInventory:
 
 class Mortar:
     def __init__(self):
-        self.width = 400
-        self.height = 50
-        self.x = (constants.WINDOW_WIDTH - self.width) / 2
-        self.y = (constants.WINDOW_HEIGHT - self.height) / 2
-        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        # CORE VARIABLES
+        # mortar variables
+        self.mortar_width = 400
+        self.mortar_height = 50
+        self.mortar_x = (constants.WINDOW_WIDTH - self.mortar_width) / 2
+        self.mortar_y = (constants.WINDOW_HEIGHT - self.mortar_height) / 2
+        self.mortar_rect = pygame.Rect(self.mortar_x, self.mortar_y, self.mortar_width, self.mortar_height)
         self.ingredients = []
 
+        # spinner dial
+        self.dial_width = 100
+        self.dial_height = 100
+        self.dial_angle = 0
+        self.spinning = False
+        self.last_mouse_angle = 0
+        self.dial_rect = pygame.Rect(self.mortar_rect.centerx - self.dial_width / 2, self.mortar_rect.centery +
+                                     100, self.dial_width, self.dial_height)
+
     def draw(self, screen):
-        pygame.draw.rect(screen, "white", self.rect)
+        self.draw_mortar(screen)
+        self.draw_dial(screen)
+
+    def draw_mortar(self, screen):
+        pygame.draw.rect(screen, "white", self.mortar_rect)
+
+    def draw_dial(self, screen):
+        pygame.draw.rect(screen, "gray", self.dial_rect)
+
+    def spin_dial(self, event):
+        import math
+        self.spinning = True
+        # Calculate initial angle
+        mouse_x, mouse_y = event.pos
+        rel_x, rel_y = mouse_x - self.dial_rect.centerx, mouse_y - self.dial_rect.centery
+        self.last_mouse_angle = math.atan2(rel_y, rel_x)
+
+    def update_dial_angle(self):
+        import math
+        if self.spinning:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            rel_x, rel_y = mouse_x - self.dial_rect.centerx, mouse_y - self.dial_rect.centery
+            current_mouse_angle = math.atan2(rel_y, rel_x)
+
+            # Calculate the angle difference
+            angle_diff = math.degrees(current_mouse_angle - self.last_mouse_angle)
+            self.dial_angle += angle_diff
+            last_mouse_angle = current_mouse_angle
+
+        # rotated_dial_image = pygame.transform.rotate(self.dial_image, -self.dial_angle)  # for future implementation
+        # rotated_dial_rect = rotated_dial_image.get_rect(center=self.dial_rect.center)
 
 
 class PlayerInventory:
@@ -396,8 +437,6 @@ class PlayerInventory:
 
     def remove_stone(self, stone):
         if stone.ammount > 0:
-            print(stone.ammount)
             self.inventory[stone.stone_type] -= 1
             self.save_player_inventory(self.inventory)
-            print(stone.ammount)
             stone.update_inv_ammount()
