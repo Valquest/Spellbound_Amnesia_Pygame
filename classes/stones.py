@@ -97,7 +97,7 @@ class StoneInventory:
         for index, (stone_name, stone_attributes) in enumerate(entities.stone_types.items()):
             stone = MagicStone(stone_name, stone_attributes["rarity"], stone_attributes["image_path"],
                                self.x + self.width / 2, self.y + 40 + (60 * index), 20, self.player_inv_instance)
-            for stone_type, amount in entities.player_inv.items():
+            for stone_type, amount in self.player_inv_instance.inventory.items():
                 if stone_name == stone_type:
                     stone.ammount = amount
                     break
@@ -436,8 +436,6 @@ class PlayerInventory:
         stone.update_inv_ammount()
 
     def remove_stone(self, stone):
-        print(stone.stone_type)
-        print(stone.ammount)
         if stone.ammount > 0:
             self.inventory[stone.stone_type] -= 1
             self.save_player_inventory(self.inventory)

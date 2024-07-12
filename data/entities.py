@@ -159,18 +159,18 @@ enemy_types = {
     }
     }
 
-player_inv = {
-    "Stone1": 2,
-    "Stone2": 3,
-    "Stone3": 1,
-    "Stone4": 5,
-    "Stone5": 1,
-    "Stone6": 2,
-    "Stone7": 0,
-    "Stone8": 0,
-    "Stone9": 0,
-    "Stone10": 0,
-    "Stone11": 0,
-    "Stone12": 0,
-    "Stone13": 0
-}
+# player_inv = {
+#     "Stone1": 2,
+#     "Stone2": 3,
+#     "Stone3": 1,
+#     "Stone4": 5,
+#     "Stone5": 1,
+#     "Stone6": 2,
+#     "Stone7": 0,
+#     "Stone8": 0,
+#     "Stone9": 0,
+#     "Stone10": 0,
+#     "Stone11": 0,
+#     "Stone12": 0,
+#     "Stone13": 0
+# }
