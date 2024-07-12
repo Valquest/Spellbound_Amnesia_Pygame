@@ -361,7 +361,7 @@ class StoneInventory:
 
 
 class Mortar:
-    def __init__(self):
+    def __init__(self, player_inv):
         # CORE VARIABLES
         # mortar variables
         self.mortar_width = 400
@@ -370,6 +370,9 @@ class Mortar:
         self.mortar_y = (constants.WINDOW_HEIGHT - self.mortar_height) / 2
         self.mortar_rect = pygame.Rect(self.mortar_x, self.mortar_y, self.mortar_width, self.mortar_height)
         self.ingredients = []
+
+        # other instances
+        self.player_inv = player_inv
 
         # spinner dial
         self.dial_width = 100
@@ -412,6 +415,20 @@ class Mortar:
 
         # rotated_dial_image = pygame.transform.rotate(self.dial_image, -self.dial_angle)  # for future implementation
         # rotated_dial_rect = rotated_dial_image.get_rect(center=self.dial_rect.center)
+
+    def stone_fusion(self):
+        if 1 < self.ingredients.count <= 3:
+            values_to_beat = []
+            viable_candidates = {}
+            output = None
+            for stone in self.ingredients:
+                print(f"Fusing stone {stone.stone_type}")
+                rarity = stone.rarity
+                values_to_beat.append(rarity)
+
+            for candidate in entities.stone_types:
+                value = candidate["rarity"]
+                if value not in values_to_beat:
 
 
 class PlayerInventory:
