@@ -25,7 +25,7 @@ class SpellCrafting:
         self.stones = self.inv.magic_stones
 
         # mortar instance
-        self.mortar = stones.Mortar(self.player_inv)
+        self.mortar = stones.Mortar(self.player_inv, self.inv)
 
     def update(self) -> None:
         """

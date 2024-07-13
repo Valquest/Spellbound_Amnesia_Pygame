@@ -1,3 +1,5 @@
+import random
+
 import pygame
 
 from data import entities
@@ -343,7 +345,8 @@ class StoneInventory:
     def stone_reset(stone, mortar):
         if (mortar.mortar_rect.x < stone.center[0] < mortar.mortar_rect.x + mortar.mortar_width and
                 stone.center[1] - stone.radius > mortar.mortar_rect.y):
-            mortar.ingredients.append(stone)
+            if len(mortar.ingredients) <= 1:
+                mortar.ingredients.append(stone)
             stone.player_inv_instance.remove_stone(stone)
             print(f"Total ingredients: {mortar.ingredients}")
             stone.reset_position_and_rotation()
@@ -361,7 +364,7 @@ class StoneInventory:
 
 
 class Mortar:
-    def __init__(self, player_inv):
+    def __init__(self, player_inv, stone_inventory):
         # CORE VARIABLES
         # mortar variables
         self.mortar_width = 400
@@ -373,6 +376,7 @@ class Mortar:
 
         # other instances
         self.player_inv = player_inv
+        self.stone_inventory = stone_inventory
 
         # spinner dial
         self.dial_width = 100
@@ -419,7 +423,7 @@ class Mortar:
     def stone_fusion(self):
         if 1 < self.ingredients.count <= 3:
             values_to_beat = []
-            viable_candidates = {}
+            viable_candidates = []
             output = None
             for stone in self.ingredients:
                 print(f"Fusing stone {stone.stone_type}")
@@ -428,7 +432,32 @@ class Mortar:
 
             for candidate in entities.stone_types:
                 value = candidate["rarity"]
-                if value not in values_to_beat:
+                if value > values_to_beat[0] and value > values_to_beat[1]:
+                    viable_candidates.append(candidate)
+
+            output = viable_candidates[self.random_stone_picker(viable_candidates)]
+            stone = next([stone for stone in self.stone_inventory.magic_stones if stone.stone_type == output.keys()])
+
+            self.player_inv.add_stone()
+
+    def random_stone_picker(self, candidates: list[dict]) -> int:
+        """
+        Randomises which stone will be the output
+        :param candidates: A dictionary with stone type dictionaries
+        :return: Returns either 0 or 1
+        """
+        score_list = []
+        for candidate in candidates:
+            temp_score = []
+            for ingredient in self.ingredients:
+                score = random.randint(1, 99) / (ingredient["rarity"] - candidate["rarity"])
+                temp_score.append(score)
+            score_list.append(max(temp_score))
+            temp_score.clear()
+        if score_list[0] > score_list[1]:
+            return 0
+        else:
+            return 1
 
 
 class PlayerInventory:
