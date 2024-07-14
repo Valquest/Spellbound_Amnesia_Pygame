@@ -421,7 +421,7 @@ class Mortar:
         # rotated_dial_rect = rotated_dial_image.get_rect(center=self.dial_rect.center)
 
     def stone_fusion(self):
-        if 1 < self.ingredients.count <= 3:
+        if 1 < len(self.ingredients) <= 3:
             values_to_beat = []
             viable_candidates = []
             output = None
@@ -431,14 +431,14 @@ class Mortar:
                 values_to_beat.append(rarity)
 
             for candidate in entities.stone_types:
-                value = candidate["rarity"]
-                if value > values_to_beat[0] and value > values_to_beat[1]:
+                value = entities.stone_types[candidate]["rarity"]
+                if value < values_to_beat[0] and value < values_to_beat[1]:
                     viable_candidates.append(candidate)
 
             output = viable_candidates[self.random_stone_picker(viable_candidates)]
-            stone = next([stone for stone in self.stone_inventory.magic_stones if stone.stone_type == output.keys()])
-
-            self.player_inv.add_stone()
+            stone = next((stone for stone in self.stone_inventory.magic_stones if stone.stone_type in output), None)
+            self.player_inv.add_stone(stone.stone_type, stone)
+            self.ingredients = []
 
     def random_stone_picker(self, candidates: list[dict]) -> int:
         """
@@ -450,10 +450,13 @@ class Mortar:
         for candidate in candidates:
             temp_score = []
             for ingredient in self.ingredients:
-                score = random.randint(1, 99) / (ingredient["rarity"] - candidate["rarity"])
+                score = random.randint(1, 99) / (ingredient.rarity - entities.stone_types[candidate]["rarity"])
                 temp_score.append(score)
+            print(f"Temp score: {temp_score}")
             score_list.append(max(temp_score))
             temp_score.clear()
+        print(f"Score list: {score_list}")
+
         if score_list[0] > score_list[1]:
             return 0
         else:
