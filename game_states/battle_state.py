@@ -180,7 +180,6 @@ class Battle:
         Manages button click actions like game state change.
         :return: None
         """
-
         # if "start turn" button is collided with mouse position
         if self.start_turn_btn.colided(pygame.mouse.get_pos()):
             # end the turn by changing flag and mark down game time during the click
@@ -189,9 +188,24 @@ class Battle:
 
         if self.home_button.colided(pygame.mouse.get_pos()):
             self.game_instance.current_state = "HomeBase"
+            self.reset_battlefield()
 
         if self.reset_choices.colided(pygame.mouse.get_pos()):
             self.move_selections = []
+
+    def reset_battlefield(self):
+        """
+        UNIFINISHED
+        :return:
+        """
+        print("Triggered")
+        from classes import battle_classes
+        import random
+        self.battlefield.hoard.enemy_list = []
+        for lane in self.battlefield.lanes:
+            for position in lane.positions:
+                position.enemy = None
+        self.battlefield.hoard = battle_classes.Hoard(random.randint(4, 8), self.battlefield.lanes, self.screen)
 
     def card_on_lane_selection(self) -> None:
         """
