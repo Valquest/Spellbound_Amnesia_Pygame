@@ -420,6 +420,9 @@ class Mortar:
         # rotated_dial_image = pygame.transform.rotate(self.dial_image, -self.dial_angle)  # for future implementation
         # rotated_dial_rect = rotated_dial_image.get_rect(center=self.dial_rect.center)
 
+    def spell_crafting(self):
+        self.ingredients
+
     def stone_fusion(self):
         if 1 < len(self.ingredients) <= 3:
             values_to_beat = []
@@ -466,12 +469,15 @@ class Mortar:
 class PlayerInventory:
     def __init__(self):
         self.inv_file_path = r"./data/player_inv.json"
-        self.inventory = self.load_player_inventory()
+        self.spell_file_path = r"./data/player_spells.json"
+        self.inventory = self.load_json_file(self.inv_file_path)
+        self.player_spells = self.load_json_file(self.spell_file_path)
         self.spellcraft_instance = None
 
-    def load_player_inventory(self):
+    @staticmethod
+    def load_json_file(path):
         import json
-        with open(self.inv_file_path, 'r') as file:
+        with open(path, 'r') as file:
             return json.load(file)
 
     def save_player_inventory(self, inventory):

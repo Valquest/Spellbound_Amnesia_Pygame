@@ -19,6 +19,8 @@ class SpellCrafting:
             "Home Base", 25, constants.WINDOW_HEIGHT - 75, 150, 50, 32)
         self.fusion_btn = util_classes.Button(
             "Start Fusion", constants.WINDOW_WIDTH / 2 + 200, constants.WINDOW_HEIGHT - 75, 200, 50, 32)
+        self.spellcraft_btn = util_classes.Button(
+            "Craft Spell", constants.WINDOW_WIDTH / 2 + 200, constants.WINDOW_HEIGHT - 130, 200, 50, 32)
 
         # stone inventory variables
         self.player_inv = stones.PlayerInventory()
@@ -79,6 +81,8 @@ class SpellCrafting:
         self.screen.blit(self.home_btn.font_render, self.home_btn.btn_position)
         self.fusion_btn.draw(self.screen)
         self.screen.blit(self.fusion_btn.font_render, self.fusion_btn.btn_position)
+        self.spellcraft_btn.draw(self.screen)
+        self.screen.blit(self.spellcraft_btn.font_render, self.spellcraft_btn.btn_position)
 
     def button_clicks(self) -> None:
         """
@@ -90,6 +94,8 @@ class SpellCrafting:
             self.game_instance.current_state = "HomeBase"
         if self.fusion_btn.colided(mouse_pos):
             self.mortar.stone_fusion()
+        if self.spellcraft_btn.colided(mouse_pos):
+            self.mortar.spell_crafting()
 
     def draw_inv_side_bar(self) -> None:
         """
