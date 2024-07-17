@@ -21,6 +21,8 @@ class SpellCrafting:
             "Start Fusion", constants.WINDOW_WIDTH / 2 + 200, constants.WINDOW_HEIGHT - 75, 200, 50, 32)
         self.spellcraft_btn = util_classes.Button(
             "Craft Spell", constants.WINDOW_WIDTH / 2 + 200, constants.WINDOW_HEIGHT - 130, 200, 50, 32)
+        self.reset_ingredients_btn = util_classes.Button(
+            "Reset Ingredients", constants.WINDOW_WIDTH / 2 + 420, constants.WINDOW_HEIGHT - 130, 200, 50, 32)
 
         # stone inventory variables
         self.player_inv = stones.PlayerInventory()
@@ -83,6 +85,8 @@ class SpellCrafting:
         self.screen.blit(self.fusion_btn.font_render, self.fusion_btn.btn_position)
         self.spellcraft_btn.draw(self.screen)
         self.screen.blit(self.spellcraft_btn.font_render, self.spellcraft_btn.btn_position)
+        self.reset_ingredients_btn.draw(self.screen)
+        self.screen.blit(self.reset_ingredients_btn.font_render, self.reset_ingredients_btn.btn_position)
 
     def button_clicks(self) -> None:
         """
@@ -96,6 +100,10 @@ class SpellCrafting:
             self.mortar.stone_fusion()
         if self.spellcraft_btn.colided(mouse_pos):
             self.mortar.spell_crafting()
+        if self.reset_ingredients_btn.colided(mouse_pos):
+            for ingredient in self.mortar.ingredients:
+                self.player_inv.add_stone(ingredient.stone_type, ingredient)
+            self.mortar.ingredients = []
 
     def draw_inv_side_bar(self) -> None:
         """

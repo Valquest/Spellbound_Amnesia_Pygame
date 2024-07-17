@@ -421,7 +421,13 @@ class Mortar:
         # rotated_dial_rect = rotated_dial_image.get_rect(center=self.dial_rect.center)
 
     def spell_crafting(self):
-        self.ingredients
+        """
+        UNFINISHED
+        :return:
+        """
+        player_spells = self.player_inv.player_spells
+        crafting_inv = self.ingredients
+
 
     def stone_fusion(self):
         if 1 < len(self.ingredients) <= 3:
